@@ -9,7 +9,7 @@ Design a global scale high stakes social game to help inspire millions of Millen
 ## Background:
 
 * We base the game on [Survivor](https://en.wikipedia.org/wiki/Survivor_(American_TV_series)) rules with modifications to make it work at global scale. 
-* Define 2 "tribes" worldwide O(1M) members each.
+* Define 2 "tribes" worldwide O(~millions) of members each.
 * $1 buy-in to play, single person winner takes all (as an incentivization mechanism)
 * Each tribe is divided into small sub-teams of 5 where people can pick their own team
 * Daily, tribe 1 is pitted against tribe 2 with an awareness and social distancing challenge
