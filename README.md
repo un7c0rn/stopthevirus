@@ -19,8 +19,8 @@ Design a global scale high stakes social game to help inspire millions of Millen
 * Sub-teams will continue to merge into groups of 5 using the algorithm automatically
 * The algorithm will email players with new team assignments and social media info of their group continuously
 * After 30 days we’ll have a final group of contestants (possibly 10 or so?) and the entire group of all participants (everyone who donated the $1) will vote on who the winner of the money should be
-* Each participant will be able to make a case on social media using a video post to state why they should be the final survivor and winner of the prize money.
-* Social awareness competitions will be user submitted e.g. Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song, Cleaning Challenge — Post a video showing your most creative way to clean your living space.
+* Each finalist will be able to make a case on social media using a video post to state why they should be the final survivor and winner of the prize money.
+* Social awareness competitions will be user submitted e.g. *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song, Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
 
 ## Design:
 
