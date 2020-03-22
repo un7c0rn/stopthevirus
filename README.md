@@ -37,7 +37,7 @@ Notification service: sends out team assignments, challenge announcements, kick 
 User device social media channels: used to submit challenges with hashtag and to score points for user tribes.
 Email / SMS / Web: Used to communicate announcements and administration to users. This is necessary since it is not possible to reliably automate announcements via Instagram. OR, we could use Twitter to post announcements and potentially automate.
 
-![Architecture](https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture1.svg  | width=200)
+![Architecture](https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture1.svg&s=200)
 
 
 Detailed Design:
