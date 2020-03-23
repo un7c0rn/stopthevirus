@@ -35,7 +35,7 @@ The game consists of the following system level components:
 1. User device social media channels: used to submit challenges with hashtag and to score points for user tribes.
 1. Email / SMS / Web: Used to communicate announcements and administration to users. This is necessary since it is not possible to reliably automate announcements via Instagram. Alternate option: we could use Twitter to post announcements and potentially automate.
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture2.svg" width="500">
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture2.svg" width="1000">
 
 ## Detailed Design:
 
