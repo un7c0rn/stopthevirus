@@ -66,7 +66,7 @@ NewVoteWin events are ignored if the game engine state is not in finalist state.
 
 ## Game Engine Finite State Machine Diagram
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture1.svg" width="500">
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_fsm1.svg" width="1000">
 
 
 
