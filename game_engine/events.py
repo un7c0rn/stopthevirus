@@ -1,6 +1,6 @@
 # from database import Player, Challenge, Entry
 import attr
-from game_engine.database import Player, Challenge, Entry
+from game_engine.database import Player, Challenge, Entry, Team
 
 class Event(object):
     def handle(self):
@@ -23,6 +23,11 @@ class NotifyPlayerScoreEvent(Event):
 @attr.s
 class NotifyTribalChallengeEvent(Event):
     challenge: Challenge = attr.ib()
+
+@attr.s
+class NotifyTeamReassignmentEvent(Event):
+    player: Player = attr.ib()
+    team: Team = attr.ib()
 
 # class Event(object):
 #     # Event objects each have handlers. a handler expects a game object

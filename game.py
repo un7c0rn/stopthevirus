@@ -11,6 +11,7 @@ from game_engine import events
 import time
 import logging
 import sys
+from queue import Queue
 
 
 def _unixtime():
@@ -145,32 +146,39 @@ class Game(object):
         small_teams = gamedb.stream_teams(
             from_tribe=tribe, team_size_predicate_value=2)
         merge_candidates = Queue()
+
         for team in small_teams:
+            _log_message("Deactivating team {}.".format(team))
+            gamedb.deactivate_team(team)
+            
             for player in gamedb.list_players(from_team=team):
+                _log_message("Found merge candidate {}.".format(player))
                 merge_candidates.put(player)
 
-        # count the team sizes for all remaining teams and sort, with smallest teams first
         sorted_teams = gamedb.stream_teams(
             from_tribe=tribe, order_by_size=True, descending=False)
-        for team in sorted_teams:
-            members_to_add_count = target_team_size - team.size()
 
-            # for each team (excluding merge candidates), in increasing order of size, continue to
-            # merge in members from the merge candidate pool until the team size == target size.
-            # once the target size is reached go to the next team.
-            while (members_to_add_count > 0) and not merge_candidates.empty():
+        # round robin redistribution strategy
+        # simplest case, could use more thought.
+        visited = {}
+        while not merge_candidates.empty():
+            for team in sorted_teams:
+                other_options_available = team.id not in visited
+                visited[team.id] = True
+
+                if (team.size >= target_team_size and other_options_available):
+                    continue
+
                 player = merge_candidates.get()
-                if player.team_id == team.id:
-                    merge_candidates.put(player)
-                else:
-                    player.team_id = team.id
-                    members_to_add_count = members_to_add_count - 1
-                    player.save()
+                _log_message("Merging player {} from team {} into team {}.".format(
+                    player, player.team_id, team.id))
+                player.team_id = team.id
+                gamedb.save(player)
 
-                    # notify player of new team assignment
-                    engine.add_event(NewTeamAssignmentEvent(
-                        player=player, team=team))
-
+                # notify player of new team assignment
+                engine.add_event(events.NotifyTeamReassignmentEvent(player=player,
+                                                                    team=team))
+                                                                    
     def _get_challenge(self, gamedb: Database) -> Challenge:
         available_challenges = gamedb.list_challenges(
             challenge_completed_predicate_value=False)

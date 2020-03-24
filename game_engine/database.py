@@ -16,24 +16,29 @@ class Player(Data):
     email: Text = attr.ib(default='')
     tribe_id: Text = attr.ib(default='')
     team_id: Text = attr.ib(default='')
+    active: bool = attr.ib(default=True)
 
 @attr.s
 class Team(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
+    size: int = attr.ib(default=0)
+    active: bool = attr.ib(default=True)
 
 @attr.s
 class Tribe(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
+    active: bool = attr.ib(default=True)
 
 @attr.s
 class Challenge(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
     message: Text = attr.ib('')
-    start_timestamp: int = attr.ib(0)
-    end_timestamp: int = attr.ib(0)
+    start_timestamp: int = attr.ib(default=0)
+    end_timestamp: int = attr.ib(default=0)
+    complete: bool = attr.ib(default=False)
 
 @attr.s
 class Entry(Data):
@@ -102,4 +107,8 @@ class Database(ABC):
 
     @abstractmethod
     def tribe_from_id(self, id: Text) -> Tribe:
+        pass
+
+    @abstractmethod
+    def save(self, data: Data) -> None:
         pass

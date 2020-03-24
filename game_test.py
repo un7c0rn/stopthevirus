@@ -3,7 +3,7 @@ import mock
 from game import Game
 from game import GameOptions
 from game_engine.engine import Engine
-from game_engine.database import Database
+from game_engine.database import Database, Data
 from game_engine.database import Player, Team, Tribe
 from game_engine.database import Challenge, Entry
 import attr
@@ -11,6 +11,7 @@ from typing import Any, Iterable, Dict, Text, Tuple, List
 import uuid
 from mock import Mock
 import time
+import pprint
 
 TEST_CHALLENGE_START_OFFSET_SEC = 1
 TEST_CHALLENGE_END_OFFSET_SEC = 1
@@ -34,14 +35,24 @@ class MockDatabase(Database):
             'player/13': Player(id='player/13', tribe_id='tribe/2', team_id='team/4'),
             'player/14': Player(id='player/14', tribe_id='tribe/2', team_id='team/4'),
             'player/15': Player(id='player/15', tribe_id='tribe/2', team_id='team/4'),
-            'player/16': Player(id='player/16', tribe_id='tribe/2', team_id='team/4')
+            'player/16': Player(id='player/16', tribe_id='tribe/2', team_id='team/4'),
+            'player/17': Player(id='player/17', tribe_id='tribe/2', team_id='team/5'),
+            'player/18': Player(id='player/18', tribe_id='tribe/2', team_id='team/5'),
+            'player/19': Player(id='player/19', tribe_id='tribe/2', team_id='team/6'),
+            'player/20': Player(id='player/20', tribe_id='tribe/2', team_id='team/6'),
+            'player/21': Player(id='player/21', tribe_id='tribe/2', team_id='team/7'),
+            'player/22': Player(id='player/22', tribe_id='tribe/2', team_id='team/7'),
+            'player/23': Player(id='player/23', tribe_id='tribe/2', team_id='team/7')
         }
 
         self._teams = {
-            'team/1': Team(id='team/1', name='name/team1'),
-            'team/2': Team(id='team/2', name='name/team2'),
-            'team/3': Team(id='team/3', name='name/team3'),
-            'team/4': Team(id='team/4', name='name/team4')
+            'team/1': Team(id='team/1', name='name/team1', size=4),
+            'team/2': Team(id='team/2', name='name/team2', size=4),
+            'team/3': Team(id='team/3', name='name/team3', size=4),
+            'team/4': Team(id='team/4', name='name/team4', size=4),
+            'team/5': Team(id='team/5', name='name/team5', size=2),
+            'team/6': Team(id='team/6', name='name/team6', size=2),
+            'team/7': Team(id='team/7', name='name/team7', size=3)
         }
 
         self._tribes = {
@@ -83,7 +94,13 @@ class MockDatabase(Database):
                      order_by_size=True,
                      descending=False
                      ) -> Iterable[Team]:
-        pass
+        if team_size_predicate_value:
+            return sorted([team for team in self._teams.values() if (team.size == team_size_predicate_value
+                                                                     and team.active)],
+                          key=lambda team: team.size, reverse=True)
+        else:
+            return sorted([team for team in self._teams.values() if team.active],
+                          key=lambda team: team.size, reverse=True)
 
     def count_players(self, from_tribe: Tribe) -> int:
         count = 0
@@ -93,7 +110,13 @@ class MockDatabase(Database):
         return count
 
     def deactivate_player(self, player: Player) -> None:
-        pass
+        player.active = False
+        self._players[player.id].active = False
+
+    def deactivate_team(self, team: Team) -> None:
+        team.active = False
+        self._teams[team.id].active = False
+        pprint.pprint(self._teams)
 
     def count_votes(self, from_team: Team) -> Tuple[Player, int]:
         pass
@@ -102,10 +125,10 @@ class MockDatabase(Database):
         pass
 
     def list_challenges(self, challenge_completed_predicate_value=False) -> Iterable[Challenge]:
-        pass
+        return [challenge for challenge in self._challenges.values() if not challenge.complete]
 
     def list_players(self, from_team: Team) -> Iterable[Player]:
-        pass
+        return [player for player in self._players.values() if player.team_id == from_team.id]
 
     def player(self, name: Text) -> Player:
         pass
@@ -125,18 +148,252 @@ class MockDatabase(Database):
     def challenge_from_id(self, id: Text) -> Challenge:
         return self._challenges[id]
 
+    def save(self, data: Data) -> None:
+        if isinstance(data, Player):
+            prev_team_id = self._players[data.id].team_id
+            next_team_id = data.team_id
+            self._players[data.id] = data
+            if prev_team_id != next_team_id:
+                self._teams[prev_team_id].size -= 1
+                self._teams[next_team_id].size += 1
 
 class GameTest(unittest.TestCase):
     def setUp(self):
-        self._game = Game(options=GameOptions(game_wait_sleep_interval_sec=0.5))
+        self._game = Game(options=GameOptions(
+            game_wait_sleep_interval_sec=0.5))
     # def test_play(self):
     # def test_play_multi_tribe(self):
     # def test_play_single_tribe(self):
     # def test_get_voted_out_player(self):
     # def test_run_multi_tribe_council(self):
     # def test_run_single_tribe_council(self):
-    # def test_merge_teams(self):
-    # def test_get_challenge(self):
+
+    def test_merge_teams_2player(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=1),
+            'team/2': Team(id='team/2', name='name/team2', size=1),
+        }
+
+        tribe = gamedb.tribe_from_id('tribe/1')
+        self._game._merge_teams(
+            target_team_size=5, tribe=tribe, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_not_called()
+        
+        expected_player_to_team_dict = {
+            'player/01': 'team/1',
+            'player/02': 'team/1',
+        }
+
+        for k, v in gamedb._players.items():
+            self.assertEqual(v.team_id, expected_player_to_team_dict[k])
+        
+    def test_merge_teams_3player(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+            'player/03': Player(id='player/03', tribe_id='tribe/1', team_id='team/2'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=2),
+            'team/2': Team(id='team/2', name='name/team2', size=1),
+        }
+
+        tribe = gamedb.tribe_from_id('tribe/1')
+        self._game._merge_teams(
+            target_team_size=5, tribe=tribe, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_called()
+
+        expected_player_to_team_dict = {
+            'player/01': 'team/2',
+            'player/02': 'team/2',
+            'player/03': 'team/2',
+        }
+
+        for k, v in gamedb._players.items():
+            self.assertEqual(v.team_id, expected_player_to_team_dict[k])
+
+    def test_merge_teams_5player(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+            'player/03': Player(id='player/03', tribe_id='tribe/1', team_id='team/2'),
+            'player/04': Player(id='player/04', tribe_id='tribe/1', team_id='team/2'),
+            'player/05': Player(id='player/05', tribe_id='tribe/1', team_id='team/2'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=2),
+            'team/2': Team(id='team/2', name='name/team2', size=3),
+        }
+
+        tribe = gamedb.tribe_from_id('tribe/1')
+        self._game._merge_teams(
+            target_team_size=5, tribe=tribe, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_called()
+        
+        expected_player_to_team_dict = {
+            'player/01': 'team/2',
+            'player/02': 'team/2',
+            'player/03': 'team/2',
+            'player/04': 'team/2',
+            'player/05': 'team/2',
+        }
+
+        for k, v in gamedb._players.items():
+            self.assertEqual(v.team_id, expected_player_to_team_dict[k])
+        
+    def test_merge_teams_6player(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+            'player/03': Player(id='player/03', tribe_id='tribe/1', team_id='team/1'),
+            'player/04': Player(id='player/04', tribe_id='tribe/1', team_id='team/2'),
+            'player/05': Player(id='player/05', tribe_id='tribe/1', team_id='team/2'),
+            'player/05': Player(id='player/05', tribe_id='tribe/1', team_id='team/2'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=3),
+            'team/2': Team(id='team/2', name='name/team2', size=3),
+        }
+
+        tribe = gamedb.tribe_from_id('tribe/1')
+        self._game._merge_teams(
+            target_team_size=5, tribe=tribe, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_not_called()
+
+        expected_player_to_team_dict = {
+            'player/01': 'team/1',
+            'player/02': 'team/1',
+            'player/03': 'team/1',
+            'player/04': 'team/2',
+            'player/05': 'team/2',
+            'player/06': 'team/2',
+        }
+
+        for k, v in gamedb._players.items():
+            self.assertEqual(v.team_id, expected_player_to_team_dict[k])
+
+    def test_merge_teams_9player(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+            'player/03': Player(id='player/03', tribe_id='tribe/1', team_id='team/2'),
+            'player/04': Player(id='player/04', tribe_id='tribe/1', team_id='team/2'),
+            'player/05': Player(id='player/05', tribe_id='tribe/1', team_id='team/3'),
+            'player/06': Player(id='player/06', tribe_id='tribe/1', team_id='team/3'),
+            'player/07': Player(id='player/07', tribe_id='tribe/1', team_id='team/4'),
+            'player/08': Player(id='player/08', tribe_id='tribe/1', team_id='team/4'),
+            'player/09': Player(id='player/09', tribe_id='tribe/1', team_id='team/4'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=2),
+            'team/2': Team(id='team/2', name='name/team2', size=2),
+            'team/3': Team(id='team/3', name='name/team3', size=2),
+            'team/4': Team(id='team/4', name='name/team4', size=3),
+        }
+
+        tribe = gamedb.tribe_from_id('tribe/1')
+        self._game._merge_teams(
+            target_team_size=5, tribe=tribe, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_called()
+
+        expected_player_to_team_dict = {
+            'player/01': 'team/4',
+            'player/02': 'team/4',
+            'player/03': 'team/4',
+            'player/04': 'team/4',
+            'player/05': 'team/4',
+            'player/06': 'team/4',
+            'player/07': 'team/4',
+            'player/08': 'team/4',
+            'player/09': 'team/4',
+        }
+
+        for k, v in gamedb._players.items():
+            self.assertEqual(v.team_id, expected_player_to_team_dict[k])
+
+    def test_merge_teams_10player(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+            'player/03': Player(id='player/03', tribe_id='tribe/1', team_id='team/2'),
+            'player/04': Player(id='player/04', tribe_id='tribe/1', team_id='team/2'),
+            'player/05': Player(id='player/05', tribe_id='tribe/1', team_id='team/2'),
+            'player/06': Player(id='player/06', tribe_id='tribe/1', team_id='team/2'),
+            'player/07': Player(id='player/07', tribe_id='tribe/1', team_id='team/3'),
+            'player/08': Player(id='player/08', tribe_id='tribe/1', team_id='team/3'),
+            'player/09': Player(id='player/09', tribe_id='tribe/1', team_id='team/3'),
+            'player/10': Player(id='player/10', tribe_id='tribe/1', team_id='team/3'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=2),
+            'team/2': Team(id='team/2', name='name/team2', size=4),
+            'team/3': Team(id='team/3', name='name/team3', size=4),
+        }
+
+        tribe = gamedb.tribe_from_id('tribe/1')
+        self._game._merge_teams(
+            target_team_size=5, tribe=tribe, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_called()
+
+        expected_player_to_team_dict = {
+            'player/01': 'team/2',
+            'player/02': 'team/3',
+            'player/03': 'team/2',
+            'player/04': 'team/2',
+            'player/05': 'team/2',
+            'player/06': 'team/2',
+            'player/07': 'team/3',
+            'player/08': 'team/3',
+            'player/09': 'team/3',
+            'player/10': 'team/3',
+        }
+
+        for k, v in gamedb._players.items():
+            self.assertEqual(v.team_id, expected_player_to_team_dict[k])
+
+    def test_get_challenge(self):
+        gamedb = MockDatabase()
+        challenges = set()
+        for _ in range(5):
+            challenge = self._game._get_challenge(gamedb=gamedb)
+            challenges.add(challenge.name)
+        self.assertSetEqual(challenges, set(
+            ['name/challenge1']))
+
+        for _ in range(5):
+            challenge = self._game._get_challenge(gamedb=gamedb)
+            challenges.add(challenge.name)
+            gamedb._challenges[challenge.id].complete = True
+        self.assertSetEqual(challenges, set(
+            ['name/challenge1', 'name/challenge2', 'name/challenge3', 'name/challenge4', 'name/challenge5']))
 
     def test_run_challenge(self):
         engine = Mock()
@@ -166,6 +423,7 @@ class GameTest(unittest.TestCase):
                                           new_tribe_name='test/tribe3', gamedb=gamedb)
         self.assertEqual(gamedb.count_players(
             from_tribe=tribe3), tribe1_count + tribe2_count)
+
 
 if __name__ == '__main__':
     unittest.main()
