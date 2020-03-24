@@ -19,16 +19,25 @@ class Player(Data):
     active: bool = attr.ib(default=True)
 
 @attr.s
+class Vote(Data):
+    id: Text = attr.ib()
+    from_id: Text = attr.ib()
+    to_id: Text = attr.ib()
+    is_for_win: bool = attr.ib(default=False)
+
+@attr.s
 class Team(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
-    size: int = attr.ib(default=0)
+    size: int = attr.ib()
+    tribe_id: Text = attr.ib()
     active: bool = attr.ib(default=True)
 
 @attr.s
 class Tribe(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
+    size: int = attr.ib(default=0)
     active: bool = attr.ib(default=True)
 
 @attr.s
@@ -107,6 +116,10 @@ class Database(ABC):
 
     @abstractmethod
     def tribe_from_id(self, id: Text) -> Tribe:
+        pass
+    
+    @abstractmethod
+    def team_from_id(self, id: Text) -> Team:
         pass
 
     @abstractmethod

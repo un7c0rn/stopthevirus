@@ -1,10 +1,12 @@
-# from database import Player, Challenge, Entry
 import attr
-from game_engine.database import Player, Challenge, Entry, Team
+from game_engine.database import Player, Challenge, Entry, Team, Tribe
+from typing import Iterable
+
 
 class Event(object):
     def handle(self):
         pass
+
 
 class EventQueue(object):
     def put(self, event: Event):
@@ -13,6 +15,7 @@ class EventQueue(object):
     def get(self) -> Event:
         return Event()
 
+
 @attr.s
 class NotifyPlayerScoreEvent(Event):
     player: Player = attr.ib()
@@ -20,13 +23,39 @@ class NotifyPlayerScoreEvent(Event):
     entry: Entry = attr.ib()
     points: int = attr.ib()
 
+
 @attr.s
 class NotifyTribalChallengeEvent(Event):
     challenge: Challenge = attr.ib()
 
+
 @attr.s
 class NotifyTeamReassignmentEvent(Event):
     player: Player = attr.ib()
+    team: Team = attr.ib()
+
+
+@attr.s
+class NotifySingleTribeCouncilEvent(Event):
+    winning_teams: Iterable[Team] = attr.ib()
+    losing_teams: Iterable[Team] = attr.ib()
+
+
+@attr.s
+class NotifyMultiTribeCouncilEvent(Event):
+    winning_tribe: Tribe = attr.ib()
+    losing_tribe: Tribe = attr.ib()
+
+@attr.s
+class NotifyPlayerVotedOutEvent(Event):
+    player: Player = attr.ib()
+
+@attr.s
+class NotifyTribalCouncilCompletionEvent(Event):
+    pass
+
+@attr.s
+class NotifyImmunityAwardedEvent(Event):
     team: Team = attr.ib()
 
 # class Event(object):
@@ -64,13 +93,13 @@ class NotifyTeamReassignmentEvent(Event):
 #             engine_lib.log_message("Player {} attempting to join during tribal council.".format(self.player))
 #             return (game, [self, UserErrorEvent(message="You must wait until tribal council ends "
 #             "in order to join the game!", email=self.player.email)])
-        
+
 #         # When a NewPlayer event is received, the game engine creates an entry in GameDB.
 #         if game.is_enrollment_open:
 #             engine_lib.log_message("Player {} enrolled in game.".format(self.player))
 #             game.create_player(self.player)
 #         else:
-#             # NewPlayer events are only valid during the valid entry window. After the 
+#             # NewPlayer events are only valid during the valid entry window. After the
 #             # entry deadline, all NewPlayer events are ignored.
 #             player_count = game.player_count
 #             engine_lib.log_message("Maximum number of players reached {}.".format(player_count))
@@ -80,7 +109,7 @@ class NotifyTeamReassignmentEvent(Event):
 
 #         # If a team is specified for the player, the player is placed on that team.
 #         # Otherwise, the algorithm finds a team and associates the player with that team in the DB. A new
-#         # team assignment event is placed on the output queue. 
+#         # team assignment event is placed on the output queue.
 #         if not self.player.is_on_team:
 #             team = game.find_team(self.player)
 #             engine_lib.log_message("Algorithm identified team {} for player {}.".format(team, self.player))
@@ -175,7 +204,7 @@ class NotifyTeamReassignmentEvent(Event):
 #     # account to spread awareness of the game and objective. After all entries are scored and
 #     # the winning tribe is computed, a NewTribalCouncilAnnouncement is placed on the output queue.
 #     # The notification system uses these events to announce the winning tribe and to let the losing
-#     # tribe know when the tribal council voting window opens. Tribal council voting windows are open 
+#     # tribe know when the tribal council voting window opens. Tribal council voting windows are open
 #     # for 4 hours.
 #         pass
 
