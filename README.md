@@ -22,6 +22,30 @@ Design a global scale high stakes social game to help inspire millions of Millen
 * Each finalist will be able to make a case on social media using a video post to state why they should be the final survivor and winner of the prize money.
 * Social awareness competitions will be user submitted e.g. *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song, Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
 
+## Requirements
+
+## Unit Tests
+
+Running the unit tests is a good way to get started and to verify that any dependencies are present. In general, the goal is to minimize the number of dependencies as much as possible.
+
+To run the unit tests:
+
+```console
+python3 -m unittest game_test.py -v
+```
+
+To continuously run unit tests in a console window as you code:
+
+Install <a href="http://eradman.com/entrproject/">entr</a>
+
+```console
+brew install entr
+```
+
+```console
+find . -name '*.py' | entr python3 -m unittest game_test.py -v
+```
+
 ## Design:
 
 The game consists of the following system level components:

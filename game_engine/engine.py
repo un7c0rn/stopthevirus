@@ -1,6 +1,12 @@
+import threading
+from multiprocessing import Process
+import time
+from game_engine.events import Event, EventQueue
+
+
 class Engine(object):
 
-    def __init__(self, options: GameOptions):
+    def __init__(self, options: object):
         self._options = options
         self._input_events = EventQueue()
         self._output_events = EventQueue()
@@ -8,14 +14,11 @@ class Engine(object):
         self._workers = list()
         for _ in range(options.engine_worker_thread_count):
             worker = Process(target=self._worker_fn)
-            self._workers.add(worker)
+            self._workers.append(worker)
             worker.start()
 
     def add_event(self, event: Event):
-        if isinstance(event, OutputEvent):
-            self._output_events.put(event)
-        elif isinstance(event, InputEvent):
-            self._input_events.put(event)
+        self._output_events.put(event)
 
     def _worker_fn(self):
         while not self._stop.is_set():

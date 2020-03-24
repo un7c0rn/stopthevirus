@@ -1,116 +1,105 @@
-from abc import ABC
-from typing import Text, Dict
-from enum import Enum
-import threading
-import json
-import time
-import logging
+from abc import ABC, abstractmethod, abstractclassmethod
 import attr
-import engine_lib
+from typing import Any, Iterable, Dict, Text, Tuple
 
-class DatabaseObject(object):
-    # TODO(brandon): consider using SQL ORM bindings
-    # for these.
-    # https://docs.sqlalchemy.org/en/14/orm/tutorial.html
+class Data(ABC):
     def save(self):
         pass
 
+    def sync(self):
+        pass
+
 @attr.s
-class Player(DatabaseObject):
+class Player(Data):
     id: Text = attr.ib()
-    instagram: Text = attr.ib()
-    email: Text = attr.ib()
-    tribe_id: Text = attr.ib()
-    team_id: Text = attr.ib()
-
-    def is_on_team(self):
-        return self.team_id is not None
+    instagram: Text = attr.ib(default='')
+    email: Text = attr.ib(default='')
+    tribe_id: Text = attr.ib(default='')
+    team_id: Text = attr.ib(default='')
 
 @attr.s
-class Team(DatabaseObject):
-    id: Text = attr.ib()
-    name: Text = attr.ib()
-
-@attr.s
-class Tribe(DatabaseObject):
+class Team(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
 
 @attr.s
-class Challenge(DatabaseObject):
+class Tribe(Data):
     id: Text = attr.ib()
     name: Text = attr.ib()
-    message: Text = attr.ib()
-    start_timestamp: int = attr.ib()
-    end_timestamp: int = attr.ib()
 
 @attr.s
-class ChallengeEntry(DatabaseObject):
+class Challenge(Data):
+    id: Text = attr.ib()
+    name: Text = attr.ib()
+    message: Text = attr.ib('')
+    start_timestamp: int = attr.ib(0)
+    end_timestamp: int = attr.ib(0)
+
+@attr.s
+class Entry(Data):
+    # An entry into a game challenge.
     id: Text = attr.ib()
     likes: int = attr.ib()
     views: int = attr.ib()
     player_id: Text = attr.ib()
+    tribe_id: Text = attr.ib()
     challenge_id: Text = attr.ib()
-    url: Text = attr.ib()
-
-class VotingReason(Enum):
-    KICKOFF = 1
-    WIN_IT_ALL = 2
-
-@attr.s
-class Vote(DatabaseObject):
-    from_id: Text = attr.ib()
-    to_id: Text = attr.ib()
-    reason: VotingReason = attr.ib(default=VotingReason.KICKOFF)
+    url: Text = attr.ib('')
 
 class Database(ABC):
 
-    def get_players(self, team: Team):
-        pass
-        
-    def get_teams_with_size(self, tribe: Tribe, team_size: int):
+    @abstractmethod
+    def batch_update_tribe(self, from_tribe: Tribe, to_tribe: Tribe) -> None:
         pass
 
-    def replace_tribe(self, tribe: Tribe, new_tribe: Tribe):
-        # updates tribe id for all members of tribe to new_tribe
+    @abstractmethod
+    def stream_entries(self, from_tribe: Tribe, from_challenge: Challenge) -> Iterable[Entry]:
         pass
 
-    def get_next_challenge(self) -> Challenge:
-        # select oldest challenge that has not already been played
-        # mark challenge played in db
-        # TODO(brandon): gamedb interface get next challenge
-      return Challenge(id='1234',
-        name='Karaoke',
-        message='These are the challenge rules',
-        start_timestamp=engine_lib.get_unix_timestamp(),
-        end_timestamp=engine_lib.get_unix_timestamp() + 5)
-
-    def create_player(self, player: Player):
+    @abstractmethod
+    def stream_teams(self, from_tribe: Tribe, 
+        team_size_predicate_value: [int, None]=None,
+        order_by_size=True,
+        descending=False
+        ) -> Iterable[Team]:
         pass
 
-    def get_player(self, id: Text) -> Player:
+    @abstractmethod
+    def count_players(self, from_tribe: Tribe) -> int:
         pass
 
-    def create_team(self, team: Team):
+    @abstractmethod
+    def deactivate_player(self, player: Player) -> None:
         pass
 
-    def get_team(self, id: Text) -> Team:
+    @abstractmethod
+    def count_votes(self, from_team: Team) -> Tuple[Player, int]:
+        pass
+    
+    @abstractmethod 
+    def clear_votes(self) -> None:
         pass
 
-    def create_tribe(self, tribe: Tribe):
+    @abstractmethod
+    def list_challenges(self, challenge_completed_predicate_value=False) -> Iterable[Challenge]:
         pass
 
-    def get_tribe(self, id: Text) -> Tribe:
+    @abstractmethod
+    def list_players(self, from_team: Team) -> Iterable[Player]:
         pass
 
-    def create_challenge(self, challenge: Challenge):
+    @abstractmethod
+    def player(self, name: Text) -> Player:
         pass
 
-    def get_challenge(self, id: Text) -> Challenge:
+    @abstractmethod
+    def player_from_id(self, id: Text) -> Player:
         pass
 
-    def create_vote(self, vote: Vote):
+    @abstractmethod
+    def tribe(self, name: Text) -> Tribe:
         pass
 
-    def get_vote(self, id: Text) -> Vote:
+    @abstractmethod
+    def tribe_from_id(self, id: Text) -> Tribe:
         pass
