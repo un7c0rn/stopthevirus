@@ -83,6 +83,10 @@ class Database(ABC):
         pass
 
     @abstractmethod
+    def count_teams(self, active_team_predicate_value=True) -> int:
+        pass
+
+    @abstractmethod
     def deactivate_player(self, player: Player) -> None:
         pass
 
@@ -99,9 +103,13 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def list_players(self, from_team: Team) -> Iterable[Player]:
+    def list_players(self, from_team: Team, active_player_predicate_value=True) -> Iterable[Player]:
         pass
 
+    @abstractmethod
+    def list_teams(self, active_team_predicate_value=True) -> Iterable[Team]:
+        pass
+    
     @abstractmethod
     def player(self, name: Text) -> Player:
         pass
