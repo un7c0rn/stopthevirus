@@ -92,7 +92,7 @@ When a **NewChallengeEntrySubmission event** is received, the game engine identi
 
 ## Game Engine Finite State Machine Diagram
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_fsm1.svg" width="1000">
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/gameflow.svg" width="1000">
 
 
 
