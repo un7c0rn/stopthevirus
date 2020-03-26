@@ -80,7 +80,7 @@ When challenges start each day, players submit their entry by simply posting to 
 
 The initial proposed components are enumerated here:
 
-1. TikTok
+1. <a href="https://www.tiktok.com/en/">TikTok</a>
 
 2. Web scraper service - a simple Python job that can run in a cluster in order to read TikTok post metadata and submit it to the game database (4). Due to API rate limiting the thought here is to use the HTTP endpoint rather than the REST API (TBD). If the API is unworkable players may need to submit challenge entry links using the frontend (6) as a fallback.
 
