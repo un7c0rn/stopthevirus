@@ -1,28 +1,28 @@
-# COVID 19 #STOPTHEVIRUS SOCIAL GAME
+# COVID-19 #STOPTHEVIRUS SOCIAL GAME
 
 ## Objective:
 
-Design a worldwide high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the planet to engage in social distancing and stop the spread of the COVID-19 virus.
+Design a global scale high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing and stop the spread of the COVID-19 virus.
 
 ## Background:
 
-* We base the game on [Survivor](https://en.wikipedia.org/wiki/Survivor_(American_TV_series)) rules with modifications to make it work at global scale. 
-* Define 2 "tribes" worldwide O(~millions) of members each.
-* $1 buy-in to play, single person winner takes all (as an incentivization mechanism)
-* Each tribe is divided into small sub-teams of 5 where people can pick their own team
-* Daily, tribe 1 is pitted against tribe 2 with an awareness and social distancing challenge
-* All participants post social content in order to score points
-* Points are aggregated across all tribe members and the tribe with the highest number of points wins for the day
-* If your tribe loses the challenge of the day, every sub-team on the tribe (so for example 200,000 sub teams on a tribe of 1M) must vote out 1 member.
-* Sub-teams will continue to merge into groups of 5 using the algorithm automatically
-* The algorithm will email players with new team assignments and social media info of their group continuously
-* After 30 days we’ll have a final group of contestants (possibly 10 or so?) and the entire group of all participants (everyone who donated the $1) will vote on who the winner of the money should be
-* Each finalist will be able to make a case on social media using a video post to state why they should be the final survivor and winner of the prize money.
-* Social awareness competitions will be user submitted e.g. *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song, Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
+It’s Spring 2020 and Coachella is cancelled. We’re at the height of human technology and innovation, but at the same time facing one of the most devastating viral pandemics in history. The economy is suffering, countries around the world are facing mandatory lockdown orders and hospitals are overwhelmed. Despite this, many people are still unaware of the seriousness of COVID-19 and actions they can take to support our health care professionals, like social distancing in order to flatten the health care demand curve. Reducing the doubling rate of COVID-19 by even a few days can have massive impact. Can we use a high stakes social game to help inspire the youth to stop the virus?
+
+This social game was inspired by the TV show Survivor. It's a social game based on fun challenges, alliances and human psychology. The twist here is that instead of being stranded on a deserted island for 30 days, players are "stranded" inside their homes. Also, since the game is digital and based on social media, we aren't limited to the standard 20 players. Everyone can play. $1 donation to join and winner takes all.
+
+Here's how the game works:
+
+Cleaning Challenge — Post a video showing your most creative way to clean your living space.
 
 ## Game Flow Chart
 
 <img src="https://github.com/unicorn1337x/stopthevirus/blob/master/flowchart.svg" width="1000">
+
+## How To Win
+
+Social distancing challenge ideas can be added continuously. Some examples include **Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song.** or **Cleaning Challenge — Post a video showing your most creative way to clean your living space.**
+
+After thirty days a group of two finalists will have made it to the end. All players, everyone who donated the $1 entry fee, will vote on who the winner of the prize money should be. Each finalist will be able to make a case on social media using a video post to say why they should be the final survivor and winner of the prize money.
 
 ## Architecture Block Diagram
 
