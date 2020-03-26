@@ -86,13 +86,28 @@ class MockDatabase(Database):
         self._votes = {}
 
     def batch_update_tribe(self, from_tribe: Tribe, to_tribe: Tribe) -> None:
+        new_active_players_count = 0
+
+        for key in self._teams:
+            if self._teams[key].tribe_id == from_tribe.id:
+                self._teams[key].tribe_id = to_tribe.id
+
         for key in self._players:
             if self._players[key].tribe_id == from_tribe.id:
                 self._players[key].tribe_id = to_tribe.id
-
-    def stream_entries(self, from_tribe: Tribe, from_challenge: Challenge) -> Iterable[Entry]:
-        return [entry for entry in self._entries.values() if
-                (entry.challenge_id == from_challenge.id and entry.tribe_id == from_tribe.id)]
+                if self._players[key].active:
+                    new_active_players_count = new_active_players_count + 1
+        self._tribes[to_tribe.id].size = self._tribes[to_tribe.id].size + new_active_players_count
+    
+    def stream_entries(self, from_tribe: Tribe=None, from_team: Team=None, from_challenge: Challenge=None) -> Iterable[Entry]:
+        if from_tribe:
+            return [entry for entry in self._entries.values() if
+                    (entry.challenge_id == from_challenge.id and entry.tribe_id == from_tribe.id)]
+        
+        if from_team:
+            players_ids = [player.id for player in self._players.values() if player.team_id == from_team.id]
+            return [entry for entry in self._entries.values() if
+                    (entry.challenge_id == from_challenge.id and entry.player_id in players_ids)]
 
     def stream_teams(self, from_tribe: Tribe,
                      team_size_predicate_value: [int, None] = None,
@@ -119,32 +134,46 @@ class MockDatabase(Database):
                     count = count + 1
         return count
 
-    def count_teams(self, active_team_predicate_value=True) -> int:
-        return len([team for team in self._teams.values() if team.active == active_team_predicate_value])
+    def count_teams(self, from_tribe: Tribe = None, active_team_predicate_value=True) -> int:
+        if from_tribe:
+            return len([team for team in self._teams.values() if team.tribe_id == from_tribe.id and team.active == active_team_predicate_value])
+        else:
+            return len([team for team in self._teams.values() if team.active == active_team_predicate_value])
 
     def deactivate_player(self, player: Player) -> None:
         player.active = False
         self._players[player.id].active = False
         self._teams[player.team_id].size = self._teams[player.team_id].size - 1
+        self._tribes[player.tribe_id].size = self._tribes[player.tribe_id].size - 1
 
     def deactivate_team(self, team: Team) -> None:
         team.active = False
         self._teams[team.id].active = False
         pprint.pprint(self._teams)
 
-    def count_votes(self, from_team: Team) -> Dict[Text, int]:
+    def count_votes(self, from_team: Team=None, is_for_win: bool=False) -> Dict[Text, int]:
         player_counts = {}
 
-        for vote in self._votes.values():
-            voter = self.player_from_id(vote.from_id)
-            team = self._teams[voter.team_id]
-            if team.id != from_team.id or not voter.active:
-                continue
+        if from_team:
+            for vote in self._votes.values():
+                voter = self.player_from_id(vote.from_id)
+                team = self._teams[voter.team_id]
+                if team.id != from_team.id or not voter.active:
+                    continue
 
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
+                if vote.to_id not in player_counts:
+                    player_counts[vote.to_id] = 1
+                else:
+                    player_counts[vote.to_id] = player_counts[vote.to_id] + 1
+        else:
+            for vote in self._votes.values():
+                if not vote.is_for_win:
+                    continue
+                
+                if vote.to_id not in player_counts:
+                    player_counts[vote.to_id] = 1
+                else:
+                    player_counts[vote.to_id] = player_counts[vote.to_id] + 1
 
         return player_counts
 
@@ -183,12 +212,10 @@ class MockDatabase(Database):
 
     def save(self, data: Data) -> None:
         if isinstance(data, Player):
-            prev_team_id = self._players[data.id].team_id
-            next_team_id = data.team_id
             self._players[data.id] = data
-            if prev_team_id != next_team_id:
-                self._teams[prev_team_id].size -= 1
-                self._teams[next_team_id].size += 1
+
+        if isinstance(data, Team):
+            self._teams[data.id] = data
 
 
 class GameTest(unittest.TestCase):
@@ -197,11 +224,533 @@ class GameTest(unittest.TestCase):
             game_wait_sleep_interval_sec=0.5,
             single_tribe_council_time_sec=2,
             single_tribe_top_k_threshold=0.5,
+            single_team_council_time_sec=2,
+            final_tribal_council_time_sec=2,
+            multi_tribe_min_tribe_size=5,
             multi_tribe_team_immunity_likelihood=0.0,
             multi_tribe_council_time_sec=2))
 
-    # def test_play(self):
-    # def test_play_multi_tribe(self):
+    def test_play(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        # [Africa r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [Asia y1 y2 y3 k1 k2 k3 x1 x2 x3]
+        gamedb._players = {
+            'r1': Player(id='r1', tribe_id='AFRICA', team_id='r'),
+            'r2': Player(id='r2', tribe_id='AFRICA', team_id='r'),
+            'r3': Player(id='r3', tribe_id='AFRICA', team_id='r'),
+            'g1': Player(id='g1', tribe_id='AFRICA', team_id='g'),
+            'g2': Player(id='g2', tribe_id='AFRICA', team_id='g'),
+            'g3': Player(id='g3', tribe_id='AFRICA', team_id='g'),
+            'b1': Player(id='b1', tribe_id='AFRICA', team_id='b'),
+            'b2': Player(id='b2', tribe_id='AFRICA', team_id='b'),
+            'b3': Player(id='b3', tribe_id='AFRICA', team_id='b'),
+            'y1': Player(id='y1', tribe_id='ASIA', team_id='y'),
+            'y2': Player(id='y2', tribe_id='ASIA', team_id='y'),
+            'y3': Player(id='y3', tribe_id='ASIA', team_id='y'),
+            'k1': Player(id='k1', tribe_id='ASIA', team_id='k'),
+            'k2': Player(id='k2', tribe_id='ASIA', team_id='k'),
+            'k3': Player(id='k3', tribe_id='ASIA', team_id='k'),
+            'x1': Player(id='x1', tribe_id='ASIA', team_id='x'),
+            'x2': Player(id='x2', tribe_id='ASIA', team_id='x'),
+            'x3': Player(id='x3', tribe_id='ASIA', team_id='x'),
+        }
+
+        gamedb._teams = {
+            'r': Team(id='r', name='name/r', size=3, tribe_id='AFRICA'),
+            'g': Team(id='g', name='name/g', size=3, tribe_id='AFRICA'),
+            'b': Team(id='b', name='name/b', size=3, tribe_id='AFRICA'),
+            'y': Team(id='y', name='name/y', size=3, tribe_id='ASIA'),
+            'k': Team(id='k', name='name/k', size=3, tribe_id='ASIA'),
+            'x': Team(id='x', name='name/x', size=3, tribe_id='ASIA'),
+        }
+
+        gamedb._tribes = {
+            'AFRICA': Tribe(id='AFRICA', name='name/AFRICA', size=9),
+            'ASIA': Tribe(id='ASIA', name='name/ASIA', size=9),
+        }
+
+        gamedb._challenges = {
+            'challenge/1': Challenge(id='challenge/1', name='name/challenge1'),
+            'challenge/2': Challenge(id='challenge/2', name='name/challenge2'),
+            'challenge/3': Challenge(id='challenge/3', name='name/challenge3'),
+            'challenge/4': Challenge(id='challenge/4', name='name/challenge4'),
+            'challenge/5': Challenge(id='challenge/5', name='name/challenge5'),
+            'challenge/6': Challenge(id='challenge/6', name='name/challenge6'),
+            'challenge/7': Challenge(id='challenge/7', name='name/challenge7'),
+            'challenge/8': Challenge(id='challenge/8', name='name/challenge8'),
+            'challenge/10': Challenge(id='challenge/9', name='name/challenge9'),
+            'challenge/11': Challenge(id='challenge/10', name='name/challenge10'),
+            'challenge/12': Challenge(id='challenge/11', name='name/challenge11'),
+            'challenge/13': Challenge(id='challenge/12', name='name/challenge12'),
+            'challenge/14': Challenge(id='challenge/13', name='name/challenge13'),
+            'challenge/15': Challenge(id='challenge/14', name='name/challenge14'),
+        }
+
+        gamedb._entries = {}
+
+        def challenge1_worker(gamedb):
+            # round 1: [Africa r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [Asia y1 y2 y3 k1 k2 k3 x1 x2 x3]
+            # africa wins
+            # asia teams vote
+            # y votes out y3
+            # k votes out k3
+            # x votes out x3
+            # [Africa r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [Asia y1 y2 k1 k2 x1 x2]
+            # asia teams of 2 would deadlock and must merge
+            # [Africa r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [Asia y1 y2 k1 k2 x1 x2 (all on k team)]
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id='AFRICA', challenge_id='challenge/1'),
+                'entry/2': Entry(id='entry/2', likes=1, views=1, player_id='y1', tribe_id='ASIA', challenge_id='challenge/1'),
+            }
+
+        def council1_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='y1', to_id='y3'),
+                'vote/2': Vote(id='vote/2', from_id='y2', to_id='y3'),
+                'vote/3': Vote(id='vote/3', from_id='y3', to_id='y1'),
+                'vote/4': Vote(id='vote/4', from_id='k1', to_id='k3'),
+                'vote/5': Vote(id='vote/5', from_id='k2', to_id='k3'),
+                'vote/6': Vote(id='vote/6', from_id='k3', to_id='k1'),
+                'vote/7': Vote(id='vote/7', from_id='x1', to_id='x3'),
+                'vote/8': Vote(id='vote/8', from_id='x2', to_id='x3'),
+                'vote/9': Vote(id='vote/9', from_id='x3', to_id='x1'),
+            }
+
+        def challenge2_worker(gamedb):
+            # round 2: [Africa r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [Asia y1 y2 k1 k2 x1 x2 (all on k team)]
+            # asia wins
+            # africa teams vote
+            # r votes out r3
+            # g votes out g3
+            # b votes out b3
+            # [Africa r1 r2 g1 g2 b1 b2] vs [Asia y1 y2 k1 k2 x1 x2 (all on k team)]
+            # africa teams of 2 would deadlock and must merge
+            # [Africa r1 r2 g1 g2 b1 b2 (all on team r)] vs [Asia y1 y2 k1 k2 x1 x2 (all on k team)]
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id='AFRICA', challenge_id='challenge/2'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id='ASIA', challenge_id='challenge/2'),
+            }
+
+        def council2_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='r3'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='r3'),
+                'vote/3': Vote(id='vote/3', from_id='r3', to_id='r1'),
+                'vote/4': Vote(id='vote/4', from_id='g1', to_id='g3'),
+                'vote/5': Vote(id='vote/5', from_id='g2', to_id='g3'),
+                'vote/6': Vote(id='vote/6', from_id='g3', to_id='g1'),
+                'vote/7': Vote(id='vote/7', from_id='b1', to_id='b3'),
+                'vote/8': Vote(id='vote/8', from_id='b2', to_id='b3'),
+                'vote/9': Vote(id='vote/9', from_id='b3', to_id='b1'),
+            }
+
+        def challenge3_worker(gamedb):
+            # round 3: [Africa r1 r2 g1 g2 b1 b2 (all on team r)] vs [Asia y1 y2 k1 k2 x1 x2 (all on k team)]
+            # asia wins
+            # africa single team votes
+            # b2 is voted out
+            # [Africa r1 r2 g1 g2 b1 (all on team r)] vs [Asia y1 y2 k1 k2 x1 x2 (all on k team)]
+            # africa tribe size has reached minimum, tribes merge
+            # [a$apmob (r1 r2 g1 g2 b1) (y1 y2 k1 k2 x1 x2)]
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id='AFRICA', challenge_id='challenge/3'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id='ASIA', challenge_id='challenge/3'),
+            }
+
+        def council3_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='b2'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='b2'),
+                'vote/3': Vote(id='vote/3', from_id='g1', to_id='b2'),
+                'vote/4': Vote(id='vote/4', from_id='g2', to_id='b2'),
+                'vote/5': Vote(id='vote/5', from_id='b1', to_id='b2'),
+                'vote/6': Vote(id='vote/6', from_id='b2', to_id='r1'),
+            }
+
+        def challenge4_worker(gamedb):
+            # round 4: [a$apmob (team L: r1 r2 g1 g2 b1) (team R: y1 y2 k1 k2 x1 x2)]
+            # team L wins
+            # team R votes out x2
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/4'),
+                'entry/2': Entry(id='entry/2', likes=1, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/4'),
+            }
+
+        def council4_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='y1', to_id='x2'),
+                'vote/2': Vote(id='vote/2', from_id='y2', to_id='x2'),
+                'vote/3': Vote(id='vote/3', from_id='k1', to_id='x2'),
+                'vote/4': Vote(id='vote/4', from_id='k2', to_id='x2'),
+                'vote/5': Vote(id='vote/5', from_id='x1', to_id='x2'),
+                'vote/6': Vote(id='vote/6', from_id='x2', to_id='x1'),
+            }
+
+        def challenge5_worker(gamedb):
+            # round 5: [a$apmob (team L: r1 r2 g1 g2 b1) (team R: y1 y2 k1 k2 x1)]
+            # team L wins
+            # team R votes out x1
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/5'),
+                'entry/2': Entry(id='entry/2', likes=1, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/5'),
+            }
+
+        def council5_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='y1', to_id='x1'),
+                'vote/2': Vote(id='vote/2', from_id='y2', to_id='x1'),
+                'vote/3': Vote(id='vote/3', from_id='k1', to_id='x1'),
+                'vote/4': Vote(id='vote/4', from_id='k2', to_id='x1'),
+                'vote/5': Vote(id='vote/5', from_id='x1', to_id='y1'),
+            }
+
+        def challenge6_worker(gamedb):
+            # round 6: [a$apmob (team L: r1 r2 g1 g2 b1) (team R: y1 y2 k1 k2)]
+            # team R wins
+            # team L votes out b1
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/6'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/6'),
+            }
+
+        def council6_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='b1'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='b1'),
+                'vote/3': Vote(id='vote/3', from_id='g1', to_id='b1'),
+                'vote/4': Vote(id='vote/4', from_id='g2', to_id='b1'),
+                'vote/5': Vote(id='vote/5', from_id='b1', to_id='r1'),
+            }
+
+        def challenge7_worker(gamedb):
+            # round 7: [a$apmob (team L: r1 r2 g1 g2) (team R: y1 y2 k1 k2)]
+            # team R wins
+            # team L votes out g2
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/7'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/7'),
+            }
+
+        def council7_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='g2'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='g2'),
+                'vote/3': Vote(id='vote/3', from_id='g1', to_id='g2'),
+                'vote/4': Vote(id='vote/4', from_id='g2', to_id='g1'),
+            }
+
+        def challenge8_worker(gamedb):
+            # round 8: [a$apmob (team L: r1 r2 g1) (team R: y1 y2 k1 k2)]
+            # team R wins
+            # team L votes out g1
+            # team L would deadlock and must merge
+            # a$apmob: r1 r2 y1 y2 k1 k2
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/8'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/8'),
+            }
+
+        def council8_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='g1'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='g1'),
+                'vote/3': Vote(id='vote/3', from_id='g1', to_id='r1'),
+            }
+
+        def challenge9_worker(gamedb):
+            # round 9: a$apmob: r1 r2 y1 y2 k1 k2
+            # r1 wins immunity
+            # team votes out k2
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=6, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/2': Entry(id='entry/2', likes=5, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/3': Entry(id='entry/3', likes=4, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/4': Entry(id='entry/4', likes=3, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/5': Entry(id='entry/5', likes=2, views=1, player_id='k1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/6': Entry(id='entry/6', likes=1, views=1, player_id='k2', tribe_id=tribe_id, challenge_id='challenge/9'),
+            }
+
+        def council9_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='k2'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='k2'),
+                'vote/3': Vote(id='vote/3', from_id='y1', to_id='k2'),
+                'vote/4': Vote(id='vote/4', from_id='y2', to_id='k2'),
+                'vote/5': Vote(id='vote/5', from_id='k1', to_id='k2'),
+                'vote/6': Vote(id='vote/6', from_id='k2', to_id='k1'),
+            }
+
+        def challenge10_worker(gamedb):
+            # round 10: a$apmob: r1 r2 y1 y2 k1
+            # r1 wins immunity
+            # team votes out k1
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=5, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/2': Entry(id='entry/2', likes=4, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/4': Entry(id='entry/4', likes=2, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/5': Entry(id='entry/5', likes=1, views=1, player_id='k1', tribe_id=tribe_id, challenge_id='challenge/9'),
+            }
+
+        def council10_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='k1'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='k1'),
+                'vote/3': Vote(id='vote/3', from_id='y1', to_id='k1'),
+                'vote/4': Vote(id='vote/4', from_id='y2', to_id='k1'),
+                'vote/5': Vote(id='vote/5', from_id='k1', to_id='r1'),
+            }
+
+        def challenge11_worker(gamedb):
+            # round 11: a$apmob: r1 r2 y1 y2
+            # r1 wins immunity
+            # team votes out y2
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=4, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/2': Entry(id='entry/2', likes=3, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/3': Entry(id='entry/3', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/4': Entry(id='entry/4', likes=1, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
+            }
+
+        def council11_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='y2'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='y2'),
+                'vote/3': Vote(id='vote/3', from_id='y1', to_id='y2'),
+                'vote/4': Vote(id='vote/4', from_id='y2', to_id='r1'),
+            }
+
+        def challenge12_worker(gamedb):
+            # round 12: a$apmob: r1 r2 y1
+            # y1 wins immunity
+            # team votes out r1
+            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
+            }
+
+        def council12_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='y1'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='r1'),
+                'vote/3': Vote(id='vote/3', from_id='y1', to_id='r1'),
+            }
+
+        def challenge13_worker(gamedb):
+            # round 13: a$apmob: r2 y1
+            # community votes y1 to win (no tribal challenge)
+            # y1 wins
+            pass
+
+        def council13_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='y1', is_for_win=True),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='y1', is_for_win=True),
+                'vote/3': Vote(id='vote/3', from_id='y2', to_id='y1', is_for_win=True),
+                'vote/4': Vote(id='vote/4', from_id='k1', to_id='y1', is_for_win=True),
+                'vote/5': Vote(id='vote/5', from_id='k2', to_id='y1', is_for_win=True),
+            }
+
+        challenge_worker_queue = Queue()
+        for worker in [challenge1_worker, challenge2_worker, challenge3_worker, challenge4_worker, challenge5_worker,
+                       challenge6_worker, challenge7_worker, challenge8_worker, challenge9_worker, challenge10_worker,
+                       challenge11_worker, challenge12_worker, challenge13_worker]:
+            challenge_worker_queue.put(worker)
+
+        council_worker_queue = Queue()
+        for worker in [council1_worker, council2_worker, council3_worker, council4_worker, council5_worker, council6_worker,
+                       council7_worker, council8_worker, council9_worker, council10_worker, council11_worker, council12_worker,
+                       council13_worker]:
+            council_worker_queue.put(worker)
+
+        def event_fn(event):
+            if isinstance(event, events.NotifyTribalChallengeEvent) and not challenge_worker_queue.empty():
+                challenge_worker = challenge_worker_queue.get_nowait()
+                challenge_worker(gamedb)
+            elif isinstance(event, events.NotifyMultiTribeCouncilEvent) and not council_worker_queue.empty():
+                council_worker = council_worker_queue.get_nowait()
+                council_worker(gamedb)
+            elif isinstance(event, events.NotifySingleTribeCouncilEvent) and not council_worker_queue.empty():
+                council_worker = council_worker_queue.get_nowait()
+                council_worker(gamedb)
+            elif isinstance(event, events.NotifySingleTeamCouncilEvent) and not council_worker_queue.empty():
+                council_worker = council_worker_queue.get_nowait()
+                council_worker(gamedb)
+            elif isinstance(event, events.NotifyFinalTribalCouncilEvent) and not council_worker_queue.empty():
+                council_worker = council_worker_queue.get_nowait()
+                council_worker(gamedb)
+
+        engine.add_event = event_fn
+        winner = self._game.play(tribe1=gamedb.tribe_from_id('AFRICA'), tribe2=gamedb.tribe_from_id('ASIA'),
+                                    gamedb=gamedb, engine=engine)
+
+        self.assertEqual(winner, gamedb.player_from_id('y1'))
+
+    def test_play_multi_tribe(self):
+        gamedb = MockDatabase()
+        engine = Mock()
+
+        # [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 y3 k1 k2 k3 x1 x2 x3]
+        gamedb._players = {
+            'r1': Player(id='r1', tribe_id='TOKYO', team_id='r'),
+            'r2': Player(id='r2', tribe_id='TOKYO', team_id='r'),
+            'r3': Player(id='r3', tribe_id='TOKYO', team_id='r'),
+            'g1': Player(id='g1', tribe_id='TOKYO', team_id='g'),
+            'g2': Player(id='g2', tribe_id='TOKYO', team_id='g'),
+            'g3': Player(id='g3', tribe_id='TOKYO', team_id='g'),
+            'b1': Player(id='b1', tribe_id='TOKYO', team_id='b'),
+            'b2': Player(id='b2', tribe_id='TOKYO', team_id='b'),
+            'b3': Player(id='b3', tribe_id='TOKYO', team_id='b'),
+            'y1': Player(id='y1', tribe_id='LONDON', team_id='y'),
+            'y2': Player(id='y2', tribe_id='LONDON', team_id='y'),
+            'y3': Player(id='y3', tribe_id='LONDON', team_id='y'),
+            'k1': Player(id='k1', tribe_id='LONDON', team_id='k'),
+            'k2': Player(id='k2', tribe_id='LONDON', team_id='k'),
+            'k3': Player(id='k3', tribe_id='LONDON', team_id='k'),
+            'x1': Player(id='x1', tribe_id='LONDON', team_id='x'),
+            'x2': Player(id='x2', tribe_id='LONDON', team_id='x'),
+            'x3': Player(id='x3', tribe_id='LONDON', team_id='x'),
+        }
+
+        gamedb._teams = {
+            'r': Team(id='r', name='name/r', size=3, tribe_id='TOKYO'),
+            'g': Team(id='g', name='name/g', size=3, tribe_id='TOKYO'),
+            'b': Team(id='b', name='name/b', size=3, tribe_id='TOKYO'),
+            'y': Team(id='y', name='name/y', size=3, tribe_id='LONDON'),
+            'k': Team(id='k', name='name/k', size=3, tribe_id='LONDON'),
+            'x': Team(id='x', name='name/x', size=3, tribe_id='LONDON'),
+        }
+
+        gamedb._tribes = {
+            'TOKYO': Tribe(id='TOKYO', name='name/TOKYO', size=9),
+            'LONDON': Tribe(id='LONDON', name='name/LONDON', size=9),
+        }
+
+        gamedb._challenges = {
+            'challenge/1': Challenge(id='challenge/1', name='name/challenge1'),
+            'challenge/2': Challenge(id='challenge/2', name='name/challenge2'),
+            'challenge/3': Challenge(id='challenge/3', name='name/challenge3'),
+            'challenge/4': Challenge(id='challenge/4', name='name/challenge4'),
+        }
+
+        gamedb._entries = {}
+
+        def challenge1_worker(gamedb):
+            # round 1: [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 y3 k1 k2 k3 x1 x2 x3]
+            # tokyo wins
+            # asia teams vote
+            # y votes out y3
+            # k votes out k3
+            # x votes out x3
+            # [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 k1 k2 x1 x2]
+            # asia teams of 2 would deadlock and must merge
+            # [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id='TOKYO', challenge_id='challenge/1'),
+                'entry/2': Entry(id='entry/2', likes=1, views=1, player_id='y1', tribe_id='LONDON', challenge_id='challenge/1'),
+            }
+
+        def council1_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='y1', to_id='y3'),
+                'vote/2': Vote(id='vote/2', from_id='y2', to_id='y3'),
+                'vote/3': Vote(id='vote/3', from_id='y3', to_id='y1'),
+                'vote/4': Vote(id='vote/4', from_id='k1', to_id='k3'),
+                'vote/5': Vote(id='vote/5', from_id='k2', to_id='k3'),
+                'vote/6': Vote(id='vote/6', from_id='k3', to_id='k1'),
+                'vote/7': Vote(id='vote/7', from_id='x1', to_id='x3'),
+                'vote/8': Vote(id='vote/8', from_id='x2', to_id='x3'),
+                'vote/9': Vote(id='vote/9', from_id='x3', to_id='x1'),
+            }
+
+        def challenge2_worker(gamedb):
+            # round 2: [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
+            # london wins
+            # tokyo teams vote
+            # r votes out r3
+            # g votes out g3
+            # b votes out b3
+            # [Tokyo r1 r2 g1 g2 b1 b2] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
+            # tokyo teams of 2 would deadlock and must merge
+            # [Tokyo r1 r2 g1 g2 b1 b2 (all on team r)] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id='TOKYO', challenge_id='challenge/1'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id='LONDON', challenge_id='challenge/1'),
+            }
+
+        def council2_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='r3'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='r3'),
+                'vote/3': Vote(id='vote/3', from_id='r3', to_id='r1'),
+                'vote/4': Vote(id='vote/4', from_id='g1', to_id='g3'),
+                'vote/5': Vote(id='vote/5', from_id='g2', to_id='g3'),
+                'vote/6': Vote(id='vote/6', from_id='g3', to_id='g1'),
+                'vote/7': Vote(id='vote/7', from_id='b1', to_id='b3'),
+                'vote/8': Vote(id='vote/8', from_id='b2', to_id='b3'),
+                'vote/9': Vote(id='vote/9', from_id='b3', to_id='b1'),
+            }
+
+        def challenge3_worker(gamedb):
+            # round 3: [Tokyo r1 r2 g1 g2 b1 b2 (all on team r)] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
+            # london wins
+            # tokyo single team votes
+            # b2 is voted out
+            # [Tokyo r1 r2 g1 g2 b1 (all on team r)] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
+            # tokyo tribe size has reached minimum, tribes merge
+            # [a$apmob (r1 r2 g1 g2 b1) (y1 y2 k1 k2 x1 x2)]
+            gamedb._entries = {
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id='TOKYO', challenge_id='challenge/1'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id='LONDON', challenge_id='challenge/1'),
+            }
+
+        def council3_worker(gamedb):
+            gamedb._votes = {
+                'vote/1': Vote(id='vote/1', from_id='r1', to_id='b2'),
+                'vote/2': Vote(id='vote/2', from_id='r2', to_id='b2'),
+                'vote/4': Vote(id='vote/4', from_id='g1', to_id='b2'),
+                'vote/5': Vote(id='vote/5', from_id='g2', to_id='b2'),
+                'vote/7': Vote(id='vote/7', from_id='b1', to_id='b2'),
+                'vote/8': Vote(id='vote/8', from_id='b2', to_id='r1'),
+            }
+
+        challenge_worker_queue = Queue()
+        for worker in [challenge1_worker, challenge2_worker, challenge3_worker]:
+            challenge_worker_queue.put(worker)
+
+        council_worker_queue = Queue()
+        for worker in [council1_worker, council2_worker, council3_worker]:
+            council_worker_queue.put(worker)
+
+        def event_fn(event):
+            if isinstance(event, events.NotifyTribalChallengeEvent) and not challenge_worker_queue.empty():
+                challenge_worker = challenge_worker_queue.get_nowait()
+                challenge_worker(gamedb)
+            elif isinstance(event, events.NotifyMultiTribeCouncilEvent) and not council_worker_queue.empty():
+                council_worker = council_worker_queue.get_nowait()
+                council_worker(gamedb)
+
+        engine.add_event = event_fn
+        tribe = self._game._play_multi_tribe(tribe1=gamedb.tribe_from_id('TOKYO'),
+                                             tribe2=gamedb.tribe_from_id('LONDON'), gamedb=gamedb, engine=engine)
+
+        # round 4: [a$apmob (r1 r2 g1 g2 b1) (y1 y2 k1 k2 x1 x2)]
+        # single tribe should be returned
+        self.assertEqual(tribe.name, self._game._options.merge_tribe_name)
+        self.assertListEqual([player.id for player in gamedb._players.values() if player.active and player.tribe_id == tribe.id], [
+            'r1', 'r2', 'g1', 'g2', 'b1', 'y1', 'y2', 'k1', 'k2', 'x1', 'x2'
+        ])
 
     def test_play_single_tribe(self):
         gamedb = MockDatabase()
@@ -389,12 +938,33 @@ class GameTest(unittest.TestCase):
         gamedb.clear_votes = Mock()
         engine = Mock()
 
+        gamedb._players = {
+            'player/1': Player(id='player/1', tribe_id='tribe/1', team_id='team/1'),
+            'player/2': Player(id='player/2', tribe_id='tribe/1', team_id='team/1'),
+            'player/3': Player(id='player/3', tribe_id='tribe/1', team_id='team/1'),
+            'player/4': Player(id='player/4', tribe_id='tribe/1', team_id='team/1'),
+            'player/5': Player(id='player/5', tribe_id='tribe/2', team_id='team/2'),
+            'player/6': Player(id='player/6', tribe_id='tribe/2', team_id='team/2'),
+            'player/7': Player(id='player/7', tribe_id='tribe/2', team_id='team/2'),
+            'player/8': Player(id='player/8', tribe_id='tribe/2', team_id='team/2'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=4, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', size=4, tribe_id='tribe/2'),
+        }
+
+        gamedb._tribes = {
+            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', size=4),
+            'tribe/2': Tribe(id='tribe/2', name='name/tribe2', size=4)
+        }
+
         # inject votes
         gamedb._votes = {
-            'vote/1': Vote(id='vote/1', from_id='player/09', to_id='player/12'),
-            'vote/2': Vote(id='vote/2', from_id='player/10', to_id='player/12'),
-            'vote/3': Vote(id='vote/3', from_id='player/11', to_id='player/12'),
-            'vote/4': Vote(id='vote/4', from_id='player/12', to_id='player/09'),
+            'vote/5': Vote(id='vote/5', from_id='player/5', to_id='player/8'),
+            'vote/6': Vote(id='vote/6', from_id='player/6', to_id='player/8'),
+            'vote/7': Vote(id='vote/7', from_id='player/7', to_id='player/8'),
+            'vote/8': Vote(id='vote/8', from_id='player/8', to_id='player/5'),
         }
 
         self._game._run_multi_tribe_council(winning_tribe=gamedb.tribe_from_id('tribe/1'),
@@ -402,7 +972,7 @@ class GameTest(unittest.TestCase):
 
         engine.add_event.assert_called()
         gamedb.clear_votes.assert_called_once()
-        self.assertFalse(gamedb.player_from_id('player/12').active)
+        self.assertFalse(gamedb.player_from_id('player/8').active)
 
     def test_run_single_tribe_council(self):
         gamedb = MockDatabase()
@@ -424,6 +994,67 @@ class GameTest(unittest.TestCase):
         engine.add_event.assert_called()
         gamedb.clear_votes.assert_called_once()
         self.assertFalse(gamedb.player_from_id('player/04').active)
+
+    def test_run_finalist_tribe_council(self):
+        gamedb = MockDatabase()
+        gamedb.clear_votes = Mock()
+        engine = Mock()
+
+        finalists = {
+            'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
+            'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
+            'player/03': Player(id='player/03', tribe_id='tribe/1', team_id='team/1'),
+            'player/04': Player(id='player/04', tribe_id='tribe/1', team_id='team/1'),
+        }
+
+        # inject votes
+        gamedb._votes = {
+            'vote/1': Vote(id='vote/1', from_id='player/01', to_id='player/04', is_for_win=True),
+            'vote/2': Vote(id='vote/2', from_id='player/02', to_id='player/04', is_for_win=True),
+            'vote/3': Vote(id='vote/3', from_id='player/03', to_id='player/04', is_for_win=True),
+            'vote/4': Vote(id='vote/4', from_id='player/04', to_id='player/01', is_for_win=True),
+        }
+
+        winner = self._game._run_finalist_tribe_council(finalists=finalists, gamedb=gamedb, engine=engine)
+        engine.add_event.assert_called()
+        self.assertEqual(winner, gamedb._players['player/04'])
+
+    def test_run_single_team_council(self):
+        gamedb = MockDatabase()
+        gamedb.clear_votes = Mock()
+        engine = Mock()
+
+        gamedb._players = {
+            'player/1': Player(id='player/1', tribe_id='tribe/1', team_id='team/1'),
+            'player/2': Player(id='player/2', tribe_id='tribe/1', team_id='team/1'),
+            'player/3': Player(id='player/3', tribe_id='tribe/1', team_id='team/1'),
+            'player/4': Player(id='player/4', tribe_id='tribe/1', team_id='team/1'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=4, tribe_id='tribe/1'),
+        }
+
+        gamedb._tribes = {
+            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', size=4)
+        }
+
+        # inject votes
+        gamedb._votes = {
+            'vote/1': Vote(id='vote/1', from_id='player/1', to_id='player/4'),
+            'vote/2': Vote(id='vote/2', from_id='player/2', to_id='player/4'),
+            'vote/3': Vote(id='vote/3', from_id='player/3', to_id='player/4'),
+            'vote/4': Vote(id='vote/4', from_id='player/4', to_id='player/1'),
+        }
+
+        self._game._run_single_team_council(team=gamedb._teams['team/1'], losing_players=[
+            gamedb._players['player/2'],
+            gamedb._players['player/3'],
+            gamedb._players['player/4'],
+        ], gamedb=gamedb, engine=engine)
+        # TODO(brandon): assert result
+        engine.add_event.assert_called()
+        self.assertFalse(gamedb._players['player/4'].active)
 
     def test_merge_teams_2player(self):
         gamedb = MockDatabase()
@@ -712,6 +1343,37 @@ class GameTest(unittest.TestCase):
             gamedb.team_from_id('team/5'),
             gamedb.team_from_id('team/4'),
         ])
+        engine.add_event.assert_called()
+
+    def test_score_entries_top_k_players(self):
+        engine = Mock()
+        gamedb = MockDatabase()
+        tribe = gamedb.tribe_from_id('tribe/1')
+        challenge = gamedb.challenge_from_id('challenge/1')
+
+        gamedb._players = {
+            'player/1': Player(id='player/1', tribe_id='tribe/1', team_id='team/1'),
+            'player/2': Player(id='player/2', tribe_id='tribe/1', team_id='team/1'),
+            'player/3': Player(id='player/3', tribe_id='tribe/1', team_id='team/1'),
+        }
+
+        gamedb._teams = {
+            'team/1': Team(id='team/1', name='name/team1', size=3, tribe_id='tribe/1'),
+        }
+
+        gamedb._entries = {
+            'entry/1': Entry(id='entry/1', likes=3, views=1, player_id='player/1', tribe_id='tribe/1', challenge_id='challenge/1'),
+            'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='player/2', tribe_id='tribe/1', challenge_id='challenge/1'),
+            'entry/3': Entry(id='entry/3', likes=1, views=1, player_id='player/3', tribe_id='tribe/1', challenge_id='challenge/1'),
+        }
+
+        losing_players = self._game._score_entries_top_k_players(team=gamedb.team_from_id('team/1'), challenge=challenge, gamedb=gamedb, engine=engine)
+
+        self.assertListEqual(losing_players, [
+            gamedb.player_from_id('player/3'),
+            gamedb.player_from_id('player/2')
+        ])
+
         engine.add_event.assert_called()
 
     def test_merge_tribes(self):

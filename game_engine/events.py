@@ -1,6 +1,6 @@
 import attr
 from game_engine.database import Player, Challenge, Entry, Team, Tribe
-from typing import Iterable
+from typing import Iterable, List
 
 
 class Event(object):
@@ -40,11 +40,19 @@ class NotifySingleTribeCouncilEvent(Event):
     winning_teams: Iterable[Team] = attr.ib()
     losing_teams: Iterable[Team] = attr.ib()
 
+@attr.s
+class NotifySingleTeamCouncilEvent(Event):
+    winning_player: Player = attr.ib()
+    losing_players: Iterable[Player] = attr.ib()
 
 @attr.s
 class NotifyMultiTribeCouncilEvent(Event):
     winning_tribe: Tribe = attr.ib()
     losing_tribe: Tribe = attr.ib()
+
+@attr.s
+class NotifyFinalTribalCouncilEvent(Event):
+    finalists: List[Player] = attr.ib()
 
 @attr.s
 class NotifyPlayerVotedOutEvent(Event):
@@ -53,6 +61,10 @@ class NotifyPlayerVotedOutEvent(Event):
 @attr.s
 class NotifyTribalCouncilCompletionEvent(Event):
     pass
+
+@attr.s
+class NotifyWinnerAnnouncementEvent(Event):
+    winner: Player = attr.ib()
 
 @attr.s
 class NotifyImmunityAwardedEvent(Event):

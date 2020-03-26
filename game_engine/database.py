@@ -67,7 +67,7 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def stream_entries(self, from_tribe: Tribe, from_challenge: Challenge) -> Iterable[Entry]:
+    def stream_entries(self, from_tribe: Tribe=None, from_team: Team=None, from_challenge: Challenge=None) -> Iterable[Entry]:
         pass
 
     @abstractmethod
@@ -83,7 +83,7 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def count_teams(self, active_team_predicate_value=True) -> int:
+    def count_teams(self, from_tribe: Tribe=None, active_team_predicate_value=True) -> int:
         pass
 
     @abstractmethod
@@ -91,7 +91,7 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def count_votes(self, from_team: Team) -> Tuple[Player, int]:
+    def count_votes(self, from_team: Team, is_for_win: bool=False) -> Tuple[Player, int]:
         pass
     
     @abstractmethod 
