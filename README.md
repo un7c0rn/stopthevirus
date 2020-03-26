@@ -2,7 +2,7 @@
 
 ## Objective:
 
-Design a worldwide high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the planet Earth to engage in social distancing and to stop the spread of the COVID-19 virus.
+Design a worldwide high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the planet to engage in social distancing and stop the spread of the COVID-19 virus.
 
 ## Background:
 
