@@ -1,32 +1,42 @@
-# stopthevirus
-
-## COVID 19 #STOPTHEVIRUS HIGH STAKES SOCIAL GAME
+# COVID-19 #STOPTHEVIRUS SOCIAL GAME
 
 ## Objective:
 
-Design a global scale high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the planet Earth to stop the spread of the COVID-19 virus.
+Design a global scale high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing and stop the spread of the COVID-19 virus.
 
 ## Background:
 
-* We base the game on [Survivor](https://en.wikipedia.org/wiki/Survivor_(American_TV_series)) rules with modifications to make it work at global scale. 
-* Define 2 "tribes" worldwide O(~millions) of members each.
-* $1 buy-in to play, single person winner takes all (as an incentivization mechanism)
-* Each tribe is divided into small sub-teams of 5 where people can pick their own team
-* Daily, tribe 1 is pitted against tribe 2 with an awareness and social distancing challenge
-* All participants post social content in order to score points
-* Points are aggregated across all tribe members and the tribe with the highest number of points wins for the day
-* If your tribe loses the challenge of the day, every sub-team on the tribe (so for example 200,000 sub teams on a tribe of 1M) must vote out 1 member.
-* Sub-teams will continue to merge into groups of 5 using the algorithm automatically
-* The algorithm will email players with new team assignments and social media info of their group continuously
-* After 30 days we’ll have a final group of contestants (possibly 10 or so?) and the entire group of all participants (everyone who donated the $1) will vote on who the winner of the money should be
-* Each finalist will be able to make a case on social media using a video post to state why they should be the final survivor and winner of the prize money.
-* Social awareness competitions will be user submitted e.g. *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song, Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
+It’s Spring 2020 and Coachella is cancelled. We’re at the height of human technology and innovation, but at the same time facing one of the most devastating viral pandemics in history. The economy is suffering, countries around the world are facing mandatory lockdown orders and hospitals are overwhelmed. Despite this, many people are still unaware of the seriousness of COVID-19 and actions they can take to support our health care professionals such as social distancing to flatten the health care demand curve. Reducing the doubling rate of COVID-19 by even a few days can have massive impact. Can we use a high stakes social game to help inspire the youth to stop the virus?
+
+This social game was inspired by the TV show Survivor. It's a game based on fun challenges, alliances and human psychology. The twist here is that instead of being stranded on a deserted island for 30 days, players are "stranded" inside their homes. This is important because social distancing, i.e. staying home, is the best tool that the youth have right now for collectively fighting the epidemic. All challenges in this game are designed to incentivize social distancing and spreading awareness. Young and healthy people are at risk and can engage in activities that can increase risk for others, so the goal is to create home-based activities that reward risk mitigation.
+
+Also, since the game is digital and based on social media, we aren't limited to the standard 20 players. Everyone can play. With the hope of attracting even more players and convinving them to socially distance, a $1 donation is required to join and the winner takes all.
+
+Here's how the game works:
+
+## Game Flow Chart
+
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/flowchart.svg" width="1000">
+
+## How To Win
+
+New social distancing challenge ideas can be added continuously by the game admins. Some examples include *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song.* or *Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
+
+After thirty days a group of two finalists will have made it to the end. All previous players will have the opportunity to vote for who the winner of the prize money should be. Each finalist will be able to make a case on social media using a video post to say why they should be the final survivor and winner of the prize money.
+
+## Architecture Block Diagram
+
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/blockdiagram.svg" width="1000">
 
 ## Requirements
 
+```
+pip3 install -r requirements.txt
+```
+
 ## Unit Tests
 
-Running the unit tests is a good way to get started and to verify that any dependencies are present. In general, the goal is to minimize the number of dependencies as much as possible.
+Running the unit tests is a good way to get started with development. In general, a technical goal here is to minimize the number of dependencies as much as possible.
 
 To run the unit tests:
 
@@ -46,56 +56,43 @@ brew install entr
 find . -name '*.py' | entr python3 -m unittest game_test.py -v
 ```
 
-## Design:
+## Design
 
-The game consists of the following system level components:
+### Data Model
 
-1. Game engine: AWS Lambda Microservice Python application that runs the scoring, team assignment and voting algorithms
-1. Game database: Amazon RDL / MySQL
-1. High speed input/output event queues: Amazon SQS 
-1. User API using JSON
-1. Scraping service: scrapes Instagram webdata for #STOPTHEVIRUS and posts challenge submission scores to input event queue using (4)
-1. Notification service: sends out team assignments, challenge announcements, kick notifications and voting ceremony announcements (globally)
-1. User device social media channels: used to submit challenges with hashtag and to score points for user tribes.
-1. Email / SMS / Web: Used to communicate announcements and administration to users. This is necessary since it is not possible to reliably automate announcements via Instagram. Alternate option: we could use Twitter to post announcements and potentially automate.
-
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture1.svg" width="1000">
-
-## Detailed Design:
-
-The core of the system is the game engine (1). Input events are ingested asynchronously onto the queue (3.1) and processed by the game engine. There are a finite number of input event types:
-
-1. New player
-1. New challenge creation
-1. New vote (kick off)
-1. New vote (win)
-1. New challenge entry submission
-
-And a finite number of output event types:
-
-1. New team assignment
-1. New challenge announcement
-1. Voted out notification
-1. New voting ceremony announcement
-
-## Event Driven Model
-
-When a **NewPlayer event** is received, the game engine creates an entry in GameDB. If a team is specified for the player, the player is placed on that team. Otherwise, the algorithm finds a team and associates the player with that team in the DB. A new team assignment event is placed on the output queue. NewPlayer events are only valid during the valid entry window. After the entry deadline, all NewPlayer events are ignored. New player events received during tribal council are placed back on the input event queue. New Player events are generated from the REST API. The REST API is called by a JavaScript frontend (8) which validates that the player is not a bot, accepts a $1 donation, and all required player info: preferred team ID (optional), IG account (required), email address (required). The registration client must also verify that the email account belongs to the user before submitting a NewPlayer event.
-
-When a **NewChallengeCreation event** is received, the gamer engine creates an entry in GameDB. The NewChallengeCreation event must contain information that indicates when the challenge starts, when the challenge should be announced, and when the deadline for entry ends. All rules pertaining to the challenge must be included in the description. When NewChallengeCreation events are received and are validated, the game engine creates a NewChallengeAnnouncement and places it on the output queue. The notification service is responsible for dequeuing the output event and making all participants aware of the daily challenge information. In addition, the notification service must post new challenge information to the web front end. New challenges should never be announced until the completion of the tribal council associated with the previous challenge. The notification service must wait for all VotedOutNotifications to be processed before sending a NewChallengeAnnouncement. NewChallengeAnnouncements are sent to all active players.
-
-When a **NewChallengeEntrySubmission event** is received, the game engine identifies the head to head opponent and verifies that both submissions have been received. It also ensures that both entries have been available for at least 1 hour. It scores the entries using the following tentative formula: score = likes / views. This normalizes entries to control for time and popularity. We want to reduce the effects of celebrity status on the ability to win. The metrics such as likes, views, etc. are included in the NewChallengeEntrySubmission event from the scraping service (5). The scraping service is a highly parallelized group of jobs that continuously check for #STOPTHEVIRUS posts. All posts are submitted to the input event queue as challenge entries. Posts by non-participants, or duplicate posts, are ignored by the game engine. The way to enter a challenge is simply to post to Instagram using the hashtag #STOPTHEVIRUS and to be a registered participant. Posts should tag the @stopthevirus IG account to spread awareness of the game and objective. After all entries are scored and the winning tribe is computed, a NewTribalCouncilAnnouncement is placed on the output queue. The notification system uses these events to announce the winning tribe and to let the losing tribe know when the tribal council voting window opens. Tribal council voting windows are open for 4 hours.
-
-**NewVoteOut events** are ignored if the game engine state is not in tribal council state. Tribal council state is controlled by the game clock. The game engine decides when to cut off challenge entries and when to enter tribal council state. Voting Ceremony states are synonymous with tribal challenge winner announcements. In other words, saying “BLUE TRIBE WINS!” is the same as saying “RED TRIBE HAS TRIBAL COUNCIL!”.
-
-**NewVoteWin events** are ignored if the game engine state is not in finalist state. Once the game engine enters the finalist state, all players that have ever played the game are allowed to vote for their favorite finalist. The game engine records NewVoteWin events for each finalist in the gamedb. The final winner announcement will be made manually via Instagram live by inspecting the database logs on the final day of the challenge.
-
-## Game Engine Finite State Machine Diagram
-
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/gameflow.svg" width="1000">
+| Type         | Properties                                               | Comments                |
+| ------------ | -------------------------------------------------------- | ------------------------|
+| Player       | id, tiktok, email, tribe_id, team_id, active             |                         |
+| Vote         | id, from_id, to_id, is_for_win                           |                         |
+| Team         | id, name, size, tribe_id, active                         |                         |
+| Tribe        | id, name, size, active                                   |                         |
+| Challenge    | id, name, message, start/end_timestamp, complete         | Posted by game admin(s) |
+| Entry        | id, likes, views, player_id, tribe_id, challenge_id, url | i.e. TikTok post        |
 
 
+### Game and Event Model
 
+The game architecture is comprised of a thin frontend (6) and a simple backend microservice (7) processing realtime events through Firebase (4) at scale. The frontend is intentionally thin and only used to display challenge information, perform signup and for player voting.
 
+When challenges start each day, players submit their entry by simply posting to TikTok using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10).
 
+The initial proposed components are enumerated here:
+
+1. TikTok
+
+2. Web scraper service - a simple Python job that can run in a cluster in order to read TikTok post metadata and submit it to the game database (4). Due to API rate limiting the thought here is to use the HTTP endpoint rather than the REST API (TBD). If the API is unworkable players may need to submit challenge entry links using the frontend (6) as a fallback.
+
+3. A Python interface for performing game queries and updates in Firebase for use from the backend (7).
+
+4. A <a href="http://firebase.com/">Firebase Cloud FireStore</a> instance for hosting and processing realtime game data.
+
+5. A JavaScript interface for performing game queries and updates in Firebase for use from the frontend (6).
+
+6. A thin HTML5 / JavaScript (possibly React) app for player registration, voting and informational updates.
+
+7. A Python microservice hosted on <a href="https://aws.amazon.com/lambda/">AWS lambda</a> that runs the core game loop and issues events.
+
+8. A scalable <a href="https://aws.amazon.com/sqs/">AWS SQS</a> queueing service for asynchronously processing game events.
+
+9. A simple job that can run in a cluster in order to read events from the queue (8) and perform bulk notifications to users via SMTP (SMS if anyone wants to integrate <a href="https://www.twilio.com/">Twilio</a>).
 
