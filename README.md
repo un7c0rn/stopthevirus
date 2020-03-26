@@ -38,7 +38,7 @@ pip3 install -r requirements.txt
 
 ## Unit Tests
 
-Running the unit tests is a good way to get started with development. In general, a technical goal here is to minimize the number of dependencies as much as possible.
+Running the unit tests is a good way to get started with development.
 
 To run the unit tests:
 
@@ -76,7 +76,7 @@ find . -name '*.py' | entr python3 -m unittest game_test.py -v
 
 The game architecture is comprised of a thin frontend (6) and a simple backend microservice (7) processing realtime events through Firebase (4) at scale. The frontend is intentionally thin and only used to display challenge information, perform signup and for player voting.
 
-When challenges start each day, players submit their entry by simply posting to TikTok using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10).
+When challenges start each day, players submit their entry by simply posting to TikTok using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10). Text-messaging would be ideal but is avoided in the initial design due to cost consideration.
 
 The initial proposed components are enumerated here:
 
