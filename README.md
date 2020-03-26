@@ -1,4 +1,4 @@
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/banner.png" width=500>
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/banner.png" width=1000>
 
 # COVID-19 #STOPTHEVIRUS SOCIAL GAME
 
