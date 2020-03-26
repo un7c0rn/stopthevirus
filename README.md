@@ -1,10 +1,8 @@
-# stopthevirus
-
-## COVID 19 #STOPTHEVIRUS HIGH STAKES SOCIAL GAME
+# COVID 19 #STOPTHEVIRUS SOCIAL GAME
 
 ## Objective:
 
-Design a global scale high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the planet Earth to stop the spread of the COVID-19 virus.
+Design a worldwide high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the planet Earth to engage in social distancing and to stop the spread of the COVID-19 virus.
 
 ## Background:
 
@@ -21,6 +19,14 @@ Design a global scale high stakes social game to help inspire millions of Millen
 * After 30 days we’ll have a final group of contestants (possibly 10 or so?) and the entire group of all participants (everyone who donated the $1) will vote on who the winner of the money should be
 * Each finalist will be able to make a case on social media using a video post to state why they should be the final survivor and winner of the prize money.
 * Social awareness competitions will be user submitted e.g. *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song, Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
+
+## Game Flow Chart
+
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/flowchart.svg" width="1000">
+
+## Architecture Block Diagram
+
+<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/blockdiagram.svg" width="1000">
 
 ## Requirements
 
@@ -46,7 +52,11 @@ brew install entr
 find . -name '*.py' | entr python3 -m unittest game_test.py -v
 ```
 
-## Design:
+## Design
+
+### Data Model
+
+### Game and Event Model
 
 The game consists of the following system level components:
 
@@ -58,8 +68,6 @@ The game consists of the following system level components:
 1. Notification service: sends out team assignments, challenge announcements, kick notifications and voting ceremony announcements (globally)
 1. User device social media channels: used to submit challenges with hashtag and to score points for user tribes.
 1. Email / SMS / Web: Used to communicate announcements and administration to users. This is necessary since it is not possible to reliably automate announcements via Instagram. Alternate option: we could use Twitter to post announcements and potentially automate.
-
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/stopthevirus_architecture1.svg" width="1000">
 
 ## Detailed Design:
 
@@ -90,9 +98,6 @@ When a **NewChallengeEntrySubmission event** is received, the game engine identi
 
 **NewVoteWin events** are ignored if the game engine state is not in finalist state. Once the game engine enters the finalist state, all players that have ever played the game are allowed to vote for their favorite finalist. The game engine records NewVoteWin events for each finalist in the gamedb. The final winner announcement will be made manually via Instagram live by inspecting the database logs on the final day of the challenge.
 
-## Game Engine Finite State Machine Diagram
-
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/gameflow.svg" width="1000">
 
 
 
