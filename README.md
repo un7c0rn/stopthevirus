@@ -26,22 +26,15 @@ After thirty days a group of two finalists will have made it to the end. All pla
 
 <img src="https://github.com/unicorn1337x/stopthevirus/blob/master/blockdiagram.svg" width="1000">
 
-The game consists of the following system level components:
-
-1. Game engine: AWS Lambda Microservice Python application that runs the scoring, team assignment and voting algorithms
-1. Game database: Amazon RDL / MySQL
-1. High speed input/output event queues: Amazon SQS 
-1. User API using JSON
-1. Scraping service: scrapes Instagram webdata for #STOPTHEVIRUS and posts challenge submission scores to input event queue using (4)
-1. Notification service: sends out team assignments, challenge announcements, kick notifications and voting ceremony announcements (globally)
-1. User device social media channels: used to submit challenges with hashtag and to score points for user tribes.
-1. Email / SMS / Web: Used to communicate announcements and administration to users. This is necessary since it is not possible to reliably automate announcements via Instagram. Alternate option: we could use Twitter to post announcements and potentially automate.
-
 ## Requirements
+
+```
+pip3 install -r requirements.txt
+```
 
 ## Unit Tests
 
-Running the unit tests is a good way to get started and to verify that any dependencies are present. In general, the goal is to minimize the number of dependencies as much as possible.
+Running the unit tests is a good way to get started with development. In general, a technical goal here is to minimize the number of dependencies as much as possible.
 
 To run the unit tests:
 
