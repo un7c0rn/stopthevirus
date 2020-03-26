@@ -12,7 +12,7 @@ class Data(ABC):
 @attr.s
 class Player(Data):
     id: Text = attr.ib()
-    instagram: Text = attr.ib(default='')
+    tiktok: Text = attr.ib(default='')
     email: Text = attr.ib(default='')
     tribe_id: Text = attr.ib(default='')
     team_id: Text = attr.ib(default='')
