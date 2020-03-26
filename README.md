@@ -1,6 +1,6 @@
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/banner.png" width=1000>
+<center><img src="https://github.com/unicorn1337x/stopthevirus/blob/master/banner.png" width=1000></center>
 
-# COVID-19 #STOPTHEVIRUS SOCIAL GAME AND DEVELOPMENT PROJECT
+# COVID-19 #STOPTHEVIRUS SOCIAL GAME
 
 ## Objective:
 
@@ -8,7 +8,7 @@ Design a global scale high stakes social game to help inspire millions of Millen
 
 ## Background:
 
-It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the Tokyo Olympics are cancelled this year. We’re at the height of human technology and innovation, but at the same time facing one of the most devastating viral pandemics in history. The economy is suffering, countries around the world are facing mandatory lockdown orders and hospitals are overwhelmed. Despite this, many people are still unaware of the seriousness of COVID-19 and actions they can take to support our health care professionals such as social distancing to <a href="https://www.wired.com/story/the-promising-math-behind-flattening-the-curve/">flatten the health care demand curve</a>. Reducing the doubling rate of COVID-19 by even a few days can have massive impact. Can we use a high stakes social game to help inspire the youth to stop the virus?
+It’s Spring 2020 and Coachella is cancelled. We’re at the height of human technology and innovation, but at the same time facing one of the most devastating viral pandemics in history. The economy is suffering, countries around the world are facing mandatory lockdown orders and hospitals are overwhelmed. Despite this, many people are still unaware of the seriousness of COVID-19 and actions they can take to support our health care professionals such as social distancing to flatten the health care demand curve. Reducing the doubling rate of COVID-19 by even a few days can have massive impact. Can we use a high stakes social game to help inspire the youth to stop the virus?
 
 This social game was inspired by the TV show Survivor. It's a game based on fun challenges, alliances and human psychology. The twist here is that instead of being stranded on a deserted island for 30 days, players are "stranded" inside their homes. This is important because social distancing, i.e. staying home, is the best tool that the youth have right now for collectively fighting the epidemic. All challenges in this game are designed to incentivize social distancing and spreading awareness. Young and healthy people are at risk and can engage in activities that can increase risk for others, so the goal is to create home-based activities that reward risk mitigation.
 
@@ -38,7 +38,7 @@ pip3 install -r requirements.txt
 
 ## Unit Tests
 
-Running the unit tests is a good way to get started with development.
+Running the unit tests is a good way to get started with development. In general, a technical goal here is to minimize the number of dependencies as much as possible.
 
 To run the unit tests:
 
@@ -76,11 +76,11 @@ find . -name '*.py' | entr python3 -m unittest game_test.py -v
 
 The game architecture is comprised of a thin frontend (6) and a simple backend microservice (7) processing realtime events through Firebase (4) at scale. The frontend is intentionally thin and only used to display challenge information, perform signup and for player voting.
 
-When challenges start each day, players submit their entry by simply posting to TikTok using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10). Text-messaging would be ideal but is avoided in the initial design due to cost consideration.
+When challenges start each day, players submit their entry by simply posting to TikTok using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10).
 
 The initial proposed components are enumerated here:
 
-1. <a href="https://www.tiktok.com/en/">TikTok</a>
+1. TikTok
 
 2. Web scraper service - a simple Python job that can run in a cluster in order to read TikTok post metadata and submit it to the game database (4). Due to API rate limiting the thought here is to use the HTTP endpoint rather than the REST API (TBD). If the API is unworkable players may need to submit challenge entry links using the frontend (6) as a fallback.
 
@@ -92,10 +92,9 @@ The initial proposed components are enumerated here:
 
 6. A thin HTML5 / JavaScript (possibly React) app for player registration, voting and informational updates.
 
-7. A Python microservice hosted on <a href="https://aws.amazon.com/lambda/">AWS lambda</a> that runs the core game loop and issues events.
+7. A Python microservice hosted on <a href="https://firebase.google.com/products/functions">Firebase Functions</a> that runs the core game loop and issues events.
 
-8. A scalable <a href="https://aws.amazon.com/sqs/">AWS SQS</a> queueing service for asynchronously processing game events.
+8. A scalable <a href="https://aws.amazon.com/sqs/">AWS SQS</a> queueing service for asynchronously processing game events. This is probably available with Firebase as well, haven't looked into it yet.
 
 9. A simple job that can run in a cluster in order to read events from the queue (8) and perform bulk notifications to users via SMTP (SMS if anyone wants to integrate <a href="https://www.twilio.com/">Twilio</a>).
 
-Questions contact <a href="mailto:brandon@formless.la">brandon@formless.la</a>
