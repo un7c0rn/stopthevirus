@@ -15,6 +15,7 @@ from queue import Queue
 import random
 import pprint
 import heapq
+from game_engine.firebase import Firebase
 
 
 def _unixtime():
@@ -32,9 +33,15 @@ class GameError(Exception):
     pass
 
 
+# TODO(brandon): update these values after creating tribes in database
+_TRIBE_1_ID = ''
+_TRIBE_2_ID = ''
+_FIREBASE_CONF = {}
+
+
 @attr.s
 class GameOptions(object):
-    engine_worker_thread_count: int = attr.ib(default=5)
+    engine_worker_process_count: int = attr.ib(default=5)
     engine_worker_sleep_interval_sec: int = attr.ib(default=1)
     game_wait_sleep_interval_sec: int = attr.ib(default=30)
     target_team_size: int = attr.ib(default=5)
@@ -68,7 +75,8 @@ class Game(object):
             team=last_team_standing, gamedb=gamedb, engine=engine)
 
         _log_message("Finalists are {}.".format(pprint.pformat(finalists)))
-        winner = self._run_finalist_tribe_council(finalists=finalists, gamedb=gamedb, engine=engine)
+        winner = self._run_finalist_tribe_council(
+            finalists=finalists, gamedb=gamedb, engine=engine)
 
         _log_message("Winner is {}.".format(winner))
         return winner
@@ -167,7 +175,6 @@ class Game(object):
         elif num_candidates > 1:
             return gamedb.player_from_id(candidates[random.randint(0, num_candidates - 1)])
         else:
-            _log_message("VOTES: {}".format(pprint.pformat(gamedb._votes)))
             raise GameError("Unable to determine voted out player.")
 
     # fraction of teams in losing tribe must vote
@@ -217,7 +224,6 @@ class Game(object):
         engine.add_event(events.NotifySingleTribeCouncilEvent(
             winning_teams=winning_teams, losing_teams=losing_teams))
         tribal_council_start_timestamp = _unixtime()
-        _log_message("VOTES: {}".format(pprint.pformat(gamedb._votes)))
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
@@ -251,7 +257,6 @@ class Game(object):
         engine.add_event(events.NotifySingleTeamCouncilEvent(
             winning_player=winning_player, losing_players=losing_players))
         tribal_council_start_timestamp = _unixtime()
-        _log_message("VOTES: {}".format(pprint.pformat(gamedb._votes)))
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
@@ -278,9 +283,9 @@ class Game(object):
     def _run_finalist_tribe_council(self, finalists: List[Player], gamedb: Database, engine: Engine) -> Player:
         gamedb.clear_votes()
 
-        engine.add_event(events.NotifyFinalTribalCouncilEvent(finalists=finalists))
+        engine.add_event(
+            events.NotifyFinalTribalCouncilEvent(finalists=finalists))
         tribal_council_start_timestamp = _unixtime()
-        _log_message("VOTES: {}".format(pprint.pformat(gamedb._votes)))
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
@@ -299,9 +304,9 @@ class Game(object):
                 winner = gamedb.player_from_id(id=player_id)
 
         # announce winner
-        engine.add_event(events.NotifyWinnerAnnouncementEvent(winner=winner)) 
+        engine.add_event(events.NotifyWinnerAnnouncementEvent(winner=winner))
         return winner
-        
+
     def _merge_teams(self, target_team_size: int, tribe: Tribe, gamedb: Database, engine: Engine):
         # team merging is only necessary when the size of the team == 2
         # once a team size == 2, it should be merged with another team. the optimal
@@ -499,3 +504,14 @@ class Game(object):
         gamedb.batch_update_tribe(from_tribe=tribe1, to_tribe=new_tribe)
         gamedb.batch_update_tribe(from_tribe=tribe2, to_tribe=new_tribe)
         return new_tribe
+
+
+if __name__ == '__main__':
+    options = GameOptions()
+    game = Game(options=options)
+    engine = Engine(options=options)
+    database = Firebase(config=_FIREBASE_CONF)
+    game.play(tribe1=database.tribe_from_id(_TRIBE_1_ID),
+              tribe2=database.tribe_from_id(_TRIBE_2_ID),
+              gamedb=database,
+              engine=engine)
