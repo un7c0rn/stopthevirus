@@ -62,25 +62,25 @@ find . -name '*.py' | entr python3 -m unittest game_test.py -v
 
 | Type         | Properties                                               | Comments                |
 | ------------ | -------------------------------------------------------- | ------------------------|
-| Player       | id, instagram, email, tribe_id, team_id, active          |                         |
+| Player       | id, tiktok, email, tribe_id, team_id, active             |                         |
 | Vote         | id, from_id, to_id, is_for_win                           |                         |
 | Team         | id, name, size, tribe_id, active                         |                         |
 | Tribe        | id, name, size, active                                   |                         |
 | Challenge    | id, name, message, start/end_timestamp, complete         | Posted by game admin(s) |
-| Entry        | id, likes, views, player_id, tribe_id, challenge_id, url | i.e. Instagram post     |
+| Entry        | id, likes, views, player_id, tribe_id, challenge_id, url | i.e. TikTok post        |
 
 
 ### Game and Event Model
 
 The game architecture is comprised of a thin frontend (6) and a simple backend microservice (7) processing realtime events through Firebase (4) at scale. The frontend is intentionally thin and only used to display challenge information, perform signup and for player voting.
 
-When challenges start each day, players submit their entry by simply posting to Instagram using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10).
+When challenges start each day, players submit their entry by simply posting to TikTok using the hashtag #STOPTHEVIRUS. The scraper service (2) will automatically search for entries from all participants and submit the relevant metrics (likes, views etc.) to the game database (4). As the game engine (7) processes each challenge and tribal council, events are submitted to a queueing service (8) so that notifications can be processed asynchronously at scale and delivered to players via email (10).
 
 The initial proposed components are enumerated here:
 
-1. Instagram (we don't need to build this)
+1. TikTok
 
-2. Web scraper service - a simple Python job that can run in a cluster in order to read Instagram post metadata and submit it to the game database (4). Due to Instagram API rate limiting the thought here is to use the HTTP endpoint rather than the REST API (TBD). If the <a href="https://www.instagram.com/developer/">Instagram API</a> is unworkable players may need to submit challenge entry links using the frontend (6) as a fallback.
+2. Web scraper service - a simple Python job that can run in a cluster in order to read TikTok post metadata and submit it to the game database (4). Due to API rate limiting the thought here is to use the HTTP endpoint rather than the REST API (TBD). If the API is unworkable players may need to submit challenge entry links using the frontend (6) as a fallback.
 
 3. A Python interface for performing game queries and updates in Firebase for use from the backend (7).
 
