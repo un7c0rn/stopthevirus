@@ -18,7 +18,7 @@ Here's how the game works:
 
 ## How To Win
 
-Social distancing challenge ideas can be added continuously. Some examples include *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song.* or *Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
+New social distancing challenge ideas can be added continuously by the game admins. Some examples include *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song.* or *Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
 
 After thirty days a group of two finalists will have made it to the end. All players, everyone who donated the $1 entry fee, will vote on who the winner of the prize money should be. Each finalist will be able to make a case on social media using a video post to say why they should be the final survivor and winner of the prize money.
 
