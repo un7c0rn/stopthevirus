@@ -12,8 +12,6 @@ This social game was inspired by the TV show Survivor. It's a social game based 
 
 Here's how the game works:
 
-Cleaning Challenge — Post a video showing your most creative way to clean your living space.
-
 ## Game Flow Chart
 
 <img src="https://github.com/unicorn1337x/stopthevirus/blob/master/flowchart.svg" width="1000">
