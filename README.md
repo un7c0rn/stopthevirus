@@ -1,10 +1,10 @@
 <center><img src="https://github.com/unicorn1337x/stopthevirus/blob/master/banner.png" width=1000></center>
 
-# COVID-19 #STOPTHEVIRUS SOCIAL GAME
+# COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
-## Objective:
+## Hypothesis:
 
-Design a global scale high stakes social game to help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing and stop the spread of the COVID-19 virus.
+Can a global scale high stakes social game help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing and stop the spread of the COVID-19 virus?
 
 ## Background:
 
