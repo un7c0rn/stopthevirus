@@ -15,7 +15,7 @@ from queue import Queue
 import random
 import pprint
 import heapq
-from game_engine.firebase import Firebase
+from game_engine.firestore import CloudFirestore
 
 
 def _unixtime():
@@ -33,10 +33,11 @@ class GameError(Exception):
     pass
 
 
-# TODO(brandon): update these values after creating tribes in database
+# TODO(brandon): update these values for production
 _TRIBE_1_ID = ''
 _TRIBE_2_ID = ''
-_FIREBASE_CONF = {}
+_GCP_PROJECT_ID = ''
+_FIRESTORE_CONF = {'projectId' : _GCP_PROJECT_ID}
 
 
 @attr.s
@@ -510,7 +511,7 @@ if __name__ == '__main__':
     options = GameOptions()
     game = Game(options=options)
     engine = Engine(options=options)
-    database = Firebase(config=_FIREBASE_CONF)
+    database = CloudFirestore(config=_FIRESTORE_CONF)
     game.play(tribe1=database.tribe_from_id(_TRIBE_1_ID),
               tribe2=database.tribe_from_id(_TRIBE_2_ID),
               gamedb=database,

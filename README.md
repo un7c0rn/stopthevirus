@@ -62,14 +62,14 @@ find . -name '*.py' | entr python3 -m unittest game_test.py -v
 
 ### Data Model
 
-| Type         | Properties                                               | Comments                |
-| ------------ | -------------------------------------------------------- | ------------------------|
-| Player       | id, tiktok, email, tribe_id, team_id, active             |                         |
-| Vote         | id, from_id, to_id, is_for_win                           |                         |
-| Team         | id, name, size, tribe_id, active                         |                         |
-| Tribe        | id, name, size, active                                   |                         |
-| Challenge    | id, name, message, start/end_timestamp, complete         | Posted by game admin(s) |
-| Entry        | id, likes, views, player_id, tribe_id, challenge_id, url | i.e. TikTok post        |
+| Type         | Properties                                                        | Comments                |
+| ------------ | ----------------------------------------------------------------- | ------------------------|
+| Player       | id, tiktok, email, tribe_id, team_id, active                      |                         |
+| Vote         | id, from_id, to_id, is_for_win                                    |                         |
+| Team         | id, name, size, tribe_id, active                                  |                         |
+| Tribe        | id, name, size, active                                            |                         |
+| Challenge    | id, name, message, start/end_timestamp, complete                  | Posted by game admin(s) |
+| Entry        | id, likes, views, player_id, team_id, tribe_id, challenge_id, url | i.e. TikTok post        |
 
 
 ### Game and Event Model

@@ -1,1 +1,3 @@
 pprint
+firebase-admin
+google-cloud-firestore

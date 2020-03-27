@@ -58,6 +58,7 @@ class Entry(Data):
     player_id: Text = attr.ib()
     tribe_id: Text = attr.ib()
     challenge_id: Text = attr.ib()
+    team_id: Text = attr.ib('')
     url: Text = attr.ib('')
 
 class Database(ABC):
