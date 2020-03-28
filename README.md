@@ -97,3 +97,5 @@ The initial proposed components are enumerated here:
 8. A scalable <a href="https://aws.amazon.com/sqs/">AWS SQS</a> queueing service for asynchronously processing game events. This is probably available with Firebase as well, haven't looked into it yet.
 
 9. A simple job that can run in a cluster in order to read events from the queue (8) and perform bulk notifications to users via SMTP (SMS if anyone wants to integrate <a href="https://www.twilio.com/">Twilio</a>).
+
+<a href="https://github.com/un7c0rn/stopthevirus/blob/master/scale.md">Scalability Analysis</a>
