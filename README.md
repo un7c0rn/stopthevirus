@@ -117,6 +117,8 @@ There are 4 phases in the game:
 3. **Phase 3:** The teams from phase 2 join together into 1 team and players compete head to head. Losing players can be voted out.
 4. **Phase 4:** The last 2 finalists remaining from phase 3 have a chance to win based on votes from other players in the game.
 
+<img src="http://latex.codecogs.com/svg.latex?%24%5Cdisplaystyle%20p_%7Bn%7D%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%24">
+
 <img src="http://latex.codecogs.com/svg.latex?\phi%20\%20=\%201\%20-\%20\left(\frac{1}{2s}%20\%20*\%20(%201\%20-\%20\alpha%20)\right)" width="1000">
 
 
