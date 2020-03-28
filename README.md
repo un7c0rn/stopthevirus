@@ -117,8 +117,7 @@ There are 4 phases in the game:
 3. **Phase 3:** The teams from phase 2 join together into 1 team and players compete head to head. Losing players can be voted out.
 4. **Phase 4:** The last 2 finalists remaining from phase 3 have a chance to win based on votes from other players in the game.
 
-<img src="https://github.com/un7c0rn/stopthevirus/blob/master/analysis.jpg" width=1000>
-
+![equation]<img src="http://latex.codecogs.com/svg.latex?\phi%20\%20=\%201\%20-\%20\left(\frac{1}{2s}%20\%20*\%20(%201\%20-\%20\alpha%20)\right)"
 
 
 
