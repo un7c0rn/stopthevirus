@@ -126,7 +126,7 @@ Equations are included below for reference but the TL;DR here is that one monoli
 
 **Phase 1 equations**
 
-<img src="http://latex.codecogs.com/svg.latex?\phi%20\%20=\%201\%20-\%20\left(\frac{1}{2s}%20\%20*\%20(%201\%20-\%20\alpha%20)\right)">
+<img src="http://latex.codecogs.com/svg.latex?\phi%20\%20=\%201\%20-\%20\left(\frac{1}{2s}%20\%20*\%20(%201\%20-\%20\alpha%20)\right)" height=50>
 
 <img src="http://latex.codecogs.com/svg.latex?%24%5Cdisplaystyle%20p_%7Bn%7D%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%24">
 
@@ -150,7 +150,7 @@ Equations are included below for reference but the TL;DR here is that one monoli
 
 <img src="http://latex.codecogs.com/svg.latex?n%3Dp_%7B0%7D%20-n%5C%5C">
 
-** Phase 4 equations**
+**Phase 4 equations**
 
 <img src="http://latex.codecogs.com/svg.latex?p_%7B0%7D%20%3D2%5C%5C">
 
@@ -158,5 +158,5 @@ Equations are included below for reference but the TL;DR here is that one monoli
 
 <img src="http://latex.codecogs.com/svg.latex?n%3D1">
 
-
+The time cost of a game is equal to the sum of the number of challenges across all four game phases. The dollar cost of a game is equal to the sum of the number of database reads and writes per challenge across all four game phases. Code to calculate approximage figures using these equations is included in <a href="https://github.com/un7c0rn/stopthevirus/blob/master/cost.py">cost.py</a>.
 
