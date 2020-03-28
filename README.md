@@ -98,10 +98,6 @@ The initial proposed components are enumerated here:
 
 9. A simple job that can run in a cluster in order to read events from the queue (8) and perform bulk notifications to users via SMTP (SMS if anyone wants to integrate <a href="https://www.twilio.com/">Twilio</a>).
 
-### Scalability
-
-<a href="https://github.com/un7c0rn/stopthevirus/blob/master/scale.md">Scalability Analysis</a>
-
 ### Getting Started with Development
 
 All contributions are appreciated here and there's no contribution too small. The typical development flow here is:
@@ -141,4 +137,12 @@ Use the <a href="https://help.github.com/en/github/collaborating-with-issues-and
 
 6. Leadership is appreciated here. If you have a design idea or improvement in mind just do it and send the pull request. Unit tests are key to working collaboratively since they ensure that changes don't cause new problems. As long as we have passing tests, changes are strongly encouraged. Feel free to submit PR's and add tests after the initial code review.
 
+You may notice that the Firestore database credentials are included here in source control. This means that you can run your code against a real database instance without having to set one up. I think this is important especially for frontend development. The credentials are for a test-only public facing instance, a new prod instance will be deployed before the game goes live.
+
 7. This is a collaborative effort that cannot be completed alone. It's important to have a diverse group of perspectives, ideas and skills to bring this together and create impact. No pull request is too small. Seeking both code and simple graphic asset / design ideas for frontend.
+
+### Scalability
+
+<a href="https://github.com/un7c0rn/stopthevirus/blob/master/scale.md">Scalability Analysis</a>
+
+Contact: <a href="mailto:brandon@formless.la">brandon@formless.la</a>
