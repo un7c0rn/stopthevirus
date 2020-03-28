@@ -134,6 +134,8 @@ Equations are included below for reference but the TL;DR here is that one monoli
 
 **Phase 2 equations**
 
+<img src="http://latex.codecogs.com/svg.latex?%5Cgamma%20%5C%20%3D%5C%201-%5Calpha%20%2C%5C%20%5Czeta%20%5C%20%3D%5C%201-%5Cphi%20">
+
 <img src="http://latex.codecogs.com/svg.latex?%5Cgamma%20%5C%20%3D%5C%201-%5Calpha%20%2C%5C%20%5Czeta%20%5C%20%3D%5C%201-%5Cbeta%20%5C%5C">
 
 <img src="http://latex.codecogs.com/svg.latex?%5Cphi%20%5C%20%3D%5C%201-%5Cfrac%7B%5Cgamma%20%7D%7Bs%7D%5C%5C">
