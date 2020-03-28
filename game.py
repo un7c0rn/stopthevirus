@@ -16,6 +16,7 @@ import random
 import pprint
 import heapq
 from game_engine.firestore import FirestoreDB
+from concurrent.futures import ThreadPoolExecutor
 
 
 def _unixtime():
@@ -41,7 +42,7 @@ _FIRESTORE_PROD_CONF_JSON_PATH = ''
 
 @attr.s
 class GameOptions(object):
-    engine_worker_process_count: int = attr.ib(default=5)
+    engine_worker_thread_count: int = attr.ib(default=5)
     engine_worker_sleep_interval_sec: int = attr.ib(default=1)
     game_wait_sleep_interval_sec: int = attr.ib(default=30)
     target_team_size: int = attr.ib(default=5)
@@ -271,11 +272,6 @@ class Game(object):
             _log_message("Deactivated player {}.".format(voted_out_player))
             engine.add_event(events.NotifyPlayerVotedOutEvent(
                 player=voted_out_player))
-        else:
-            # TODO(brandon): get rid of this
-            _log_message("For some reason no one got voted out...")
-            _log_message("Players = {}.".format(
-                pprint.pformat(gamedb.list_players(from_team=team))))
 
         # notify all players of what happened at tribal council
         engine.add_event(events.NotifyTribalCouncilCompletionEvent())
@@ -390,24 +386,57 @@ class Game(object):
         challenge.complete = True
         gamedb.save(challenge)
 
+    def _score_entries_tribe_aggregate_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
+        """Note that all built-ins are thread safe in python, meaning we can
+        atomically increment the score int held in score_dict."""
+
+        entries_iter = iter(entries)
+        while not self._stop.is_set():
+            try:
+                entry = next(entries_iter)
+                pprint.pprint(entry)
+                points = entry.likes / entry.views
+                player = gamedb.player_from_id(entry.player_id)
+                engine.add_event(events.NotifyPlayerScoreEvent(
+                    player=player, challenge=challenge,
+                    entry=entry, points=points))
+                score_dict['score'] += points
+            except StopIteration:
+                break
+
     def _score_entries_tribe_aggregate(self, tribe: Tribe, challenge: Challenge, gamedb: Database, engine: Engine):
-        # trivial scorer for now.
-        score = 0
+        score_dict = {'score': 0}
         players = gamedb.count_players(from_tribe=tribe)
         entries = gamedb.stream_entries(
             from_tribe=tribe, from_challenge=challenge)
 
-        # TODO(someone): parallelize w/ async multiprocess pool
-        for entry in entries:
-            points = entry.likes / entry.views
-            player = gamedb.player_from_id(entry.player_id)
-            engine.add_event(events.NotifyPlayerScoreEvent(
-                player=player, challenge=challenge,
-                entry=entry, points=points))
-            score = score + points
+        with ThreadPoolExecutor(max_workers=self._options.engine_worker_thread_count) as executor:
+            executor.submit(self._score_entries_tribe_aggregate_fn,
+                            entries=entries, challenge=challenge, score_dict=score_dict, gamedb=gamedb, engine=engine)
 
         # tribe score = avg score of all tribe members
-        return score / players
+        _log_message("_score_entries_tribe_agg = {}.".format(
+            score_dict['score']))
+        return score_dict['score'] / players
+
+    def _score_entries_top_k_teams_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
+        entries_iter = iter(entries)
+        while not self._stop.is_set():
+            try:
+                entry = next(entries_iter)
+                _log_message("Entry {}.".format(entry))
+                points = entry.likes / entry.views
+                player = gamedb.player_from_id(entry.player_id)
+                engine.add_event(events.NotifyPlayerScoreEvent(
+                    player=player, challenge=challenge,
+                    entry=entry, points=points))
+
+                if player.team_id not in score_dict:
+                    score_dict[player.team_id] = points
+                else:
+                    score_dict[player.team_id] += points
+            except StopIteration:
+                break
 
     def _score_entries_top_k_teams(self, k: float, tribe: Tribe, challenge: Challenge, gamedb: Database,
                                    engine: Engine) -> Tuple[List[Team], List[Team]]:
@@ -419,19 +448,9 @@ class Game(object):
         entries = gamedb.stream_entries(
             from_tribe=tribe, from_challenge=challenge)
 
-        # TODO(someone): parallelize w/ async multiprocess pool
-        for entry in entries:
-            _log_message("Entry {}.".format(entry))
-            points = entry.likes / entry.views
-            player = gamedb.player_from_id(entry.player_id)
-            engine.add_event(events.NotifyPlayerScoreEvent(
-                player=player, challenge=challenge,
-                entry=entry, points=points))
-
-            if player.team_id not in team_scores:
-                team_scores[player.team_id] = points
-            else:
-                team_scores[player.team_id] = team_scores[player.team_id] + points
+        with ThreadPoolExecutor(max_workers=self._options.engine_worker_thread_count) as executor:
+            executor.submit(self._score_entries_top_k_teams_fn,
+                            entries=entries, challenge=challenge, score_dict=team_scores, gamedb=gamedb, engine=engine)
 
         for team_id, score in team_scores.items():
             heapq.heappush(top_scores, (score / gamedb.count_players(from_team=gamedb.team_from_id(team_id)),
@@ -461,6 +480,21 @@ class Game(object):
 
         return (winning_teams, losing_teams)
 
+    def _score_entries_top_k_players_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
+        entries_iter = iter(entries)
+        while not self._stop.is_set():
+            try:
+                entry = next(entries_iter)
+                _log_message("Entry {}.".format(entry))
+                points = entry.likes / entry.views
+                player = gamedb.player_from_id(entry.player_id)
+                engine.add_event(events.NotifyPlayerScoreEvent(
+                    player=player, challenge=challenge,
+                    entry=entry, points=points))
+                score_dict[player.id] = points
+            except StopIteration:
+                break
+
     def _score_entries_top_k_players(self, team: Team, challenge: Challenge, gamedb: Database, engine: Engine) -> List[Player]:
         player_scores = {}
         top_scores = list()
@@ -468,15 +502,9 @@ class Game(object):
         entries = gamedb.stream_entries(
             from_team=team, from_challenge=challenge)
 
-        # TODO(someone): parallelize w/ async multiprocess pool
-        for entry in entries:
-            _log_message("Entry {}.".format(entry))
-            points = entry.likes / entry.views
-            player = gamedb.player_from_id(entry.player_id)
-            engine.add_event(events.NotifyPlayerScoreEvent(
-                player=player, challenge=challenge,
-                entry=entry, points=points))
-            player_scores[player.id] = points
+        with ThreadPoolExecutor(max_workers=self._options.engine_worker_thread_count) as executor:
+            executor.submit(self._score_entries_top_k_players_fn,
+                            entries=entries, challenge=challenge, score_dict=player_scores, gamedb=gamedb, engine=engine)
 
         for player_id, score in player_scores.items():
             heapq.heappush(top_scores, (score, player_id))

@@ -2,6 +2,7 @@ import unittest
 import mock
 from game_engine.firestore import FirestoreDB
 import pprint
+import json
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = './stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TRIBE_TIGRAWAY_ID = '77TMV9omdLeW7ORvuheX'
@@ -13,17 +14,173 @@ _TEST_CHALLENGE_KARAOKE_ID = '2JQ5ZvttkFafjxvrN07Q'
 _TEST_CHALLENGE_KARAOKE_URL = 'https://www.youtube.com/watch?v=irVIUvDTTB0'
 _TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID = '2ZPmDfX9q82KY5PVf1LH'
 _TEST_BOSTON_ROB_PLAYER_ID = '2ZPmDfX9q82KY5PVf1LH'
+_TEST_COLLECTION_PATHS = ['games', 'games/7rPwCJaiSkxYgDocGDw1/players', 'games/7rPwCJaiSkxYgDocGDw1/teams',
+                          'games/7rPwCJaiSkxYgDocGDw1/tribes', 'games/7rPwCJaiSkxYgDocGDw1/votes']
 
 _gamedb = FirestoreDB(
     json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, game_id=_TEST_GAME_ID)
 
 
+_TEST_DATA_JSON = """
+{
+   "games":{
+      "7rPwCJaiSkxYgDocGDw1":{
+         "count_teams":6,
+         "count_players":2,
+         "name":"test_game1"
+      }
+   },
+   "games/7rPwCJaiSkxYgDocGDw1/players":{
+      "2ZPmDfX9q82KY5PVf1LH":{
+         "team_id":"Q09FeEtoIgjNI57Bnl1E",
+         "active":true,
+         "name":"Boston Rob",
+         "tribe_id":"cbTgYdPh97K6rRTDdEPL"
+      },
+      "LXHpnrUA65FS25wGfJ00":{
+         "active":true,
+         "name":"Amber Brkich",
+         "tribe_id":"cbTgYdPh97K6rRTDdEPL",
+         "team_id":"Q09FeEtoIgjNI57Bnl1E"
+      }
+   },
+   "games/7rPwCJaiSkxYgDocGDw1/teams":{
+      "GQnxhYXnV86oJXLklbGB":{
+         "count_players":0,
+         "name":"BLUE",
+         "tribe_id":"77TMV9omdLeW7ORvuheX",
+         "size":0,
+         "active":true
+      },
+      "Q09FeEtoIgjNI57Bnl1E":{
+         "active":true,
+         "count_players":2,
+         "name":"YELLOW",
+         "tribe_id":"cbTgYdPh97K6rRTDdEPL",
+         "size":2
+      },
+      "Zpuv2bEn4WykPpIyNuJ5":{
+         "count_players":0,
+         "name":"GREEN",
+         "tribe_id":"77TMV9omdLeW7ORvuheX",
+         "size":0,
+         "active":true
+      },
+      "hRt3wVz6ZtVEOhkeNlIn":{
+         "count_players":0,
+         "name":"RED",
+         "tribe_id":"77TMV9omdLeW7ORvuheX",
+         "size":0,
+         "active":true
+      }
+   },
+   "games/7rPwCJaiSkxYgDocGDw1/tribes":{
+      "77TMV9omdLeW7ORvuheX":{
+         "count_players":0,
+         "name":"TIGRAWAY",
+         "count_teams":4
+      },
+      "cbTgYdPh97K6rRTDdEPL":{
+         "count_teams":1,
+         "count_players":2,
+         "name":"SIDAMA"
+      }
+   },
+   "games/7rPwCJaiSkxYgDocGDw1/votes":{
+      "AcuR476MF1O0tvI3bH8u":{
+         "is_for_win":false,
+         "team_id":"Q09FeEtoIgjNI57Bnl1E",
+         "to_id":"2ZPmDfX9q82KY5PVf1LH",
+         "from_id":"LXHpnrUA65FS25wGfJ00"
+      },
+      "G8u6obWxyHhXMD9cLuE0":{
+         "team_id":"Q09FeEtoIgjNI57Bnl1E",
+         "to_id":"2ZPmDfX9q82KY5PVf1LH",
+         "from_id":"LXHpnrUA65FS25wGfJ00",
+         "is_for_win":false
+      },
+      "K1umHRQpEorC9O2kdlRi":{
+         "team_id":"Q09FeEtoIgjNI57Bnl1E",
+         "to_id":"2ZPmDfX9q82KY5PVf1LH",
+         "from_id":"LXHpnrUA65FS25wGfJ00",
+         "is_for_win":false
+      },
+      "VnD8joQqsyBBFTYkkP56":{
+         "from_id":"LXHpnrUA65FS25wGfJ00",
+         "is_for_win":false,
+         "team_id":"Q09FeEtoIgjNI57Bnl1E",
+         "to_id":"2ZPmDfX9q82KY5PVf1LH"
+      },
+      "ptPg1MWPtKIHiElLKiLU":{
+         "team_id":"Q09FeEtoIgjNI57Bnl1E",
+         "to_id":"2ZPmDfX9q82KY5PVf1LH",
+         "from_id":"LXHpnrUA65FS25wGfJ00",
+         "is_for_win":false
+      }
+   }
+}
+"""
+
+
+def _export_collections(gamedb, collection_paths):
+    """Function for persisting test DB data."""
+
+    paths = collection_paths
+    collections = dict()
+    dict4json = dict()
+    doc_count = 0
+
+    for path in paths:
+        collections[path] = gamedb._client.collection(path).stream()
+        dict4json[path] = {}
+        for document in collections[path]:
+            docdict = document.to_dict()
+            dict4json[path][document.id] = docdict
+            doc_count += 1
+
+    print(json.dumps(dict4json))
+
+
 class FirestoreDBTest(unittest.TestCase):
 
-    # TODO(brandon): after all the reads are done and the test db is setup, export
-    # the whole thing and set it up at the beginning of the unit tests. that way doing
-    # things like deactivating players won't matter as much during testing.
-    # https://firebase.google.com/docs/firestore/manage-data/export-import
+    def setUp(self):
+        self._import_collections(_gamedb, _TEST_DATA_JSON)
+
+    def _import_collections(self, gamedb, collections_json):
+        """Function for restoring test DB data."""
+
+        batch = gamedb._client.batch()
+        collections_dict = json.loads(collections_json)
+        for path in collections_dict:
+            for document_id in collections_dict[path]:
+                document_ref = gamedb._client.document(
+                    "{}/{}".format(path, document_id))
+                properties_dict = collections_dict[path][document_id]
+                properties_dict['id'] = document_id
+                batch.set(document_ref, properties_dict, merge=True)
+        batch.commit()
+
+    def test_batch_update_tribe(self):
+        sidama_tribe = _gamedb.tribe_from_id(_TEST_TRIBE_SIDAMA_ID)
+        tigraway_tribe = _gamedb.tribe_from_id(_TEST_TRIBE_TIGRAWAY_ID)
+        sidama_player_count = _gamedb.count_players(from_tribe=sidama_tribe)
+        sidama_team_count = _gamedb.count_teams(from_tribe=sidama_tribe)
+        tigraway_player_count = _gamedb.count_players(
+            from_tribe=tigraway_tribe)
+        tigraway_team_count = _gamedb.count_teams(
+            from_tribe=tigraway_tribe)
+        _gamedb.batch_update_tribe(
+            from_tribe=sidama_tribe, to_tribe=tigraway_tribe)
+        self.assertEqual(_gamedb.count_players(from_tribe=sidama_tribe), 0)
+        self.assertEqual(_gamedb.count_teams(from_tribe=sidama_tribe), 0)
+        self.assertEqual(_gamedb.count_players(
+            from_tribe=tigraway_tribe), sidama_player_count + tigraway_player_count)
+        self.assertEqual(_gamedb.count_teams(
+            from_tribe=tigraway_tribe), sidama_team_count + tigraway_team_count)
+        self.assertListEqual([team.name for team in _gamedb.stream_teams(from_tribe=sidama_tribe)], [])
+        self.assertListEqual([team.name for team in _gamedb.stream_teams(from_tribe=tigraway_tribe)], [
+            'BLUE', 'GREEN', 'RED', 'YELLOW'
+        ])
 
     def test_stream_teams(self):
         teams = _gamedb.stream_teams(
@@ -108,8 +265,79 @@ class FirestoreDBTest(unittest.TestCase):
             _TEST_TRIBE_TIGRAWAY_ID).name, 'TIGRAWAY')
 
     def test_challenge_from_id(self):
-        self.assertEqual(_gamedb.tribe_from_id(
+        self.assertEqual(_gamedb.challenge_from_id(
             _TEST_CHALLENGE_KARAOKE_ID).name, 'KARAOKE')
+
+    def test_deactivate_player(self):
+        player = _gamedb.player_from_id(_TEST_BOSTON_ROB_PLAYER_ID)
+        tribe = _gamedb.tribe_from_id(player.tribe_id)
+        team = _gamedb.team_from_id(player.team_id)
+        game_player_count = _gamedb.count_players()
+        tribe_player_count = _gamedb.count_players(from_tribe=tribe)
+        team_player_count = _gamedb.count_players(from_team=team)
+        _gamedb.deactivate_player(player)
+        self.assertFalse(_gamedb.player_from_id(
+            _TEST_BOSTON_ROB_PLAYER_ID).active)
+        self.assertEqual(_gamedb.count_players(), game_player_count - 1)
+        self.assertEqual(_gamedb.count_players(
+            from_tribe=tribe), tribe_player_count - 1)
+        self.assertEqual(_gamedb.count_players(
+            from_team=team), team_player_count - 1)
+
+    def test_deactivate_team(self):
+        team = _gamedb.team_from_id(_TEST_TEAM_BLUE_ID)
+        tribe = _gamedb.tribe_from_id(team.tribe_id)
+        game_team_count = _gamedb.count_teams()
+        tribe_team_count = _gamedb.count_teams(from_tribe=tribe)
+        _gamedb.deactivate_team(team)
+        self.assertFalse(_gamedb.team_from_id(_TEST_TEAM_BLUE_ID).active)
+        self.assertEqual(_gamedb.count_teams(), game_team_count - 1)
+        self.assertEqual(_gamedb.count_teams(
+            from_tribe=tribe), tribe_team_count - 1)
+
+    def test_save_player(self):
+        player = _gamedb.player_from_id(_TEST_BOSTON_ROB_PLAYER_ID)
+        player.name = 'Asap Ferg'
+        self.assertEqual(_gamedb.player_from_id(
+            _TEST_BOSTON_ROB_PLAYER_ID).name, 'Boston Rob')
+        _gamedb.save(player)
+        self.assertEqual(_gamedb.player_from_id(
+            _TEST_BOSTON_ROB_PLAYER_ID).name, 'Asap Ferg')
+
+    def test_save_team(self):
+        team = _gamedb.team_from_id(_TEST_TEAM_BLUE_ID)
+        team.name = 'AQUA'
+        self.assertEqual(_gamedb.team_from_id(
+            _TEST_TEAM_BLUE_ID).name, 'BLUE')
+        _gamedb.save(team)
+        self.assertEqual(_gamedb.team_from_id(
+            _TEST_TEAM_BLUE_ID).name, 'AQUA')
+
+    def test_tribe(self):
+        tribe = _gamedb.tribe(name='name/foo')
+        try:
+            self.assertEqual(_gamedb.tribe_from_id(
+                tribe.id).name, 'name/foo')
+            self.assertIsNotNone(tribe.id)
+        finally:
+            _gamedb._client.document(
+                "games/{}/tribes/{}".format(_gamedb._game_id, tribe.id)).delete()
+
+    def test_player(self):
+        game_player_count = _gamedb.count_players()
+        player = _gamedb.player(name='name/foo')
+        try:
+            self.assertEqual(_gamedb.player_from_id(
+                player.id).name, 'name/foo')
+            self.assertEqual(_gamedb.count_players(), game_player_count + 1)
+            self.assertIsNotNone(player.id)
+        finally:
+            _gamedb._client.document(
+                "games/{}/players/{}".format(_gamedb._game_id, player.id)).delete()
+
+    def test_clear_votes(self):
+        _gamedb.clear_votes()
+        self.assertEqual(_gamedb.count_votes(), {})
 
 
 if __name__ == '__main__':
