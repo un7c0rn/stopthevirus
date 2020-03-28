@@ -43,7 +43,7 @@ Running the unit tests is a good way to get started with development. In general
 To run the unit tests:
 
 ```console
-python3 -m unittest game_test.py -v
+python3 -m unittest -v
 ```
 
 To continuously run unit tests in a console window as you code:
