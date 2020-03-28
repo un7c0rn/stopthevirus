@@ -156,6 +156,6 @@ Equations are included below for reference but the TL;DR here is that one monoli
 
 <img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%3D1%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?n%3D1" height=70>
+<img src="http://latex.codecogs.com/svg.latex?n%3D1">
 
 The time cost of one game is equal to the sum of the number of challenges across all four game phases. The dollar cost of one game is equal to the sum of the number of database reads and writes per challenge across all four game phases. Code to calculate approximage figures using these equations is included in <a href="https://github.com/un7c0rn/stopthevirus/blob/master/cost.py">cost.py</a>.
