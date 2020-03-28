@@ -98,3 +98,28 @@ The initial proposed components are enumerated here:
 
 9. A simple job that can run in a cluster in order to read events from the queue (8) and perform bulk notifications to users via SMTP (SMS if anyone wants to integrate <a href="https://www.twilio.com/">Twilio</a>).
 
+## Scalability
+
+In order for this game to have impact, it needs to scale. Scalability in this context means several things:
+
+1. The number of people that can join the game and have fun must increase over time as awareness grows. For example, it provides little value if a relatively small number of people play the game with no ability for more to join in.
+
+2. Since the game is virtually free ($1 donation to play), the cost to run the servers must be extremely low.
+
+3. The game must run for long enough for awareness to grow, but be short enough for people to complete. For example we assume that people won't stick around for a 3 month game that requires daily challenges.
+
+To address the scalability requirements we've performed some analysis on game cost with respect to number of players, where cost is represented by both time to game completion and dollar amount to run infrastructure:
+
+There are 4 phases in the game: 
+
+1. **Phase 1:** 2 large tribes compete against eachother and the losing tribe must vote players out.
+2. **Phase 2:** The tribes from phase 1 join together and smaller teams compete within the tribe. Losing teams must vote players out.
+3. **Phase 3:** The teams from phase 2 join together into 1 team and players compete head to head. Losing players can be voted out.
+4. **Phase 4:** The last 2 finalists remaining from phase 3 have a chance to win based on votes from other players in the game.
+
+
+
+
+
+
+
