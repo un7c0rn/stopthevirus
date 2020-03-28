@@ -20,7 +20,7 @@ Here's how the game works:
 
 <img src="https://github.com/unicorn1337x/stopthevirus/blob/master/flowchart.svg" width="1000">
 
-## How To Win
+## How to Win
 
 New social distancing challenge ideas can be added continuously by the game admins. Some examples include *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song.* or *Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
 
@@ -101,3 +101,44 @@ The initial proposed components are enumerated here:
 ### Scalability
 
 <a href="https://github.com/un7c0rn/stopthevirus/blob/master/scale.md">Scalability Analysis</a>
+
+### Getting Started with Development
+
+All contributions are appreciated here and there's no contribution too small. The typical development flow here is:
+
+1. Clone the repo:
+
+```
+git clone https://github.com/un7c0rn/stopthevirus.git
+```
+
+2. Create a local development branch:
+
+```
+git branch my_dev_branch_name
+git switch my_dev_branch_name
+```
+
+3. Run the unit tests to make sure things pass before you start:
+
+```console
+python3 -m unittest -v
+```
+
+4. Check the issues <a href="https://github.com/un7c0rn/stopthevirus/issues">list</a>.
+
+5. If you see some work or on the issues list that matches your experience or is something you'd like to learn more about, comment on the thread and jump in. After writing your code and running the unit tests, create a pull request:
+
+```
+git commit -m "my new changes"
+```
+
+```
+git push
+```
+
+Use the <a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request">GitHub UI to compare changes and submit a pull request.</a>
+
+6. Leadership is appreciated here. If you have a design idea or improvement in mind just do it and send the pull request. Unit tests are key to working collaboratively since they ensure that changes don't cause new problems. As long as we have passing tests, changes are strongly encouraged. Feel free to submit PR's and add tests after the initial code review.
+
+7. This is a collaborative effort that cannot be completed alone. It's important to have a diverse group of perspectives, ideas and skills to bring this together and create impact. No pull request is too small. Seeking both code and simple graphic asset / design ideas for frontend.
