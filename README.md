@@ -126,35 +126,35 @@ Equations are included below for reference but the TL;DR here is that one monoli
 
 **Phase 1 equations**
 
-<img src="http://latex.codecogs.com/svg.latex?\phi%20\%20=\%201\%20-\%20\left(\frac{1}{2s}%20\%20*\%20(%201\%20-\%20\alpha%20)\right)" height=70>
+<img src="http://latex.codecogs.com/svg.latex?\phi%20\%20=\%201\%20-\%20\left(\frac{1}{2s}%20\%20*\%20(%201\%20-\%20\alpha%20)\right)">
 
-<img src="http://latex.codecogs.com/svg.latex?%24%5Cdisplaystyle%20p_%7Bn%7D%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%24" height=70>
+<img src="http://latex.codecogs.com/svg.latex?%24%5Cdisplaystyle%20p_%7Bn%7D%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%24">
 
-<img src="http://latex.codecogs.com/svg.latex?n%5C%20%3D%5C%20%5Clog_%7B%5Cphi%20%7D%5Cleft%28%5Cfrac%7Bp_%7Bn%7D%7D%7Bp_%7B0%7D%7D%5Cright%29%24" height=70>
+<img src="http://latex.codecogs.com/svg.latex?n%5C%20%3D%5C%20%5Clog_%7B%5Cphi%20%7D%5Cleft%28%5Cfrac%7Bp_%7Bn%7D%7D%7Bp_%7B0%7D%7D%5Cright%29%24">
 
 **Phase 2 equations**
 
-<img src="http://latex.codecogs.com/svg.latex?%5Cgamma%20%5C%20%3D%5C%201-%5Calpha%20%2C%5C%20%5Czeta%20%5C%20%3D%5C%201-%5Cbeta%20%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?%5Cgamma%20%5C%20%3D%5C%201-%5Calpha%20%2C%5C%20%5Czeta%20%5C%20%3D%5C%201-%5Cbeta%20%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?%5Cphi%20%5C%20%3D%5C%201-%5Cfrac%7B%5Cgamma%20%7D%7Bs%7D%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?%5Cphi%20%5C%20%3D%5C%201-%5Cfrac%7B%5Cgamma%20%7D%7Bs%7D%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%5C%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%20%5C%20%2B%5C%20%5Cgamma%20%5Csum%20%5E%7Bn-1%7D_%7Bk%5C%20%3D%5C%200%7D%20%5Cphi%20%5E%7Bk%7D%20%5C%20%5C%20%28%20sum%5C%20here%5C%20is%5C%20a%5C%20geometric%5C%20series%29%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%5C%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%20%5C%20%2B%5C%20%5Cgamma%20%5Csum%20%5E%7Bn-1%7D_%7Bk%5C%20%3D%5C%200%7D%20%5Cphi%20%5E%7Bk%7D%20%5C%20%5C%20%28%20sum%5C%20here%5C%20is%5C%20a%5C%20geometric%5C%20series%29%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%5C%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%20%2B%5Cfrac%7B%5Cgamma%20-%5Cgamma%20%5Cphi%20%5E%7Bn%7D%20%5C%20%7D%7B%5Czeta%20%7D%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%5C%20%3D%5C%20p_%7B0%7D%20%5Cphi%20%5E%7Bn%7D%20%2B%5Cfrac%7B%5Cgamma%20-%5Cgamma%20%5Cphi%20%5E%7Bn%7D%20%5C%20%7D%7B%5Czeta%20%7D%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?n%5C%20%3D%5C%20log_%7B%5Cphi%20%7D%5Cleft%28%5Cfrac%7Bp_%7Bn%7D%20-%5Cfrac%7B%5Cgamma%20%7D%7B%5Czeta%20%7D%7D%7Bp_%7B0%7D%20-%5Cfrac%7B%5Cgamma%20%7D%7B%5Czeta%20%7D%7D%5Cright%29%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?n%5C%20%3D%5C%20log_%7B%5Cphi%20%7D%5Cleft%28%5Cfrac%7Bp_%7Bn%7D%20-%5Cfrac%7B%5Cgamma%20%7D%7B%5Czeta%20%7D%7D%7Bp_%7B0%7D%20-%5Cfrac%7B%5Cgamma%20%7D%7B%5Czeta%20%7D%7D%5Cright%29%5C%5C">
 
 **Phase 3 equations**
 
-<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%3Dp_%7B0%7D%20-n%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%3Dp_%7B0%7D%20-n%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?n%3Dp_%7B0%7D%20-n%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?n%3Dp_%7B0%7D%20-n%5C%5C">
 
 **Phase 4 equations**
 
-<img src="http://latex.codecogs.com/svg.latex?p_%7B0%7D%20%3D2%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?p_%7B0%7D%20%3D2%5C%5C">
 
-<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%3D1%5C%5C" height=70>
+<img src="http://latex.codecogs.com/svg.latex?p_%7Bn%7D%20%3D1%5C%5C">
 
 <img src="http://latex.codecogs.com/svg.latex?n%3D1" height=70>
 
