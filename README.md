@@ -12,7 +12,7 @@ It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the Tokyo Olympics
 
 This social game was inspired by the TV show <a href="https://www.youtube.com/watch?v=5xQ-JQEGOHM">Survivor</a> (Watch before reading more). It's a game based on fun challenges, alliances and human psychology. The twist here is that instead of being stranded on a deserted island for 30 days, players are "stranded" inside their homes. This is important because social distancing, i.e. staying home, is the best tool that the youth have right now for collectively fighting the epidemic. All challenges in this game are designed to incentivize social distancing and spreading awareness. Simple activities like <a href="https://www.youtube.com/watch?v=qFmaSNP6_z4">making home made cotton based masks</a> can help reduce droplet based transmission rates by up to 70% and can be turned into social awareness challenges. Young and healthy people are at risk and can engage in activities that can increase risk for others, so the goal is to create home-based activities that reward risk mitigation.
 
-Also, since the game is digital and based on social media, we aren't limited to the standard 20 players. Everyone can play. With the hope of attracting even more players and convinving them to socially distance, a donation is required to join and the winner takes all.
+Also, since the game is digital and based on social media, we aren't limited to the standard 20 players. Everyone can play. With the hope of attracting even more players and convincing them to socially distance, a donation is required to join and the winner takes all.
 
 Here's how the game works:
 
