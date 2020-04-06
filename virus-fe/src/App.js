@@ -6,6 +6,13 @@ import {
   Link
 } from "react-router-dom";
 
+import ChallengeSubmissionPage from './components/ChallengeSubmissionPage';
+import CreateChallengePage from './components/CreateChallengePage';
+import GameInfoPage from './components/GameInfoPage';
+import JoinGamePage from './components/JoinGamePage';
+import StartGamePage from './components/StartGamePage';
+
+
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
 //
@@ -20,9 +27,6 @@ export default function BasicExample() {
     <Router>
       <div>
         <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
           <li>
             <Link to="/start">Start Game</Link>
           </li>
@@ -50,72 +54,23 @@ export default function BasicExample() {
           of them to render at a time
         */}
         <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
           <Route path="/start">
-            <Start />
+            <StartGamePage />
           </Route>
           <Route path="/join">
-            <Join />
+            <JoinGamePage />
           </Route>
           <Route path="/info">
-            <Info />
+            <GameInfoPage />
           </Route>
           <Route path="/submit">
-            <Submit />
+            <ChallengeSubmissionPage />
           </Route>
           <Route path="/create">
-            <Create />
+            <CreateChallengePage />
           </Route>
         </Switch>
       </div>
     </Router>
-  );
-}
-
-// You can think of these components as "pages"
-// in your app.
-
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
-}
-function Start() {
-  return (
-    <div>
-      <h2>Start Game</h2>
-    </div>
-  );
-}
-function Join() {
-  return (
-    <div>
-      <h2>Join Game</h2>
-    </div>
-  );
-}
-function Info() {
-  return (
-    <div>
-      <h2>Game Info</h2>
-    </div>
-  );
-}
-function Submit() {
-  return (
-    <div>
-      <h2>Challenge Submission</h2>
-    </div>
-  );
-}
-function Create() {
-  return (
-    <div>
-      <h2>Crate Challenge</h2>
-    </div>
   );
 }
