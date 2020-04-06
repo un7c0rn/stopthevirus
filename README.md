@@ -30,6 +30,12 @@ After thirty days a group of two finalists will have made it to the end. All pre
 
 <img src="https://github.com/unicorn1337x/stopthevirus/blob/master/blockdiagram.svg" width="1000">
 
+# Frontend Development
+
+<a href="https://github.com/un7c0rn/stopthevirus/blob/master/virus-fe/README.md">Documentation</a>
+
+# Backend Development
+
 ## Requirements
 
 ```
