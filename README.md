@@ -1,4 +1,4 @@
-<center><img src="https://github.com/unicorn1337x/stopthevirus/blob/master/documentation/banner.png" width=1000></center>
+<center><img src="/documentation/banner.png" width=1000></center>
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
@@ -18,7 +18,7 @@ Here's how the game works:
 
 ## Game Flow Chart
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/documentation/flowchart.svg" width="1000">
+<img src="documentation/flowchart.svg" width="1000">
 
 ## How to Win
 
@@ -28,11 +28,11 @@ After thirty days a group of two finalists will have made it to the end. All pre
 
 ## Architecture Block Diagram
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/documentation/blockdiagram.svg" width="1000">
+<img src="documentation/blockdiagram.svg" width="1000">
 
 # Frontend Development
 
-<a href="https://github.com/un7c0rn/stopthevirus/blob/master/documentation/react%20front%20end/README.md">Documentation</a>
+<a href="./react%20front%20end/README.md">Documentation</a>
 
 # Backend Development
 
