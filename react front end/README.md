@@ -1,4 +1,30 @@
+# Front end development team guidance
+
+Information about where files are and what does what and goes where is listed below.
+
+**Files are in**
+
+1. Pages are in ./src/pages
+2. Page components are in ./src/pages/components
+3. Utilities are in ./src/utilities
+4. Service are in ./src/services
+
+**Routes + Suspense + lazy loading (go here)**
+
+1. Routes should be in the ./src/App.js
+
+**Utilities**
+
+1. Common JS function helpers, e.g. date using moment.js, or a toCurrency function using Intl are in ./src/utilities
+
+# Project setup
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+# Challenge submission page
+
+This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**
+Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
 
 ## Available Scripts
 
