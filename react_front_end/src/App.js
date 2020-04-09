@@ -10,7 +10,7 @@ const VotingPage = lazy(() => import("./pages/VotingPage"));
 const SubmitPage = lazy(() => import("./pages/SubmitPage"));
 
 const theme = createMuiTheme({
-  background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
+  background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
 });
 
 console.log("MUI Theme");
@@ -30,8 +30,9 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/instructions" element={<InstructionsPage />} />
-            <Route path="/vote" element={<VotingPage />} />
+            <Route path="/start-game" element={<h1>START GAME PAGE</h1>} />
+            <Route path="/join-game" element={<h1>JOIN GAME PAGE</h1>} />
+            <Route path="/game-info" element={<h1>GAME INFO PAGE</h1>} />
             <Route
               path="/challenge-submission/:phone/:game"
               element={<SubmitPage />}
