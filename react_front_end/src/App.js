@@ -5,8 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.scss";
 
 const LandingPage = lazy(() => import("./pages/LandingPage"));
-const InstructionsPage = lazy(() => import("./pages/InstructionsPage"));
-const VotingPage = lazy(() => import("./pages/VotingPage"));
 const SubmitPage = lazy(() => import("./pages/SubmitPage"));
 
 const theme = createMuiTheme({

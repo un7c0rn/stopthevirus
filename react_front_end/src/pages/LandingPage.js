@@ -1,10 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Button } from "./components/Button";
-import { toCurrency } from "../utilities/Utilities";
 import { withStyles } from "@material-ui/core";
 
 // put your custom styles in here
-const styles = theme => ({});
+const styles = (theme) => ({});
 
 const LandingPage = () => {
   // state
@@ -24,19 +23,19 @@ const LandingPage = () => {
     setYourStateItem("#STOPTHEVIRUS");
   }, []);
 
-  const play = event => {
+  const play = (event) => {
     console.log("play");
   };
 
-  const instructions = event => {
+  const instructions = (event) => {
     console.log("instructions");
   };
 
-  const create = event => {
+  const create = (event) => {
     console.log("create");
   };
 
-  const scroll = event => {
+  const scroll = (event) => {
     console.log("scroll");
   };
 
