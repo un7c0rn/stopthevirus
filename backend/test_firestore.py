@@ -4,7 +4,7 @@ from game_engine.firestore import FirestoreDB
 import pprint
 import json
 
-_TEST_FIRESTORE_INSTANCE_JSON_PATH = './stv-game-db-test-4c0ec2310b2e.json'
+_TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TRIBE_TIGRAWAY_ID = '77TMV9omdLeW7ORvuheX'
 _TEST_TRIBE_SIDAMA_ID = 'cbTgYdPh97K6rRTDdEPL'
 _TEST_GAME_ID = '7rPwCJaiSkxYgDocGDw1'
