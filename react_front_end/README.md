@@ -143,3 +143,11 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 ## Challenge submission page
 
 After running `yarn start` in the **react front end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
+
+## TicTok metric parser
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+1. `yarn && yarn start`
+2. `yarn test`
+3. `netlify functions:invoke tiktok --no-identity --querystring "url=https://www.tiktok.com/@jadethirlwall/video/6813412701310635269"`
