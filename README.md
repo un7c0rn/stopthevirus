@@ -1,4 +1,4 @@
-<center><img src="https://github.com/unicorn1337x/stopthevirus/blob/master/banner.png" width=1000></center>
+<center><img src="/documentation/banner.png" width=1000></center>
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
@@ -18,21 +18,21 @@ Here's how the game works:
 
 ## Game Flow Chart
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/flowchart.svg" width="1000">
+<img src="documentation/flowchart.svg" width="1000">
 
 ## How to Win
 
-New social distancing challenge ideas can be added continuously by the game admins. Some examples include *Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song.* or *Cleaning Challenge — Post a video showing your most creative way to clean your living space.*
+New social distancing challenge ideas can be added continuously by the game admins. Some examples include _Karaoke Challenge — Post a video doing your best lyric for lyric rendition of your favorite song._ or _Cleaning Challenge — Post a video showing your most creative way to clean your living space._
 
 After thirty days a group of two finalists will have made it to the end. All previous players will have the opportunity to vote for who the winner of the prize money should be. Each finalist will be able to make a case on social media using a video post to say why they should be the final survivor and winner of the prize money.
 
 ## Architecture Block Diagram
 
-<img src="https://github.com/unicorn1337x/stopthevirus/blob/master/blockdiagram.svg" width="1000">
+<img src="documentation/blockdiagram.svg" width="1000">
 
 # Frontend Development
 
-<a href="https://github.com/un7c0rn/stopthevirus/blob/master/virus-fe/README.md">Documentation</a>
+<a href="./react%20front%20end/README.md">Documentation</a>
 
 # Backend Development
 
@@ -49,6 +49,7 @@ Running the unit tests is a good way to get started with development. In general
 To run the unit tests:
 
 ```console
+cd backend
 python3 -m unittest -v
 ```
 
@@ -61,23 +62,23 @@ brew install entr
 ```
 
 ```console
-find . -name '*.py' | entr python3 -m unittest game_test.py -v
+cd backend
+find . -name '*.py' | entr python3 -m unittest test_game.py -v
 ```
 
 ## Design
 
 ### Data Model
 
-| Type         | Properties                                                        | Comments                |
-| ------------ | ----------------------------------------------------------------- | ------------------------|
-| Game         | id, count_players/teams/tribes                                    | Counters for Firestore. |
-| Player       | id, tiktok, email, tribe_id, team_id, active                      |                         |
-| Vote         | id, from_id, to_id, team_id, is_for_win                           |                         |
-| Team         | id, name, tribe_id, active, count_players                         |                         |
-| Tribe        | id, name, active, count_players/teams                             |                         |
-| Challenge    | id, name, message, start/end_timestamp, complete                  | Posted by game admin(s) |
-| Entry        | id, likes, views, player_id, team_id, tribe_id, challenge_id, url | i.e. TikTok post        |
-
+| Type      | Properties                                                        | Comments                |
+| --------- | ----------------------------------------------------------------- | ----------------------- |
+| Game      | id, count_players/teams/tribes                                    | Counters for Firestore. |
+| Player    | id, tiktok, email, tribe_id, team_id, active                      |                         |
+| Vote      | id, from_id, to_id, team_id, is_for_win                           |                         |
+| Team      | id, name, tribe_id, active, count_players                         |                         |
+| Tribe     | id, name, active, count_players/teams                             |                         |
+| Challenge | id, name, message, start/end_timestamp, complete                  | Posted by game admin(s) |
+| Entry     | id, likes, views, player_id, team_id, tribe_id, challenge_id, url | i.e. TikTok post        |
 
 ### Game and Event Model
 
@@ -150,6 +151,6 @@ You may notice that the Firestore database credentials are included here in sour
 
 ### Scalability
 
-<a href="https://github.com/un7c0rn/stopthevirus/blob/master/scale.md">Scalability Analysis</a>
+<a href="https://github.com/un7c0rn/stopthevirus/blob/master/documentation/scale.md">Scalability Analysis</a>
 
 Contact: <a href="mailto:brandon@formless.la">brandon@formless.la</a>
