@@ -49,6 +49,7 @@ Running the unit tests is a good way to get started with development. In general
 To run the unit tests:
 
 ```console
+cd backend
 python3 -m unittest -v
 ```
 
@@ -61,7 +62,8 @@ brew install entr
 ```
 
 ```console
-find . -name '*.py' | entr python3 -m unittest game_test.py -v
+cd backend
+find . -name '*.py' | entr python3 -m unittest test_game.py -v
 ```
 
 ## Design
