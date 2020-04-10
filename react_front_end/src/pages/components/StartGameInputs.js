@@ -8,37 +8,40 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import MuiPhoneNumber from "material-ui-phone-number";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import React, { useRef } from "react";
 import { useParams } from "react-router-dom";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-    "& > *": {
-      width: "100vw",
-      height: "45vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center"
-    }
-  },
-  title: {
-    margin: "1em 0",
-    fontSize: "1em"
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    "& > *": {
-      margin: "1em 0"
-    }
-  }
-}));
+
 
 export default function StartGameInputs() {
+  const sm = useMediaQuery('(max-height:650px)');//for iphone 5SE
+  const useStyles = makeStyles(theme => ({
+    root: {
+      display: "flex",
+      flexWrap: "wrap",
+      "& > *": {
+        width: "100vw",
+        height: sm ? "55vh" : "45vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+      }
+    },
+    title: {
+      margin: "1em 0",
+      fontSize: "1em"
+    },
+    form: {
+      display: "flex",
+      flexDirection: "column",
+      "& > *": {
+        margin: "1em 0"
+      }
+    }
+  }));
   const classes = useStyles();
 
   const inputRef = useRef();
