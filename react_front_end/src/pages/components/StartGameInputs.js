@@ -7,6 +7,7 @@ import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import MuiPhoneNumber from "material-ui-phone-number";
 
 import React, { useRef } from "react";
 import { useParams } from "react-router-dom";
@@ -57,23 +58,22 @@ export default function StartGameInputs() {
     console.log(game);
   };
 
+  function handleOnPhoneChange(value) {
+    console.log(value);
+ }
+
   return (
     <div className={classes.root}>
       <Paper square>
         <form className={classes.form} noValidate autoComplete="off">
-          <CountrySelect/>
           <TextField
             id="outlined-basic"
             label="Tik Tok"
             variant="outlined"
             inputRef={inputRef}
           />
-          <TextField
-            id="outlined-basic"
-            label="SMS Phone Number"
-            variant="outlined"
-            inputRef={inputRef}
-          />
+          <MuiPhoneNumber label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
+          disableDropdown={false} onChange={handleOnPhoneChange}/>
           <TextField
             id="outlined-basic"
             label="Your Game Name"
