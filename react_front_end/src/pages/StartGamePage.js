@@ -9,6 +9,8 @@ import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import ChallengeInfo from "./components/ChallengeInfo";
 import ChallengeSubmit from "./components/ChallengeSubmit";
+import StartGamePrompt from "./components/StartGamePrompt";
+import StartGameInputs from "./components/StartGameInputs";
 
 export default function StartGamePage() {
   const useStyles = makeStyles(theme => ({
@@ -29,8 +31,8 @@ export default function StartGamePage() {
       <section className={classes.root}>
         <ButtonAppBar />
         <AppTitle />
-        <ChallengeInfo />
-        <ChallengeSubmit />
+        <StartGamePrompt />
+        <StartGameInputs />
         <Footer />
       </section>
     </>
