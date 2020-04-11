@@ -31,6 +31,7 @@ function App() {
             <Route path="/start-game" element={<h1>START GAME PAGE</h1>} />
             <Route path="/join-game" element={<h1>JOIN GAME PAGE</h1>} />
             <Route path="/game-info" element={<h1>GAME INFO PAGE</h1>} />
+<Route path="/start-game" element={<StartGamePage />} />
             <Route
               path="/challenge-submission/:phone/:game"
               element={<SubmitPage />}
