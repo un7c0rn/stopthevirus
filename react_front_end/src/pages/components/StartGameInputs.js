@@ -5,7 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 export default function StartGameInputs() {
   const sm = useMediaQuery('(max-height:650px)');//for iphone 5SE
@@ -46,12 +46,17 @@ export default function StartGameInputs() {
     console.log(gameNameRef.current.value);
     console.log(phone);
     console.log(country);
+
+    setDidSubmit(true);
   };
 
   function handleOnPhoneChange(value,countryObj) {
     phone=value;
     country=countryObj;
  }
+ const [tikTok, setTikTok] = useState("");
+ const [didSubmit, setDidSubmit] = useState(false);
+ const [gameName, setGameName] = useState("");
 
   return (
     <div className={classes.root}>
@@ -62,6 +67,9 @@ export default function StartGameInputs() {
             label="Tik Tok"
             variant="outlined"
             inputRef={tikTokRef}
+            error={didSubmit && tikTok === ""}
+            onChange={event => setTikTok(event.target.value )}
+            value={tikTok}
           />
           <MuiPhoneNumber label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
           onChange={handleOnPhoneChange}/>
@@ -69,7 +77,10 @@ export default function StartGameInputs() {
             id="outlined-basic"
             label="Your Game Name"
             variant="outlined"
+            error={didSubmit && gameName === ""}
+            onChange={event => setGameName(event.target.value )}
             inputRef={gameNameRef}
+            value={gameName}
           />
           <Button variant="contained" onClick={submit}>
             Start a game
