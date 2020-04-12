@@ -38,7 +38,6 @@ export default function StartGameInputs() {
 
   const tikTokRef = useRef();
   const gameNameRef = useRef();
-  let phone, country;
 
   const submit = event => {
     console.log("send to API endpoint");
@@ -51,12 +50,14 @@ export default function StartGameInputs() {
   };
 
   function handleOnPhoneChange(value,countryObj) {
-    phone=value;
-    country=countryObj;
+    setPhone(value);
+    setCountry(countryObj);
  }
  const [tikTok, setTikTok] = useState("");
  const [didSubmit, setDidSubmit] = useState(false);
  const [gameName, setGameName] = useState("");
+ const [phone, setPhone] = useState("");
+ const [country, setCountry] = useState({});
 
   return (
     <div className={classes.root}>
@@ -71,8 +72,11 @@ export default function StartGameInputs() {
             onChange={event => setTikTok(event.target.value )}
             value={tikTok}
           />
-          <MuiPhoneNumber label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
-          onChange={handleOnPhoneChange}/>
+          <MuiPhoneNumber error={didSubmit && phone.length <=6}
+          label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
+          onChange={handleOnPhoneChange}
+          value={phone}
+          />
           <TextField
             id="outlined-basic"
             label="Your Game Name"
