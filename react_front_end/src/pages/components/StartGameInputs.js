@@ -8,7 +8,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import React, { useRef, useState } from "react";
 
 export default function StartGameInputs() {
-  const sm = useMediaQuery('(max-height:650px)');//for iphone 5SE
+  const sm = useMediaQuery("(max-height:650px)");//for iphone 5SE
   const useStyles = makeStyles(theme => ({
     root: {
       display: "flex",
@@ -39,32 +39,34 @@ export default function StartGameInputs() {
   const tikTokRef = useRef();
   const gameNameRef = useRef();
 
-  const submit = event => {
-    console.log("send to API endpoint");
-    console.log(tikTokRef.current.value);
-    console.log(gameNameRef.current.value);
-    console.log(phone);
-    console.log(country);
-
-    setDidSubmit(true);
-  };
-
-  function handleOnPhoneChange(value,countryObj) {
-    setPhone(value);
-    setCountry(countryObj);
- }
  const [tikTok, setTikTok] = useState("");
  const [didSubmit, setDidSubmit] = useState(false);
  const [gameName, setGameName] = useState("");
  const [phone, setPhone] = useState("");
  const [country, setCountry] = useState({});
 
+ const submit = event => {
+   console.log("send to API endpoint");
+   console.log(tikTokRef.current.value);
+   console.log(gameNameRef.current.value);
+   console.log(phone);
+   console.log(country);
+
+   setDidSubmit(true);
+ };
+
+ function handleOnPhoneChange(value,countryObj) {
+   setPhone(value);
+   setCountry(countryObj);
+}
+
+
   return (
     <div className={classes.root}>
       <Paper square>
-        <form className={classes.form} noValidate autoComplete="off">
+        <form className={classes.form} autoComplete="off">
           <TextField
-            id="outlined-basic"
+            id="start-game-inputs-tiktok"
             label="Tik Tok"
             variant="outlined"
             inputRef={tikTokRef}
@@ -72,13 +74,14 @@ export default function StartGameInputs() {
             onChange={event => setTikTok(event.target.value )}
             value={tikTok}
           />
-          <MuiPhoneNumber error={didSubmit && phone.length <=6}
+          <MuiPhoneNumber error={didSubmit && phone.length <= 6}
           label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
           onChange={handleOnPhoneChange}
           value={phone}
+          id="start-game-inputs-phone"
           />
           <TextField
-            id="outlined-basic"
+            id="start-game-inputs-game-name"
             label="Your Game Name"
             variant="outlined"
             error={didSubmit && gameName === ""}
