@@ -27,5 +27,5 @@ jobs:
         run: |
           cd react_front_end
           yarn
-          netlify dev
+          ./node_modules/netlify-cli/bin/run dev
           yarn test
