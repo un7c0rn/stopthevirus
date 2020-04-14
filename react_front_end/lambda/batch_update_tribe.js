@@ -86,21 +86,59 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "../src/services/FireStore.js":
+/*!************************************!*\
+  !*** ../src/services/FireStore.js ***!
+  \************************************/
+/*! exports provided: initialise */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initialise", function() { return initialise; });
+/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
+/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_0__);
+// Google FireStore implementation
+
+const initialise = () => {
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyA9SDYzjtocqWPZsqf6mv9tIEa5VbiVJIE",
+    authDomain: "stv-game-db-test.firebaseapp.com",
+    databaseURL: "https://stv-game-db-test.firebaseio.com",
+    projectId: "stv-game-db-test",
+    storageBucket: "stv-game-db-test.appspot.com",
+    messagingSenderId: "530854469072",
+    appId: "1:530854469072:web:2503db7eeb01807e2bedd5",
+    measurementId: "G-5K41Q2HLL0"
+  }; // Initialize Firebase
+
+  firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp(firebaseConfig, "VIR-US");
+  return firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a;
+};
+
+/***/ }),
+
 /***/ "./batch_update_tribe.js":
 /*!*******************************!*\
   !*** ./batch_update_tribe.js ***!
   \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-// Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _src_services_FireStore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../src/services/FireStore */ "../src/services/FireStore.js");
+ // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
+
 exports.handler = (event, context, callback) => {
   try {
+    const fb = Object(_src_services_FireStore__WEBPACK_IMPORTED_MODULE_0__["initialise"])();
     const body = JSON.parse(event.body) || null;
     if (!body) throw new Error("problem with data in body");
     callback(null, {
       statusCode: 200,
-      body: "ok"
+      body: fb.SDK_VERSION
     });
   } catch (err) {
     callback(null, {
@@ -109,6 +147,17 @@ exports.handler = (event, context, callback) => {
     });
   }
 };
+
+/***/ }),
+
+/***/ "firebase-admin":
+/*!*********************************!*\
+  !*** external "firebase-admin" ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("firebase-admin");
 
 /***/ })
 
