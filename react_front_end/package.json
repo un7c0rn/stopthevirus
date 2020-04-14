@@ -32,7 +32,7 @@
     "start:lambda": "yarn watch:functions",
     "prepare:lambda-build": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "build": "react-scripts build",
-    "test": "REACT_APP_ENV=test react-scripts test",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "run_lambda": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "watch:functions": "npm-watch run_lambda"
@@ -53,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "webpack-node-externals": "^1.7.2"
   },
