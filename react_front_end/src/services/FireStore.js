@@ -17,3 +17,11 @@ export const initialise = () => {
   firebase.initializeApp(firebaseConfig, "VIR-US");
   return firebase;
 };
+
+export const countPlayers = (pool = null) => {
+  // count the players in the pool
+};
+
+export const countTeams = (pool = null) => {
+  // count the teams in the pool
+};
