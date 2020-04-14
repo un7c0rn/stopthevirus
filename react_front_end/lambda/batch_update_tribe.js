@@ -90,12 +90,14 @@
 /*!************************************!*\
   !*** ../src/services/FireStore.js ***!
   \************************************/
-/*! exports provided: initialise */
+/*! exports provided: initialise, countPlayers, countTeams */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initialise", function() { return initialise; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "countPlayers", function() { return countPlayers; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "countTeams", function() { return countTeams; });
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_0__);
 // Google FireStore implementation
@@ -103,18 +105,22 @@ __webpack_require__.r(__webpack_exports__);
 const initialise = () => {
   // Your web app's Firebase configuration
   var firebaseConfig = {
-    apiKey: "AIzaSyA9SDYzjtocqWPZsqf6mv9tIEa5VbiVJIE",
-    authDomain: "stv-game-db-test.firebaseapp.com",
-    databaseURL: "https://stv-game-db-test.firebaseio.com",
-    projectId: "stv-game-db-test",
-    storageBucket: "stv-game-db-test.appspot.com",
-    messagingSenderId: "530854469072",
-    appId: "1:530854469072:web:2503db7eeb01807e2bedd5",
-    measurementId: "G-5K41Q2HLL0"
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.FIREBASE_DB_URL,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID
   }; // Initialize Firebase
 
   firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp(firebaseConfig, "VIR-US");
   return firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a;
+};
+const countPlayers = (pool = null) => {// count the players in the pool
+};
+const countTeams = (pool = null) => {// count the teams in the pool
 };
 
 /***/ }),
