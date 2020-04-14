@@ -28,7 +28,6 @@
   "scripts": {
     "start": "yarn prepare:lambda-build; run-p start:*",
     "start:app": "react-scripts start",
-    "start:lambda": "yarn watch:functions",
     "prepare:lambda-build": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "build": "react-scripts build",
     "test": "REACT_APP_ENV=test react-scripts test",
