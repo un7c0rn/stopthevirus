@@ -28,9 +28,3 @@ jobs:
           cd react_front_end
           yarn
           ./node_modules/netlify-cli/bin/run dev
-
-      # Runs a set of commands using the runners shell
-      - name: Run front end tests
-        run: |
-          cd react_front_end
-          yarn test
