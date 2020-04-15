@@ -33,4 +33,25 @@ export default class Firestore {
       await this.firestoreClient.doc(`games/${game}/tribes/${id}`).get()
     ).data();
   };
+
+  count_players = async ({
+    game = null,
+    from_tribe = null,
+    from_team = null,
+  }) => {
+    if (from_tribe) {
+      return (
+        await this.firestoreClient
+          .doc(`games/${game}/tribes/${from_tribe}`)
+          .get()
+      ).data().count_players;
+    } else if (from_team) {
+      return (
+        await this.firestoreClient.doc(`games/${game}/teams/${from_team}`).get()
+      ).data().count_players;
+    } else {
+      return (await this.firestoreClient.doc(`games/${game}`).get()).data()
+        .count_players;
+    }
+  };
 }

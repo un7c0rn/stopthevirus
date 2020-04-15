@@ -61,4 +61,35 @@ describe("Firestore service", () => {
     );
     expect(response.id).toBe(_TEST_TRIBE_SIDAMA_ID);
   });
+
+  it("should count the players in a game", async () => {
+    const response = await firestore.count_players({
+      game: _TEST_GAME_ID,
+    });
+    expect(response).toBe(2);
+  });
+
+  it("should count the players in a tribe", async () => {
+    const response = await firestore.count_players({
+      game: _TEST_GAME_ID,
+      from_tribe: _TEST_TRIBE_SIDAMA_ID,
+    });
+    expect(response).toBe(2);
+  });
+
+  it("should count the players in a different tribe", async () => {
+    const response = await firestore.count_players({
+      game: _TEST_GAME_ID,
+      from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
+    });
+    expect(response).toBe(0);
+  });
+
+  it("should count the players in a team", async () => {
+    const response = await firestore.count_players({
+      game: _TEST_GAME_ID,
+      from_team: _TEST_TEAM_BLUE_ID,
+    });
+    expect(response).toBe(0);
+  });
 });
