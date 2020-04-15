@@ -31,7 +31,7 @@ jobs:
           yarn
 
       # Runs a set of commands using the runners shell
-      - name: Run development server
+      - name: Run development server & tests
         run: |
           cd react_front_end
           ./node_modules/netlify-cli/bin/run dev
