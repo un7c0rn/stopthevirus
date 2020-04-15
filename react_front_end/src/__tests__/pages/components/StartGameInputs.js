@@ -30,7 +30,7 @@ test("TikTok input", () => {
   expect(tikTokLocater().value).toEqual(testMessage);
 });
 
-test("Phone number input", async () => {
+test("Phone number input", () => {
   const testMessage = '+1 (23)';//this component will automatically add parenthesis
   render(<StartGameInputs />)
   fireEvent.change(phoneNumberLocator(), {
@@ -39,7 +39,7 @@ test("Phone number input", async () => {
   expect(phoneNumberLocator().value).toEqual(testMessage);
 });
 
-test("Game name input", async () => {
+test("Game name input", () => {
   const testMessage = 'Test Message';
   render(<StartGameInputs />)
   fireEvent.change(gameNameLocator(), {
@@ -48,14 +48,14 @@ test("Game name input", async () => {
   expect(gameNameLocator().value).toEqual(testMessage);
 });
 
-test("Phone number submit invalid", async () => {
+test("Phone number submit invalid", () => {
   render(<StartGameInputs />)
   expect(phoneNumberLocator()).toHaveAttribute("aria-invalid", "false");
   fireEvent.click(startGameLocator());
   expect(phoneNumberLocator()).toHaveAttribute("aria-invalid", "true");
 });
 
-test("Phone number submit short invalid", async () => {
+test("Phone number submit short invalid", () => {
   render(<StartGameInputs />)
   expect(phoneNumberLocator()).toHaveAttribute("aria-invalid", "false");
 
@@ -69,7 +69,7 @@ test("Phone number submit short invalid", async () => {
   expect(phoneNumberLocator()).toHaveAttribute("aria-invalid", "true");
 });
 
-test("Phone number submit valid", async () => {
+test("Phone number submit valid", () => {
   render(<StartGameInputs />)
   expect(phoneNumberLocator()).toHaveAttribute("aria-invalid", "false");
 
@@ -83,7 +83,7 @@ test("Phone number submit valid", async () => {
   expect(phoneNumberLocator()).toHaveAttribute("aria-invalid", "false");
 });
 
-test("game name submit valid", async () => {
+test("game name submit valid", () => {
   const testMessage = 'Test Message';
   render(<StartGameInputs />)
   expect(gameNameLocator()).toHaveAttribute("aria-invalid", "false");
@@ -95,7 +95,7 @@ test("game name submit valid", async () => {
   expect(gameNameLocator()).toHaveAttribute("aria-invalid", "false");
 });
 
-test("game name submit invalid", async () => {
+test("game name submit invalid", () => {
   render(<StartGameInputs />)
   expect(gameNameLocator()).toHaveAttribute("aria-invalid", "false");
   fireEvent.click(startGameLocator());
@@ -103,7 +103,7 @@ test("game name submit invalid", async () => {
   expect(gameNameLocator()).toHaveAttribute("aria-invalid", "true");
 });
 
-test("tiktok submit valid", async () => {
+test("tiktok submit valid", () => {
   const testMessage = 'Test Message';
   render(<StartGameInputs />)
   expect(gameNameLocator()).toHaveAttribute("aria-invalid", "false");
@@ -115,7 +115,7 @@ test("tiktok submit valid", async () => {
   expect(tikTokLocater()).toHaveAttribute("aria-invalid", "false");
 });
 
-test("tiktok submit invalid", async () => {
+test("tiktok submit invalid", () => {
   render(<StartGameInputs />)
   expect(tikTokLocater()).toHaveAttribute("aria-invalid", "false");
   fireEvent.click(startGameLocator());
