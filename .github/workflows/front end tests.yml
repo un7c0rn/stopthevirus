@@ -35,3 +35,4 @@ jobs:
         run: |
           cd react_front_end
           ./node_modules/netlify-cli/bin/run dev
+          yarn test
