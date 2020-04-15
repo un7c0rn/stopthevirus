@@ -86,36 +86,76 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "../src/services/FireStore.js":
+/***/ "../service_account/stv-game-db-test-0f631b94adde.json":
+/*!*************************************************************!*\
+  !*** ../service_account/stv-game-db-test-0f631b94adde.json ***!
+  \*************************************************************/
+/*! exports provided: type, project_id, private_key_id, private_key, client_email, client_id, auth_uri, token_uri, auth_provider_x509_cert_url, client_x509_cert_url, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"type\":\"service_account\",\"project_id\":\"stv-game-db-test\",\"private_key_id\":\"0f631b94addef223f278ef100f9be070ad1288be\",\"private_key\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdcKFUJpRYgJuj\\n7MLPNjcV0VEBSUHocmq/rlZbKO3RJc2pOVmk7q4wK9Ic5JWxJYs6dJQMFgOWmTu7\\nzEnkzCOPaLpvX23o4o8iWI99GLJk/CXZywviVgiDcqxeb347cGSzkn0uDe/dj7M5\\n1Gx3nJukqzbxTPYeN8NzwIhcMLA4UhuZzdy/TFjoqDuNoKaVjFrkbKQn+x6TToNy\\nAC69wOcJChd4oiaxXDOZNH3wismEexlzQj5w6FsCtGrEOHZiz0+/REibwW1BGHCr\\ncMl1/JD0KNF3RM1cAizLhdrf168x43xcR+9qlvNNTfp/lUhiN/cPsDX0/tbArFgv\\niHCf7vuxAgMBAAECggEAB8mdMNfiUxpNxEYbA/LIB+fv4XvS2gKubfiK0ANTLsNr\\nCsrJ/r6ynfN9POJ4lbg9v96SR3pdjLCtojvWXu9OHQNjEsWK7dwMNNo4t0lqBQVo\\nQYiDozAg9e96L/WGPX9Pw/rF6nusviXejkJ3VehflxBQOwxN96+AxmEPYppHPj8V\\n2sWVNICI6qy8DjXXcuuJqY3KrUkvyvyYNh5RcWtMA8wSk1Vm/7cjq6otUWBn/f2t\\nM3/Jjs9minRtZ48bmhH4y4u4y/3cSP1TTicitdIFrNZ6D3UoGk9ndW1T5HZzmF1M\\n2VcG/cKolDqHgg8lmDohdZLAUg+vO5+GB8vEKYk66QKBgQD/0f9DL1yn+DDdPGSq\\n+wFeCSZMoZJCaz1Hq7gPyjC37dIgPSM8gqx7uYPIEtl5uGo8ty1zJaBbjxV3VqWy\\nfKzOxE31UuQPfwyIYpPkvFZtuPWtXp40Q7Pl7iHQ526GMeh6CTUJXS8UH762yBpT\\n3/jtYDZjA5e6TfUJUaSWota+qQKBgQDdmHNcUbkBioay3SRhcnAUlWV//3UOLPUw\\nT3QahOhsx0P5zClWeYQE4zqpClU7oVur8xPWyw1ZcQFFTK9hjBe8RwWrvpDodo43\\n/bqEiBpnWmA5i5d/0M5xkpVvgBu8YuqdsgNmSojmxEAc1gNFVA54EI7aCkJpFi/b\\nJ0a79fOhyQKBgAHaqMn43ugMwXXpCSXAGftvf4qQpTm8Az6wvO3IXmAG5j37k3TN\\n0ag36P+bO15JeuOjxD2QaUAgolwyEZNgmfQJsjLz/dkq55FZfY7r2oiDDazLAcSJ\\nNRWWi0IzWza3x+KSjILb3Qp9TGmQu7gd6HT3/IztKr1b8Um3AMViusG5AoGBAMJE\\nt8YUwzvNpR9D7nQb7pStEOnxHD8MPPxYe7IQGO/clgR17zunlozuZOvzahu373VE\\nynzBUPe7sWB+xTagqeJe5WLW05Vo8m+12oH8DCHVwoxQi8X7WjGJT8cLqcUzdvo/\\nKOnRqEmffZGKMh3ifjjWU1ZmLiiQ0e2wdjuseSW5AoGAZ+ju9OC7KsGttDebI4B7\\n1kpfFQTRnKqLBx0PM9cOaAxQxN6ZLO3rz40QuS7DDl8/ju/pZtVQ0p/aX9yXLNAa\\nBq2ZVHuPlpYOWbe6a4xJSOdQ7orxMbQmg4Vv/2tkx2buuQZrniQha//CcOlc0YNU\\nz+y6/incGzC+UqDRR3y7VCg=\\n-----END PRIVATE KEY-----\\n\",\"client_email\":\"stv-firebase-public-test@stv-game-db-test.iam.gserviceaccount.com\",\"client_id\":\"106834055588256677526\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/stv-firebase-public-test%40stv-game-db-test.iam.gserviceaccount.com\"}");
+
+/***/ }),
+
+/***/ "../src/services/Firestore.js":
 /*!************************************!*\
-  !*** ../src/services/FireStore.js ***!
+  !*** ../src/services/Firestore.js ***!
   \************************************/
-/*! exports provided: initialise */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initialise", function() { return initialise; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Firestore; });
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _service_account_stv_game_db_test_0f631b94adde_json__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../service_account/stv-game-db-test-0f631b94adde.json */ "../service_account/stv-game-db-test-0f631b94adde.json");
+var _service_account_stv_game_db_test_0f631b94adde_json__WEBPACK_IMPORTED_MODULE_1___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../../service_account/stv-game-db-test-0f631b94adde.json */ "../service_account/stv-game-db-test-0f631b94adde.json", 1);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Google FireStore implementation
 
-const initialise = () => {
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyA9SDYzjtocqWPZsqf6mv9tIEa5VbiVJIE",
-    authDomain: "stv-game-db-test.firebaseapp.com",
-    databaseURL: "https://stv-game-db-test.firebaseio.com",
-    projectId: "stv-game-db-test",
-    storageBucket: "stv-game-db-test.appspot.com",
-    messagingSenderId: "530854469072",
-    appId: "1:530854469072:web:2503db7eeb01807e2bedd5",
-    measurementId: "G-5K41Q2HLL0"
-  }; // Initialize Firebase
 
-  firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp(firebaseConfig, "VIR-US");
-  return firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a;
-};
+class Firestore {
+  constructor() {
+    _firestoreClient.set(this, {
+      writable: true,
+      value: void 0
+    });
+
+    _defineProperty(this, "initialise", () => {
+      // Web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+        authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+        databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
+        projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.REACT_APP_FIREBASE_APP_ID,
+        measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+      }; // Initialize Firebase
+
+      const app = firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp({
+        credential: firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.credential.cert(_service_account_stv_game_db_test_0f631b94adde_json__WEBPACK_IMPORTED_MODULE_1__),
+        databaseURL: "https://stv-game-db-test.firebaseio.com"
+      });
+      this.firestoreClient = firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.firestore(app);
+      const firestoreClient = this.firestoreClient;
+      return {
+        firebase: (firebase_admin__WEBPACK_IMPORTED_MODULE_0___default()),
+        firestoreClient
+      };
+    });
+
+    _defineProperty(this, "tribe_from_id", async (game = null, id = null) => {
+      return await (await this.firestoreClient.doc(`games/${game}/tribes/${id}`).get()).data();
+    });
+  }
+
+}
+
+var _firestoreClient = new WeakMap();
 
 /***/ }),
 
@@ -128,17 +168,18 @@ const initialise = () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _src_services_FireStore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../src/services/FireStore */ "../src/services/FireStore.js");
+/* harmony import */ var _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../src/services/Firestore */ "../src/services/Firestore.js");
  // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
 
 exports.handler = (event, context, callback) => {
   try {
-    const fb = Object(_src_services_FireStore__WEBPACK_IMPORTED_MODULE_0__["initialise"])();
+    const firestore = new _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    firestore.initialise();
     const body = JSON.parse(event.body) || null;
     if (!body) throw new Error("problem with data in body");
     callback(null, {
       statusCode: 200,
-      body: fb.SDK_VERSION
+      body: "ok"
     });
   } catch (err) {
     callback(null, {

@@ -1,0 +1,97 @@
+{
+    "games": {
+        "7rPwCJaiSkxYgDocGDw4": {
+            "count_teams": 6,
+            "count_players": 2,
+            "name": "test_game1"
+        }
+    },
+    "games/7rPwCJaiSkxYgDocGDw4/players": {
+        "2ZPmDfX9q82KY5PVf1LH": {
+            "team_id": "Q09FeEtoIgjNI57Bnl1E",
+            "active": true,
+            "name": "Boston Rob",
+            "tribe_id": "cbTgYdPh97K6rRTDdEPL"
+        },
+        "LXHpnrUA65FS25wGfJ00": {
+            "active": true,
+            "name": "Amber Brkich",
+            "tribe_id": "cbTgYdPh97K6rRTDdEPL",
+            "team_id": "Q09FeEtoIgjNI57Bnl1E"
+        }
+    },
+    "games/7rPwCJaiSkxYgDocGDw4/teams": {
+        "GQnxhYXnV86oJXLklbGB": {
+            "count_players": 0,
+            "name": "BLUE",
+            "tribe_id": "77TMV9omdLeW7ORvuheX",
+            "size": 0,
+            "active": true
+        },
+        "Q09FeEtoIgjNI57Bnl1E": {
+            "active": true,
+            "count_players": 2,
+            "name": "YELLOW",
+            "tribe_id": "cbTgYdPh97K6rRTDdEPL",
+            "size": 2
+        },
+        "Zpuv2bEn4WykPpIyNuJ5": {
+            "count_players": 0,
+            "name": "GREEN",
+            "tribe_id": "77TMV9omdLeW7ORvuheX",
+            "size": 0,
+            "active": true
+        },
+        "hRt3wVz6ZtVEOhkeNlIn": {
+            "count_players": 0,
+            "name": "RED",
+            "tribe_id": "77TMV9omdLeW7ORvuheX",
+            "size": 0,
+            "active": true
+        }
+    },
+    "games/7rPwCJaiSkxYgDocGDw4/tribes": {
+        "77TMV9omdLeW7ORvuheX": {
+            "count_players": 0,
+            "name": "TIGRAWAY",
+            "count_teams": 4
+        },
+        "cbTgYdPh97K6rRTDdEPL": {
+            "count_teams": 1,
+            "count_players": 2,
+            "name": "SIDAMA"
+        }
+    },
+    "games/7rPwCJaiSkxYgDocGDw4/votes": {
+        "AcuR476MF1O0tvI3bH8u": {
+            "is_for_win": false,
+            "team_id": "Q09FeEtoIgjNI57Bnl1E",
+            "to_id": "2ZPmDfX9q82KY5PVf1LH",
+            "from_id": "LXHpnrUA65FS25wGfJ00"
+        },
+        "G8u6obWxyHhXMD9cLuE0": {
+            "team_id": "Q09FeEtoIgjNI57Bnl1E",
+            "to_id": "2ZPmDfX9q82KY5PVf1LH",
+            "from_id": "LXHpnrUA65FS25wGfJ00",
+            "is_for_win": false
+        },
+        "K1umHRQpEorC9O2kdlRi": {
+            "team_id": "Q09FeEtoIgjNI57Bnl1E",
+            "to_id": "2ZPmDfX9q82KY5PVf1LH",
+            "from_id": "LXHpnrUA65FS25wGfJ00",
+            "is_for_win": false
+        },
+        "VnD8joQqsyBBFTYkkP56": {
+            "from_id": "LXHpnrUA65FS25wGfJ00",
+            "is_for_win": false,
+            "team_id": "Q09FeEtoIgjNI57Bnl1E",
+            "to_id": "2ZPmDfX9q82KY5PVf1LH"
+        },
+        "ptPg1MWPtKIHiElLKiLU": {
+            "team_id": "Q09FeEtoIgjNI57Bnl1E",
+            "to_id": "2ZPmDfX9q82KY5PVf1LH",
+            "from_id": "LXHpnrUA65FS25wGfJ00",
+            "is_for_win": false
+        }
+    }
+}

@@ -1,11 +1,14 @@
-import { initialise } from "../src/services/FireStore";
+import Firestore from "../src/services/Firestore";
 // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
 exports.handler = (event, context, callback) => {
   try {
-    const fb = initialise();
+    const firestore = new Firestore();
+    firestore.initialise();
+
     const body = JSON.parse(event.body) || null;
     if (!body) throw new Error("problem with data in body");
-    callback(null, { statusCode: 200, body: fb.SDK_VERSION });
+
+    callback(null, { statusCode: 200, body: "ok" });
   } catch (err) {
     callback(null, { statusCode: 500, body: err.toString() });
   }
