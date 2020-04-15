@@ -32,9 +32,7 @@
     "prepare:lambda-build": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "build": "react-scripts build",
     "test": "REACT_APP_ENV=test react-scripts test",
-    "eject": "react-scripts eject",
-    "run_lambda": "netlify-lambda -c ./webpack.functions.js build ./functions",
-    "watch:functions": "npm-watch run_lambda"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
