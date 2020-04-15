@@ -92,4 +92,36 @@ describe("Firestore service", () => {
     });
     expect(response).toBe(0);
   });
+
+  it("should count the teams in a game", async () => {
+    const response = await firestore.count_teams({
+      game: _TEST_GAME_ID,
+    });
+    expect(response).toBe(6);
+  });
+
+  it("should count the teams in a tribe", async () => {
+    const response = await firestore.count_teams({
+      game: _TEST_GAME_ID,
+      from_tribe: _TEST_TRIBE_SIDAMA_ID,
+    });
+    expect(response).toBe(1);
+  });
+
+  it("should count the teams in a different tribe", async () => {
+    const response = await firestore.count_teams({
+      game: _TEST_GAME_ID,
+      from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
+    });
+    expect(response).toBe(4);
+  });
+
+  it("should perform a batch update from one tribe to another", async () => {
+    const response = await firestore.batch_update_tribe({
+      game: _TEST_GAME_ID,
+      from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
+      to_tribe: _TEST_TRIBE_SIDAMA_ID,
+    });
+    expect(response).toBe(false);
+  });
 });
