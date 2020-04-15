@@ -86,17 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "../service_account/stv-game-db-test-0f631b94adde.json":
-/*!*************************************************************!*\
-  !*** ../service_account/stv-game-db-test-0f631b94adde.json ***!
-  \*************************************************************/
-/*! exports provided: type, project_id, private_key_id, private_key, client_email, client_id, auth_uri, token_uri, auth_provider_x509_cert_url, client_x509_cert_url, default */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"type\":\"service_account\",\"project_id\":\"stv-game-db-test\",\"private_key_id\":\"0f631b94addef223f278ef100f9be070ad1288be\",\"private_key\":\"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdcKFUJpRYgJuj\\n7MLPNjcV0VEBSUHocmq/rlZbKO3RJc2pOVmk7q4wK9Ic5JWxJYs6dJQMFgOWmTu7\\nzEnkzCOPaLpvX23o4o8iWI99GLJk/CXZywviVgiDcqxeb347cGSzkn0uDe/dj7M5\\n1Gx3nJukqzbxTPYeN8NzwIhcMLA4UhuZzdy/TFjoqDuNoKaVjFrkbKQn+x6TToNy\\nAC69wOcJChd4oiaxXDOZNH3wismEexlzQj5w6FsCtGrEOHZiz0+/REibwW1BGHCr\\ncMl1/JD0KNF3RM1cAizLhdrf168x43xcR+9qlvNNTfp/lUhiN/cPsDX0/tbArFgv\\niHCf7vuxAgMBAAECggEAB8mdMNfiUxpNxEYbA/LIB+fv4XvS2gKubfiK0ANTLsNr\\nCsrJ/r6ynfN9POJ4lbg9v96SR3pdjLCtojvWXu9OHQNjEsWK7dwMNNo4t0lqBQVo\\nQYiDozAg9e96L/WGPX9Pw/rF6nusviXejkJ3VehflxBQOwxN96+AxmEPYppHPj8V\\n2sWVNICI6qy8DjXXcuuJqY3KrUkvyvyYNh5RcWtMA8wSk1Vm/7cjq6otUWBn/f2t\\nM3/Jjs9minRtZ48bmhH4y4u4y/3cSP1TTicitdIFrNZ6D3UoGk9ndW1T5HZzmF1M\\n2VcG/cKolDqHgg8lmDohdZLAUg+vO5+GB8vEKYk66QKBgQD/0f9DL1yn+DDdPGSq\\n+wFeCSZMoZJCaz1Hq7gPyjC37dIgPSM8gqx7uYPIEtl5uGo8ty1zJaBbjxV3VqWy\\nfKzOxE31UuQPfwyIYpPkvFZtuPWtXp40Q7Pl7iHQ526GMeh6CTUJXS8UH762yBpT\\n3/jtYDZjA5e6TfUJUaSWota+qQKBgQDdmHNcUbkBioay3SRhcnAUlWV//3UOLPUw\\nT3QahOhsx0P5zClWeYQE4zqpClU7oVur8xPWyw1ZcQFFTK9hjBe8RwWrvpDodo43\\n/bqEiBpnWmA5i5d/0M5xkpVvgBu8YuqdsgNmSojmxEAc1gNFVA54EI7aCkJpFi/b\\nJ0a79fOhyQKBgAHaqMn43ugMwXXpCSXAGftvf4qQpTm8Az6wvO3IXmAG5j37k3TN\\n0ag36P+bO15JeuOjxD2QaUAgolwyEZNgmfQJsjLz/dkq55FZfY7r2oiDDazLAcSJ\\nNRWWi0IzWza3x+KSjILb3Qp9TGmQu7gd6HT3/IztKr1b8Um3AMViusG5AoGBAMJE\\nt8YUwzvNpR9D7nQb7pStEOnxHD8MPPxYe7IQGO/clgR17zunlozuZOvzahu373VE\\nynzBUPe7sWB+xTagqeJe5WLW05Vo8m+12oH8DCHVwoxQi8X7WjGJT8cLqcUzdvo/\\nKOnRqEmffZGKMh3ifjjWU1ZmLiiQ0e2wdjuseSW5AoGAZ+ju9OC7KsGttDebI4B7\\n1kpfFQTRnKqLBx0PM9cOaAxQxN6ZLO3rz40QuS7DDl8/ju/pZtVQ0p/aX9yXLNAa\\nBq2ZVHuPlpYOWbe6a4xJSOdQ7orxMbQmg4Vv/2tkx2buuQZrniQha//CcOlc0YNU\\nz+y6/incGzC+UqDRR3y7VCg=\\n-----END PRIVATE KEY-----\\n\",\"client_email\":\"stv-firebase-public-test@stv-game-db-test.iam.gserviceaccount.com\",\"client_id\":\"106834055588256677526\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_x509_cert_url\":\"https://www.googleapis.com/robot/v1/metadata/x509/stv-firebase-public-test%40stv-game-db-test.iam.gserviceaccount.com\"}");
-
-/***/ }),
-
 /***/ "../src/services/Firestore.js":
 /*!************************************!*\
   !*** ../src/services/Firestore.js ***!
