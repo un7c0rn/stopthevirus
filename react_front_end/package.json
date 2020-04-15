@@ -54,15 +54,5 @@
   "devDependencies": {
     "babel-plugin-transform-remove-console": "^6.9.4",
     "webpack-node-externals": "^1.7.2"
-  },
-  "watch": {
-    "run_lambda": {
-      "patterns": [
-        "./functions"
-      ],
-      "extensions": ".js",
-      "quiet": true,
-      "runOnChangeOnly": true
-    }
   }
 }
