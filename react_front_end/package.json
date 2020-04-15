@@ -61,7 +61,8 @@
         "./functions"
       ],
       "extensions": ".js",
-      "quiet": true
+      "quiet": true,
+      "runOnChangeOnly": true
     }
   }
 }
