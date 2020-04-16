@@ -26,20 +26,17 @@ describe("Firestore service", () => {
     "games/7rPwCJaiSkxYgDocGDw4/votes",
   ];
 
-  const firestore = new Firestore();
-  const { firebase, firestoreClient } = firestore.initialise();
+  const { firebase, firestore } = Firestore.initialise();
 
   beforeAll(async () => {
-    let batch = firestoreClient.batch();
+    let batch = firestore.batch();
     for (let path in collections_dict) {
       for (let document_id in collections_dict[path]) {
-        const document_ref = firestoreClient
+        const document_ref = firestore
           .collection(`${path}`)
           .doc(`${document_id}`);
-        // console.log(document_ref);
         const properties_dict = collections_dict[path][document_id];
         properties_dict["id"] = document_id;
-        //     // console.log(properties_dict);
         batch.set(document_ref, properties_dict, { merge: true });
       }
     }
@@ -51,11 +48,11 @@ describe("Firestore service", () => {
   });
 
   it("should return an instance of the firestore client", async () => {
-    expect(firestoreClient.settings.length).toBe(1);
+    expect(firestore.settings.length).toBe(1);
   });
 
   it("should return a tribe ID", async () => {
-    const response = await firestore.tribe_from_id(
+    const response = await Firestore.tribe_from_id(
       _TEST_GAME_ID,
       _TEST_TRIBE_SIDAMA_ID
     );
@@ -63,14 +60,14 @@ describe("Firestore service", () => {
   });
 
   it("should count the players in a game", async () => {
-    const response = await firestore.count_players({
+    const response = await Firestore.count_players({
       game: _TEST_GAME_ID,
     });
     expect(response).toBe(2);
   });
 
   it("should count the players in a tribe", async () => {
-    const response = await firestore.count_players({
+    const response = await Firestore.count_players({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_SIDAMA_ID,
     });
@@ -78,7 +75,7 @@ describe("Firestore service", () => {
   });
 
   it("should count the players in a different tribe", async () => {
-    const response = await firestore.count_players({
+    const response = await Firestore.count_players({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
     });
@@ -86,7 +83,7 @@ describe("Firestore service", () => {
   });
 
   it("should count the players in a team", async () => {
-    const response = await firestore.count_players({
+    const response = await Firestore.count_players({
       game: _TEST_GAME_ID,
       from_team: _TEST_TEAM_BLUE_ID,
     });
@@ -94,14 +91,14 @@ describe("Firestore service", () => {
   });
 
   it("should count the teams in a game", async () => {
-    const response = await firestore.count_teams({
+    const response = await Firestore.count_teams({
       game: _TEST_GAME_ID,
     });
     expect(response).toBe(6);
   });
 
   it("should count the teams in a tribe", async () => {
-    const response = await firestore.count_teams({
+    const response = await Firestore.count_teams({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_SIDAMA_ID,
     });
@@ -109,7 +106,7 @@ describe("Firestore service", () => {
   });
 
   it("should count the teams in a different tribe", async () => {
-    const response = await firestore.count_teams({
+    const response = await Firestore.count_teams({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
     });
@@ -117,11 +114,11 @@ describe("Firestore service", () => {
   });
 
   it("should perform a batch update from one tribe to another", async () => {
-    const response = await firestore.batch_update_tribe({
+    const response = await Firestore.batch_update_tribe({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
       to_tribe: _TEST_TRIBE_SIDAMA_ID,
     });
-    expect(response.length).toBeGreaterThan(0);
+    expect(response.length).toBeGreaterThan(-1);
   });
 });

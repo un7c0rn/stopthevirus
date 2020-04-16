@@ -1,276 +1,288 @@
-(function (e, a) {
-  for (var i in a) e[i] = a[i];
-})(
-  exports,
-  /******/ (function (modules) {
-    // webpackBootstrap
-    /******/ // The module cache
-    /******/ var installedModules = {}; // The require function
-    /******/
-    /******/ /******/ function __webpack_require__(moduleId) {
-      /******/
-      /******/ // Check if module is in cache
-      /******/ if (installedModules[moduleId]) {
-        /******/ return installedModules[moduleId].exports;
-        /******/
-      } // Create a new module (and put it into the cache)
-      /******/ /******/ var module = (installedModules[moduleId] = {
-        /******/ i: moduleId,
-        /******/ l: false,
-        /******/ exports: {},
-        /******/
-      }); // Execute the module function
-      /******/
-      /******/ /******/ modules[moduleId].call(
-        module.exports,
-        module,
-        module.exports,
-        __webpack_require__
-      ); // Flag the module as loaded
-      /******/
-      /******/ /******/ module.l = true; // Return the exports of the module
-      /******/
-      /******/ /******/ return module.exports;
-      /******/
-    } // expose the modules object (__webpack_modules__)
-    /******/
-    /******/
-    /******/ /******/ __webpack_require__.m = modules; // expose the module cache
-    /******/
-    /******/ /******/ __webpack_require__.c = installedModules; // define getter function for harmony exports
-    /******/
-    /******/ /******/ __webpack_require__.d = function (exports, name, getter) {
-      /******/ if (!__webpack_require__.o(exports, name)) {
-        /******/ Object.defineProperty(exports, name, {
-          enumerable: true,
-          get: getter,
-        });
-        /******/
-      }
-      /******/
-    }; // define __esModule on exports
-    /******/
-    /******/ /******/ __webpack_require__.r = function (exports) {
-      /******/ if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
-        /******/ Object.defineProperty(exports, Symbol.toStringTag, {
-          value: "Module",
-        });
-        /******/
-      }
-      /******/ Object.defineProperty(exports, "__esModule", { value: true });
-      /******/
-    }; // create a fake namespace object // mode & 1: value is a module id, require it // mode & 2: merge all properties of value into the ns // mode & 4: return value when already ns object // mode & 8|1: behave like require
-    /******/
-    /******/ /******/ /******/ /******/ /******/ /******/ __webpack_require__.t = function (
-      value,
-      mode
-    ) {
-      /******/ if (mode & 1) value = __webpack_require__(value);
-      /******/ if (mode & 8) return value;
-      /******/ if (
-        mode & 4 &&
-        typeof value === "object" &&
-        value &&
-        value.__esModule
-      )
-        return value;
-      /******/ var ns = Object.create(null);
-      /******/ __webpack_require__.r(ns);
-      /******/ Object.defineProperty(ns, "default", {
-        enumerable: true,
-        value: value,
-      });
-      /******/ if (mode & 2 && typeof value != "string")
-        for (var key in value)
-          __webpack_require__.d(
-            ns,
-            key,
-            function (key) {
-              return value[key];
-            }.bind(null, key)
-          );
-      /******/ return ns;
-      /******/
-    }; // getDefaultExport function for compatibility with non-harmony modules
-    /******/
-    /******/ /******/ __webpack_require__.n = function (module) {
-      /******/ var getter =
-        module && module.__esModule
-          ? /******/ function getDefault() {
-              return module["default"];
-            }
-          : /******/ function getModuleExports() {
-              return module;
-            };
-      /******/ __webpack_require__.d(getter, "a", getter);
-      /******/ return getter;
-      /******/
-    }; // Object.prototype.hasOwnProperty.call
-    /******/
-    /******/ /******/ __webpack_require__.o = function (object, property) {
-      return Object.prototype.hasOwnProperty.call(object, property);
-    }; // __webpack_public_path__
-    /******/
-    /******/ /******/ __webpack_require__.p = ""; // Load entry module and return exports
-    /******/
-    /******/
-    /******/ /******/ return __webpack_require__(
-      (__webpack_require__.s = "./batch_update_tribe.js")
-    );
-    /******/
-  })(
-    /************************************************************************/
-    /******/ {
-      /***/ "../src/services/Firestore.js":
-        /*!************************************!*\
+(function(e, a) { for(var i in a) e[i] = a[i]; }(exports, /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./batch_update_tribe.js");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "../src/services/Firestore.js":
+/*!************************************!*\
   !*** ../src/services/Firestore.js ***!
   \************************************/
-        /*! exports provided: default */
-        /***/ function (module, __webpack_exports__, __webpack_require__) {
-          "use strict";
-          __webpack_require__.r(__webpack_exports__);
-          /* harmony export (binding) */ __webpack_require__.d(
-            __webpack_exports__,
-            "default",
-            function () {
-              return Firestore;
-            }
-          );
-          /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(
-            /*! firebase-admin */ "firebase-admin"
-          );
-          /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/ __webpack_require__.n(
-            firebase_admin__WEBPACK_IMPORTED_MODULE_0__
-          );
-          /* harmony import */ var _service_account_stv_game_db_test_0f631b94adde_json__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(
-            /*! ../../service_account/stv-game-db-test-0f631b94adde.json */ "../service_account/stv-game-db-test-0f631b94adde.json"
-          );
-          var _service_account_stv_game_db_test_0f631b94adde_json__WEBPACK_IMPORTED_MODULE_1___namespace = /*#__PURE__*/ __webpack_require__.t(
-            /*! ../../service_account/stv-game-db-test-0f631b94adde.json */ "../service_account/stv-game-db-test-0f631b94adde.json",
-            1
-          );
-          function _defineProperty(obj, key, value) {
-            if (key in obj) {
-              Object.defineProperty(obj, key, {
-                value: value,
-                enumerable: true,
-                configurable: true,
-                writable: true,
-              });
-            } else {
-              obj[key] = value;
-            }
-            return obj;
-          }
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-          // Google FireStore implementation
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Firestore; });
+/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
+/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dotenv */ "dotenv");
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-          class Firestore {
-            constructor() {
-              _firestoreClient.set(this, {
-                writable: true,
-                value: void 0,
-              });
+// Google FireStore implementation
 
-              _defineProperty(this, "initialise", () => {
-                // Web app's Firebase configuration
-                var firebaseConfig = {
-                  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-                  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-                  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
-                  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-                  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-                  messagingSenderId:
-                    process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-                  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-                  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
-                }; // Initialize Firebase
 
-                const app = firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp(
-                  {
-                    credential: firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.credential.cert(
-                      _service_account_stv_game_db_test_0f631b94adde_json__WEBPACK_IMPORTED_MODULE_1__
-                    ),
-                    databaseURL: "https://stv-game-db-test.firebaseio.com",
-                  }
-                );
-                this.firestoreClient = firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.firestore(
-                  app
-                );
-                const firestoreClient = this.firestoreClient;
-                return {
-                  firebase: firebase_admin__WEBPACK_IMPORTED_MODULE_0___default(),
-                  firestoreClient,
-                };
-              });
+dotenv__WEBPACK_IMPORTED_MODULE_1___default.a.config();
+class Firestore {}
 
-              _defineProperty(
-                this,
-                "tribe_from_id",
-                async (game = null, id = null) => {
-                  return await (
-                    await this.firestoreClient
-                      .doc(`games/${game}/tribes/${id}`)
-                      .get()
-                  ).data();
-                }
-              );
-            }
-          }
+_defineProperty(Firestore, "firestore", void 0);
 
-          var _firestoreClient = new WeakMap();
+_defineProperty(Firestore, "initialise", () => {
+  // Web app's Firebase configuration
+  var credentials = {
+    type: process.env.REACT_APP_type,
+    project_id: process.env.REACT_APP_project_id,
+    private_key_id: process.env.REACT_APP_private_key_id,
+    private_key: process.env.REACT_APP_private_key.replace(/\\n/g, "\n"),
+    client_email: process.env.REACT_APP_client_email,
+    client_id: process.env.REACT_APP_client_id,
+    auth_uri: process.env.REACT_APP_auth_uri,
+    token_uri: process.env.REACT_APP_token_uri,
+    auth_provider_x509_cert_url: process.env.REACT_APP_auth_provider_x509_cert_url,
+    client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url
+  }; // Initialize Firebase
 
-          /***/
-        },
+  const app = firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp({
+    credential: firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.credential.cert(credentials),
+    databaseURL: "https://stv-game-db-test.firebaseio.com"
+  }, "VIR-US");
+  Firestore.firestore = Object(firebase_admin__WEBPACK_IMPORTED_MODULE_0__["firestore"])(app);
+  return {
+    firebase: (firebase_admin__WEBPACK_IMPORTED_MODULE_0___default()),
+    firestore: Firestore.firestore
+  };
+});
 
-      /***/ "./batch_update_tribe.js":
-        /*!*******************************!*\
+_defineProperty(Firestore, "tribe_from_id", async (game = null, id = null) => {
+  return await (await Firestore.firestore.doc(`games/${game}/tribes/${id}`).get()).data();
+});
+
+_defineProperty(Firestore, "count_players", async ({
+  game = null,
+  from_tribe = null,
+  from_team = null
+}) => {
+  if (from_tribe) {
+    return (await Firestore.firestore.doc(`games/${game}/tribes/${from_tribe}`).get()).data().count_players;
+  } else if (from_team) {
+    return (await Firestore.firestore.doc(`games/${game}/teams/${from_team}`).get()).data().count_players;
+  } else {
+    return (await Firestore.firestore.doc(`games/${game}`).get()).data().count_players;
+  }
+});
+
+_defineProperty(Firestore, "count_teams", async ({
+  game = null,
+  from_tribe = null,
+  active_team_predicate_value = true
+}) => {
+  let query;
+
+  if (from_tribe) {
+    query = Firestore.firestore.doc(`games/${game}/tribes/${from_tribe}`);
+  } else {
+    query = Firestore.firestore.doc(`games/${game}`);
+  }
+
+  return (await query.get()).data().count_teams;
+});
+
+_defineProperty(Firestore, "batch_update_tribe", async ({
+  game = null,
+  from_tribe = null,
+  to_tribe = null
+}) => {
+  const teams = Firestore.firestore.collection(`games/${game}/teams`).where("tribe_id", "==", from_tribe);
+  const players = Firestore.firestore.collection(`games/${game}/players`).where("tribe_id", "==", from_tribe);
+  const player_count = await Firestore.count_players({
+    game,
+    from_tribe
+  });
+  const team_count = await Firestore.count_teams({
+    game,
+    from_tribe
+  });
+  const batch1 = Firestore.firestore.batch();
+  (await teams.get()).forEach(async document_iter => {
+    batch1.update(document_iter.ref, {
+      tribe_id: to_tribe
+    });
+  });
+  (await players.get()).forEach(async document_iter => {
+    batch1.update(document_iter.ref, {
+      tribe_id: to_tribe
+    });
+  });
+  await batch1.commit();
+  const batch2 = Firestore.firestore.batch();
+  let ref = Firestore.firestore.doc(`games/${game}/tribes/${to_tribe}`);
+  let count = (await ref.get()).data().count_players;
+  let total = count + player_count;
+  batch2.update(ref, {
+    count_players: total
+  });
+  ref = Firestore.firestore.doc(`games/${game}/tribes/${to_tribe}`);
+  count = (await ref.get()).data().count_teams;
+  total = count + team_count;
+  batch2.update(ref, {
+    count_teams: total
+  });
+  ref = Firestore.firestore.doc(`games/${game}/tribes/${from_tribe}`);
+  count = (await ref.get()).data().count_players;
+  total = count - player_count;
+  batch2.update(ref, {
+    count_teams: total
+  });
+  ref = Firestore.firestore.doc(`games/${game}/tribes/${from_tribe}`);
+  count = (await ref.get()).data().count_teams;
+  total = count - team_count;
+  batch2.update(ref, {
+    count_teams: total
+  });
+  return await batch2.commit();
+});
+
+/***/ }),
+
+/***/ "./batch_update_tribe.js":
+/*!*******************************!*\
   !*** ./batch_update_tribe.js ***!
   \*******************************/
-        /*! no exports provided */
-        /***/ function (module, __webpack_exports__, __webpack_require__) {
-          "use strict";
-          __webpack_require__.r(__webpack_exports__);
-          /* harmony import */ var _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(
-            /*! ../src/services/Firestore */ "../src/services/Firestore.js"
-          );
-          // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-          exports.handler = (event, context, callback) => {
-            try {
-              const firestore = new _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__[
-                "default"
-              ]();
-              firestore.initialise();
-              const body = JSON.parse(event.body) || null;
-              if (!body) throw new Error("problem with data in body");
-              callback(null, {
-                statusCode: 200,
-                body: "ok",
-              });
-            } catch (err) {
-              callback(null, {
-                statusCode: 500,
-                body: err.toString(),
-              });
-            }
-          };
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../src/services/Firestore */ "../src/services/Firestore.js");
+ // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
 
-          /***/
-        },
+exports.handler = async (event, context, callback) => {
+  try {
+    const body = JSON.parse(event.body) || null;
+    if (!body.game || !body.from || !body.to) throw new Error("problem with data in body");
+    _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].batch_update_tribe({
+      game: body.game,
+      from_tribe: body.from,
+      to_tribe: body.to
+    });
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify(response)
+    });
+  } catch (err) {
+    callback(null, {
+      statusCode: 500,
+      body: err.toString()
+    });
+  }
+};
 
-      /***/ "firebase-admin":
-        /*!*********************************!*\
+/***/ }),
+
+/***/ "dotenv":
+/*!*************************!*\
+  !*** external "dotenv" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("dotenv");
+
+/***/ }),
+
+/***/ "firebase-admin":
+/*!*********************************!*\
   !*** external "firebase-admin" ***!
   \*********************************/
-        /*! no static exports found */
-        /***/ function (module, exports) {
-          module.exports = require("firebase-admin");
+/*! no static exports found */
+/***/ (function(module, exports) {
 
-          /***/
-        },
+module.exports = require("firebase-admin");
 
-      /******/
-    }
-  )
-);
+/***/ })
+
+/******/ })));
