@@ -2,6 +2,8 @@
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
+WATCH PROJECT VIDEO <a href="https://vimeo.com/402226460">HERE</a>
+
 ## Hypothesis:
 
 Can a global scale high stakes social game help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing activities and stop the spread of the COVID-19 virus?
