@@ -2,7 +2,7 @@
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
-Selected as a WINNER of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects.
+Selected as a winner of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects.
 
 WATCH PROJECT VIDEO <a href="https://vimeo.com/402226460">HERE</a>
 
