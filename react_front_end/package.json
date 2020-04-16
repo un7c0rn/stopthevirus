@@ -9,6 +9,8 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "firebase-admin": "^8.10.0",
     "history": "^5.0.0-beta.7",
     "material-ui-phone-number": "^2.2.6",
     "netlify-cli": "^2.43.0",
@@ -31,7 +33,7 @@
     "start:lambda": "yarn watch:functions",
     "prepare:lambda-build": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "build": "react-scripts build",
-    "test": "REACT_APP_ENV=test react-scripts test",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "run_lambda": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "watch:functions": "npm-watch run_lambda"
@@ -52,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "webpack-node-externals": "^1.7.2"
   },

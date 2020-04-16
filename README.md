@@ -1,5 +1,7 @@
 <center><img src="documentation/vir-us_logotype_new.png" width=900></center>
 
+![Python application](https://github.com/un7c0rn/stopthevirus/workflows/Python%20application/badge.svg?branch=develop) ![JavaScript tests](https://github.com/un7c0rn/stopthevirus/workflows/JavaScript%20tests/badge.svg?branch=develop)
+
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
 Selected as a winner of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects.

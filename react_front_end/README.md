@@ -36,7 +36,7 @@ Information about where files are and what does what and goes where is listed be
 ## Install Netlify CLI
 
 1. Install [Netlify CLI](https://www.npmjs.com/package/netlify-cli) globally on your machine.
-2. Install the packages in the **react front end** folder using the `yarn` command.
+2. Install the packages in the **react_front_end** folder using the `yarn` command.
 3. Inside that folder run `netlify link`.
 4. You will be presented with questions. Pick the options in bold.
    ? How do you want to link this folder to a site? **Search by full or partial site name**
@@ -44,8 +44,8 @@ Information about where files are and what does what and goes where is listed be
 
 ### Deploy from the command line
 
-1. Run `yarn build` from wihin the `react front end` folder.
-2. Run the following command in the **react front end** directory `netlify deploy --prod --open --message "Example message: Testing deployment of different GitHub repository." --json --dir="./build"`.
+1. Run `yarn build` from wihin the `react_front_end` folder.
+2. Run the following command in the **react_front_end** directory `netlify deploy --prod --open --message "Example message: Testing deployment of different GitHub repository." --json --dir="./build"`.
 3. You should see output in the terminal like below. CMD + Click the `deploy_url` in the terminal to view the deployed website.
 
 ```
@@ -63,11 +63,11 @@ Information about where files are and what does what and goes where is listed be
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-After cloning the repo, in the base directory run `cd react\ front\ end/` to move into the React project. After which time you can run the scripts below.
+After cloning the repo, in the base directory run `cd react_front_end/` to move into the React project. After which time you can run the scripts below.
 
 ## Available Scripts
 
-In the project directory **react front end** , you can run:
+In the project directory **react_front_end** , you can run:
 
 ### `yarn`
 
@@ -142,12 +142,26 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 ## Challenge submission page
 
-After running `netlify dev` in the **react front end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
+After running `netlify dev` in the **react_front_end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
 
 ## TicTok metric parser
 
-All commands should be run in the **react front end** directory. Each in separate terminal windows.
+All commands should be run in the **react_front_end** directory. Each in separate terminal windows.
 
 1. `yarn && netlify dev`
 2. `yarn test`
 3. `netlify functions:invoke tiktok --no-identity --querystring "url=https://www.tiktok.com/@jadethirlwall/video/6813412701310635269"`
+
+## Firebase API **batch-update-tribe**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `batch_update_tribe.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke batch_update_tribe --payload '{"game":"7rPwCJaiSkxYgDocGDw4", "from":"77TMV9omdLeW7ORvuheX", "to":"cbTgYdPh97K6rRTDdEPL"}' --no-identity`
