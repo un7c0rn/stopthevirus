@@ -151,3 +151,17 @@ All commands should be run in the **react_front_end** directory. Each in separat
 1. `yarn && netlify dev`
 2. `yarn test`
 3. `netlify functions:invoke tiktok --no-identity --querystring "url=https://www.tiktok.com/@jadethirlwall/video/6813412701310635269"`
+
+## Firebase API **batch-update-tribe**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `batch_update_tribe.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke batch_update_tribe --payload '{"game":"7rPwCJaiSkxYgDocGDw4", "from":"77TMV9omdLeW7ORvuheX", "to":"cbTgYdPh97K6rRTDdEPL"}' --no-identity`
