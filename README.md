@@ -2,11 +2,11 @@
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
+Selected as a WINNER of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects.
+
 ## Hypothesis:
 
 Can a global scale high stakes social game help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing activities and stop the spread of the COVID-19 virus?
-
-Selected as a WINNER of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects. Watch our <a href="https://vimeo.com/402226460">video</a> and continue reading if interested in collaborating.
 
 WATCH PROJECT VIDEO <a href="https://vimeo.com/402226460">HERE</a>
 
