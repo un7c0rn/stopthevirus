@@ -122,6 +122,6 @@ describe("Firestore service", () => {
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
       to_tribe: _TEST_TRIBE_SIDAMA_ID,
     });
-    expect(response).toBe(false);
+    expect(response.length).toBeGreaterThan(0);
   });
 });

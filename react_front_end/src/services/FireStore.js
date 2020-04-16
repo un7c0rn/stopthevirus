@@ -133,6 +133,6 @@ export default class Firestore {
 
     batch2.update(ref, { count_teams: total });
 
-    await batch2.commit();
+    return await batch2.commit();
   };
 }
