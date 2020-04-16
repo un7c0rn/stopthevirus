@@ -10,8 +10,6 @@ Can a global scale high stakes social game help inspire millions of Millennial a
 
 Selected as a WINNER of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects. Watch our <a href="https://vimeo.com/402226460">video</a> and continue reading if interested in collaborating.
 
-<center><img src="https://github.com/un7c0rn/stopthevirus/blob/master/documentation/ux_prototype1.png" width="250"/></center>
-
 ## Background:
 
 It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the Tokyo Olympics are cancelled this year. We’re at the height of human technology and innovation, but at the same time facing one of the most devastating viral pandemics in history. The economy is suffering, countries around the world are facing mandatory lockdown orders and hospitals are overwhelmed. Despite this, many people are still unaware of the seriousness of COVID-19 and actions they can take to support our health care professionals such as social distancing to <a href="https://www.wired.com/story/the-promising-math-behind-flattening-the-curve/">flatten the health care demand curve</a>. Reducing the doubling rate of COVID-19 by even a few days can have massive impact. Can we use a high stakes social game to help inspire the youth to stop the virus?
