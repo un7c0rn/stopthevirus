@@ -1,4 +1,4 @@
-<center><img src="documentation/vir-us_logotype_new.png" width=1000></center>
+<center><img src="documentation/vir-us_logotype_new.png" width=900></center>
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
 
