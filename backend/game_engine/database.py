@@ -1,49 +1,53 @@
 from abc import ABC, abstractmethod, abstractclassmethod
 import attr
 from typing import Any, Iterable, Dict, Text, Tuple
+from game_engine.common import Serializable
 
-class Data(ABC):
+class Data(ABC, Serializable):
     def save(self):
         pass
 
     def sync(self):
         pass
 
+
+
 @attr.s
 class Player(Data):
-    id: Text = attr.ib()
+    id: Text = attr.ib('')
     tiktok: Text = attr.ib(default='')
     email: Text = attr.ib(default='')
+    phone_number: Text = attr.ib(default='')
     tribe_id: Text = attr.ib(default='')
     team_id: Text = attr.ib(default='')
     active: bool = attr.ib(default=True)
 
 @attr.s
 class Vote(Data):
-    id: Text = attr.ib()
-    from_id: Text = attr.ib()
-    to_id: Text = attr.ib()
+    id: Text = attr.ib('')
+    from_id: Text = attr.ib('')
+    to_id: Text = attr.ib('')
     is_for_win: bool = attr.ib(default=False)
 
 @attr.s
 class Team(Data):
-    id: Text = attr.ib()
-    name: Text = attr.ib()
-    size: int = attr.ib()
-    tribe_id: Text = attr.ib()
+    id: Text = attr.ib('')
+    name: Text = attr.ib('')
+    size: int = attr.ib('')
+    tribe_id: Text = attr.ib('')
     active: bool = attr.ib(default=True)
 
 @attr.s
 class Tribe(Data):
-    id: Text = attr.ib()
-    name: Text = attr.ib()
+    id: Text = attr.ib('')
+    name: Text = attr.ib('')
     size: int = attr.ib(default=0)
     active: bool = attr.ib(default=True)
 
 @attr.s
 class Challenge(Data):
-    id: Text = attr.ib()
-    name: Text = attr.ib()
+    id: Text = attr.ib('')
+    name: Text = attr.ib('')
     message: Text = attr.ib('')
     start_timestamp: int = attr.ib(default=0)
     end_timestamp: int = attr.ib(default=0)
@@ -52,12 +56,12 @@ class Challenge(Data):
 @attr.s
 class Entry(Data):
     # An entry into a game challenge.
-    id: Text = attr.ib()
-    likes: int = attr.ib()
-    views: int = attr.ib()
-    player_id: Text = attr.ib()
-    tribe_id: Text = attr.ib()
-    challenge_id: Text = attr.ib()
+    id: Text = attr.ib('')
+    likes: int = attr.ib('')
+    views: int = attr.ib('')
+    player_id: Text = attr.ib('')
+    tribe_id: Text = attr.ib('')
+    challenge_id: Text = attr.ib('')
     team_id: Text = attr.ib('')
     url: Text = attr.ib('')
 
