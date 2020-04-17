@@ -3,12 +3,11 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-
+import {isSm} from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 
 export default function StartGameInputs() {
-  const sm = useMediaQuery("(max-height:650px)");//for iphone 5SE
+  const sm = isSm();
   const useStyles = makeStyles(theme => ({
     root: {
       display: "flex",
