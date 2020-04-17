@@ -6,7 +6,7 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import {isSm} from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 
-export default function StartGameInputs() {
+export default function JoinGameInputs() {
   const sm = isSm();
   const useStyles = makeStyles(theme => ({
     root: {
@@ -14,7 +14,7 @@ export default function StartGameInputs() {
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "55vh" : "45vh",
+        height: sm ? "40vh" : "35vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -36,18 +36,15 @@ export default function StartGameInputs() {
   const classes = useStyles();
 
   const tikTokRef = useRef();
-  const gameNameRef = useRef();
 
  const [tikTok, setTikTok] = useState("");
  const [didSubmit, setDidSubmit] = useState(false);
- const [gameName, setGameName] = useState("");
  const [phone, setPhone] = useState("");
  const [country, setCountry] = useState({});
 
  const submit = event => {
    console.log("send to API endpoint");
    console.log(tikTokRef.current.value);
-   console.log(gameNameRef.current.value);
    console.log(phone);
    console.log(country);
 
@@ -65,7 +62,7 @@ export default function StartGameInputs() {
       <Paper square>
         <form className={classes.form} autoComplete="off">
           <TextField
-            id="start-game-inputs-tiktok"
+            id="join-game-inputs-tiktok"
             label="Tik Tok"
             variant="outlined"
             inputRef={tikTokRef}
@@ -77,19 +74,10 @@ export default function StartGameInputs() {
           label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
           onChange={handleOnPhoneChange}
           value={phone}
-          id="start-game-inputs-phone"
-          />
-          <TextField
-            id="start-game-inputs-game-name"
-            label="Your Game Name"
-            variant="outlined"
-            error={didSubmit && gameName === ""}
-            onChange={event => setGameName(event.target.value )}
-            inputRef={gameNameRef}
-            value={gameName}
+          id="join-game-inputs-phone"
           />
           <Button variant="contained" onClick={submit}>
-            Start a game
+            Join This Game
           </Button>
         </form>
 

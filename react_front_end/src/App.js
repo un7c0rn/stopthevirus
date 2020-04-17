@@ -4,6 +4,7 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.scss";
 
+const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const SubmitPage = lazy(() => import("./pages/SubmitPage"));
 const StartGamePage = lazy(() => import("./pages/StartGamePage"));
@@ -26,7 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/start-game" element={<StartGamePage />} />
-            <Route path="/join-game" element={<h1>JOIN GAME PAGE</h1>} />
+            <Route path="/join-game" element={<JoinGamePage />} />
             <Route path="/game-info" element={<h1>GAME INFO PAGE</h1>} />
             <Route
               path="/challenge-submission/:phone/:game"
