@@ -399,6 +399,7 @@ class Game(object):
                 points = entry.likes / entry.views
                 player = gamedb.player_from_id(entry.player_id)
                 engine.add_event(events.NotifyPlayerScoreEvent(
+                    game_id=self._game_id,
                     player=player, challenge=challenge,
                     entry=entry, points=points))
                 score_dict['score'] += points

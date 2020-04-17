@@ -16,8 +16,8 @@ from multiprocessing import Process
 from game_engine import events
 from queue import Queue
 
-_TEST_CHALLENGE_START_OFFSET_SEC = 1
-_TEST_CHALLENGE_END_OFFSET_SEC = 1
+_TEST_CHALLENGE_START_OFFSET_SEC = .1
+_TEST_CHALLENGE_END_OFFSET_SEC = .1
 
 
 class MockDatabase(Database):
@@ -222,15 +222,25 @@ class MockDatabase(Database):
 
 class GameTest(unittest.TestCase):
     def setUp(self):
+        # self._game = Game(game_id=str(uuid.uuid4()), options=GameOptions(
+        #     game_wait_sleep_interval_sec=0.5,
+        #     single_tribe_council_time_sec=2,
+        #     single_tribe_top_k_threshold=0.5,
+        #     single_team_council_time_sec=2,
+        #     final_tribal_council_time_sec=2,
+        #     multi_tribe_min_tribe_size=5,
+        #     multi_tribe_team_immunity_likelihood=0.0,
+        #     multi_tribe_council_time_sec=2))
+
         self._game = Game(game_id=str(uuid.uuid4()), options=GameOptions(
-            game_wait_sleep_interval_sec=0.5,
-            single_tribe_council_time_sec=2,
+            game_wait_sleep_interval_sec=0.1,
+            single_tribe_council_time_sec=.2,
             single_tribe_top_k_threshold=0.5,
-            single_team_council_time_sec=2,
-            final_tribal_council_time_sec=2,
+            single_team_council_time_sec=.2,
+            final_tribal_council_time_sec=.2,
             multi_tribe_min_tribe_size=5,
             multi_tribe_team_immunity_likelihood=0.0,
-            multi_tribe_council_time_sec=2))
+            multi_tribe_council_time_sec=.2))
 
     def test_play(self):
         gamedb = MockDatabase()
