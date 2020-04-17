@@ -9,10 +9,10 @@ import {Link} from "react-router-dom";
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     "& > *": {
       width: "100vw",
-      height: "20vh",
+      height: "30vh",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -21,7 +21,9 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     margin: "1em",
-    fontSize: "1em"
+    fontSize: "1em",
+    textAlign: "center",
+  //  lineHeight: "2"
   }
 }));
 
@@ -40,18 +42,46 @@ export default function JoinGamePrompt() {
           component="h4"
           gutterBottom
           className={classes.title}
-        >
-        You've been invited to "{gameName}" <br/>
-        <NumberFormat value={numPlayers}
-        displayType={"text"}
-        thousandSeparator={true} />+ Players <br />
-        Game starts on {date} at {time}
-        <Link to='/game-info' style={{ textDecoration: "none" }} >
-          <Button  >
 
-            HOW THE GAME WORKS
-          </Button>
+        >
+          You've been invited to "{gameName}"
+        </Typography>
+
+        <Typography
+          variant="h3"
+          component="h4"
+          gutterBottom
+          className={classes.title}
+        >
+          <NumberFormat value={numPlayers}
+          displayType={"text"}
+          thousandSeparator={true} />+ Players
+
+        </Typography>
+
+        <Typography
+          variant="h3"
+          component="h4"
+          gutterBottom
+          className={classes.title}
+
+        >
+          Game starts on {date} at {time}
+
+        </Typography>
+        <Typography
+          variant="h3"
+          component="h4"
+          gutterBottom
+          className={classes.title}
+
+        >
+          <Link to='/game-info' style={{ textDecoration: "none" }} >
+            <Button  >
+              HOW THE GAME WORKS
+            </Button>
           </Link>
+
         </Typography>
       </Paper>
     </div>

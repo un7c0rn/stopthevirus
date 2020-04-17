@@ -15,7 +15,7 @@ export default function JoinGameInputs() {
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "55vh" : "45vh",
+        height: "35vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
