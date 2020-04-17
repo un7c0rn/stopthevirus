@@ -1,14 +1,20 @@
-<center><img src="/documentation/banner.png" width=1000></center>
+<center><img src="documentation/vir-us_logotype_new.png" width=900></center>
+
+![Python application](https://github.com/un7c0rn/stopthevirus/workflows/Python%20application/badge.svg?branch=develop) ![JavaScript tests](https://github.com/un7c0rn/stopthevirus/workflows/JavaScript%20tests/badge.svg?branch=develop)
 
 # COVID-19 #STOPTHEVIRUS SOCIAL EXPERIMENT
+
+Selected as a winner of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects.
+
+WATCH PROJECT VIDEO <a href="https://vimeo.com/402226460">HERE</a>
+
+Please reach out if interested in collaborating! <a href="mailto:brandon@formless.la">brandon@formless.la</a>
+
+Official Contributors: Bernard Baker, David Zeifman, DL Warfield, Daniel Francois, Edward Alcide, Brandon Tory
 
 ## Hypothesis:
 
 Can a global scale high stakes social game help inspire millions of Millennial and Gen-Z individuals across the world to engage in social distancing activities and stop the spread of the COVID-19 virus?
-
-Selected as a WINNER of <a href="https://covidglobalhackathon.com">COVID-19 Global Hackathon</a> from among 18,000 innovators, 175 countries and 1,560 projects. Watch our <a href="https://vimeo.com/402226460">video</a> and continue reading if interested in collaborating.
-
-<center><img src="documentation/ux_prototype1.png" width="500"/></center>
 
 ## Background:
 
@@ -157,4 +163,3 @@ You may notice that the Firestore database credentials are included here in sour
 
 <a href="https://github.com/un7c0rn/stopthevirus/blob/master/documentation/scale.md">Scalability Analysis</a>
 
-Contact: <a href="mailto:brandon@formless.la">brandon@formless.la</a>
