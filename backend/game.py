@@ -4,7 +4,7 @@ import attr
 import threading
 from typing import Any, Iterable, Dict, Text, Tuple, List
 import game_engine
-from game_engine.events import Event
+from game_engine.events import SMSEvent
 from game_engine.engine import Engine
 from game_engine.database import *
 from game_engine import events
@@ -17,27 +17,20 @@ import pprint
 import heapq
 from game_engine.firestore import FirestoreDB
 from concurrent.futures import ThreadPoolExecutor
+from game_engine.common import GameError
+from game_engine.common import log_message
+import uuid
 
 
 def _unixtime():
     return time.time()
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
-
-def _log_message(message):
-    logging.info(message)
-
-
-class GameError(Exception):
-    pass
-
-
 # TODO(brandon): update these values for production
 _TRIBE_1_ID = ''
 _TRIBE_2_ID = ''
 _FIRESTORE_PROD_CONF_JSON_PATH = ''
+_AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
 
 
 @attr.s
@@ -60,57 +53,58 @@ class GameOptions(object):
 
 class Game(object):
 
-    def __init__(self, options: GameOptions):
+    def __init__(self, game_id: Text, options: GameOptions):
         self._options = options
         self._stop = threading.Event()
+        self._game_id = game_id
 
     def play(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Player:
         last_tribe_standing = self._play_multi_tribe(tribe1=tribe1, tribe2=tribe2,
                                                      gamedb=gamedb, engine=engine)
-        _log_message("Last tribe standing is {}.".format(last_tribe_standing))
+        log_message("Last tribe standing is {}.".format(last_tribe_standing))
         last_team_standing = self._play_single_tribe(
             tribe=last_tribe_standing, gamedb=gamedb, engine=engine)
 
-        _log_message("Last team standing is {}.".format(last_team_standing))
+        log_message("Last team standing is {}.".format(last_team_standing))
         finalists = self._play_single_team(
             team=last_team_standing, gamedb=gamedb, engine=engine)
 
-        _log_message("Finalists are {}.".format(pprint.pformat(finalists)))
+        log_message("Finalists are {}.".format(pprint.pformat(finalists)))
         winner = self._run_finalist_tribe_council(
             finalists=finalists, gamedb=gamedb, engine=engine)
 
-        _log_message("Winner is {}.".format(winner))
+        log_message("Winner is {}.".format(winner))
         return winner
 
     def _play_multi_tribe(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Tribe:
         while (tribe1.size > self._options.multi_tribe_min_tribe_size and
                tribe2.size > self._options.multi_tribe_min_tribe_size):
-            _log_message("Tribe {} size {} tribe {} size {}.".format(
+            log_message("Tribe {} size {} tribe {} size {}.".format(
                 tribe1, tribe1.size, tribe2, tribe2.size))
 
-            _log_message("Getting new challenge.")
+            log_message("Getting new challenge.")
             challenge = self._get_challenge(gamedb=gamedb)
 
-            _log_message("Running challenge {}.".format(challenge))
+            log_message("Running challenge {}.".format(challenge))
             self._run_challenge(challenge=challenge,
                                 gamedb=gamedb, engine=engine)
 
-            _log_message("Scoring entries for {}.".format(tribe1))
+            log_message("Scoring entries for {}.".format(tribe1))
             tribe1_score = self._score_entries_tribe_aggregate(tribe=tribe1, challenge=challenge,
                                                                gamedb=gamedb, engine=engine)
 
-            _log_message("Scoring entries for {}.".format(tribe2))
+            log_message("Scoring entries for {}.".format(tribe2))
             tribe2_score = self._score_entries_tribe_aggregate(tribe=tribe2, challenge=challenge,
                                                                gamedb=gamedb, engine=engine)
 
             winning_tribe = tribe1 if tribe1_score > tribe2_score else tribe2
             losing_tribe = tribe1 if winning_tribe == tribe2 else tribe2
 
-            _log_message("Running multi-tribe council.")
+            log_message("Running multi-tribe council.")
             self._run_multi_tribe_council(winning_tribe=winning_tribe, losing_tribe=losing_tribe,
                                           gamedb=gamedb, engine=engine)
 
-            _log_message("Merging teams.")
+            log_message("Merging teams.")
             self._merge_teams(target_team_size=self._options.target_team_size, tribe=losing_tribe,
                               gamedb=gamedb, engine=engine)
 
@@ -119,25 +113,25 @@ class Game(object):
 
     def _play_single_tribe(self, tribe: Tribe, gamedb: Database, engine: Engine) -> Team:
         while gamedb.count_teams(active_team_predicate_value=True) > 1:
-            _log_message("Teams remaining = {}.".format(
+            log_message("Teams remaining = {}.".format(
                 gamedb.count_teams(active_team_predicate_value=True)))
 
-            _log_message("Getting new challenge.")
+            log_message("Getting new challenge.")
             challenge = self._get_challenge(gamedb=gamedb)
 
-            _log_message("Running challenge {}.".format(challenge))
+            log_message("Running challenge {}.".format(challenge))
             self._run_challenge(challenge=challenge,
                                 gamedb=gamedb, engine=engine)
 
-            _log_message("Scoring entries.")
+            log_message("Scoring entries.")
             winning_teams, losing_teams = self._score_entries_top_k_teams(k=self._options.single_tribe_top_k_threshold,
                                                                           tribe=tribe, challenge=challenge, gamedb=gamedb, engine=engine)
 
-            _log_message("Running single tribe council.")
+            log_message("Running single tribe council.")
             self._run_single_tribe_council(winning_teams=winning_teams, losing_teams=losing_teams,
                                            gamedb=gamedb, engine=engine)
 
-            _log_message("Merging teams.")
+            log_message("Merging teams.")
             self._merge_teams(target_team_size=self._options.target_team_size, tribe=tribe, gamedb=gamedb,
                               engine=engine)
 
@@ -158,9 +152,9 @@ class Game(object):
     def _get_voted_out_player(self, team: Team, gamedb: Database) -> [Player, None]:
         high = 0
         candidates = []
-        _log_message("Counting votes from team {}.".format(team))
+        log_message("Counting votes from team {}.".format(team))
         team_votes = gamedb.count_votes(from_team=team)
-        _log_message("Got votes {}.".format(pprint.pformat(team_votes)))
+        log_message("Got votes {}.".format(pprint.pformat(team_votes)))
 
         for _, votes in team_votes.items():
             if votes > high:
@@ -183,38 +177,40 @@ class Game(object):
         non_immune_teams = list()
 
         for team in gamedb.stream_teams(from_tribe=losing_tribe):
-            _log_message("Found losing team {}.".format(team))
+            log_message("Found losing team {}.".format(team))
             immunity_granted = random.random() < self._options.multi_tribe_team_immunity_likelihood
             if not immunity_granted:
                 non_immune_teams.append(team)
             else:
-                engine.add_event(events.NotifyImmunityAwardedEvent(team=team))
+                engine.add_event(events.NotifyImmunityAwardedEvent(
+                    game_id=self._game_id, team=team))
 
         # announce winner and tribal council for losing tribe
         tribal_council_start_timestamp = _unixtime()
         gamedb.clear_votes()
-        engine.add_event(events.NotifyMultiTribeCouncilEvent(
-            winning_tribe=winning_tribe, losing_tribe=losing_tribe))
+        engine.add_event(events.NotifyMultiTribeCouncilEvent(game_id=self._game_id,
+                                                             winning_tribe=winning_tribe, losing_tribe=losing_tribe))
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
                 < self._options.multi_tribe_council_time_sec) and not self._stop.is_set()):
-            _log_message("Waiting for tribal council to end.")
+            log_message("Waiting for tribal council to end.")
             time.sleep(self._options.game_wait_sleep_interval_sec)
 
         # count votes
         for team in non_immune_teams:
-            _log_message("Counting votes for non-immune team {}.".format(team))
+            log_message("Counting votes for non-immune team {}.".format(team))
             voted_out_player = self._get_voted_out_player(
                 team=team, gamedb=gamedb)
             if voted_out_player:
                 gamedb.deactivate_player(player=voted_out_player)
-                _log_message("Deactivated player {}.".format(voted_out_player))
-                engine.add_event(events.NotifyPlayerVotedOutEvent(
-                    player=voted_out_player))
+                log_message("Deactivated player {}.".format(voted_out_player))
+                engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id,
+                                                                  player=voted_out_player))
 
         # notify all players of what happened at tribal council
-        engine.add_event(events.NotifyTribalCouncilCompletionEvent())
+        engine.add_event(events.NotifyTribalCouncilCompletionEvent(
+            game_id=self._game_id, ))
 
     # keep top K teams
     def _run_single_tribe_council(self, winning_teams: List[Team], losing_teams: List[Team],
@@ -223,13 +219,14 @@ class Game(object):
         # announce winner and tribal council for losing teams
         gamedb.clear_votes()
         engine.add_event(events.NotifySingleTribeCouncilEvent(
+            game_id=self._game_id,
             winning_teams=winning_teams, losing_teams=losing_teams))
         tribal_council_start_timestamp = _unixtime()
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
                 < self._options.single_tribe_council_time_sec) and not self._stop.is_set()):
-            _log_message("Waiting for tribal council to end.")
+            log_message("Waiting for tribal council to end.")
             time.sleep(self._options.game_wait_sleep_interval_sec)
 
         # count votes
@@ -238,16 +235,17 @@ class Game(object):
                 team=team, gamedb=gamedb)
             if voted_out_player:
                 gamedb.deactivate_player(player=voted_out_player)
-                _log_message("Deactivated player {}.".format(voted_out_player))
-                engine.add_event(events.NotifyPlayerVotedOutEvent(
-                    player=voted_out_player))
+                log_message("Deactivated player {}.".format(voted_out_player))
+                engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id,
+                                                                  player=voted_out_player))
             else:
-                _log_message("For some reason no one got voted out...")
-                _log_message("Players = {}.".format(
+                log_message("For some reason no one got voted out...")
+                log_message("Players = {}.".format(
                     pprint.pformat(gamedb.list_players(from_team=team))))
 
         # notify all players of what happened at tribal council
-        engine.add_event(events.NotifyTribalCouncilCompletionEvent())
+        engine.add_event(
+            events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id))
 
     def _run_single_team_council(self, team: Team, losing_players: List[Player], gamedb: Database, engine: Engine):
         # announce winner and tribal council for losing teams
@@ -255,38 +253,40 @@ class Game(object):
 
         winning_player = [player for player in gamedb.list_players(
             from_team=team) if player not in losing_players][0]
-        engine.add_event(events.NotifySingleTeamCouncilEvent(
-            winning_player=winning_player, losing_players=losing_players))
+        engine.add_event(events.NotifySingleTeamCouncilEvent(game_id=self._game_id,
+                                                             winning_player=winning_player, losing_players=losing_players))
         tribal_council_start_timestamp = _unixtime()
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
                 < self._options.single_team_council_time_sec) and not self._stop.is_set()):
-            _log_message("Waiting for tribal council to end.")
+            log_message("Waiting for tribal council to end.")
             time.sleep(self._options.game_wait_sleep_interval_sec)
 
         # count votes
         voted_out_player = self._get_voted_out_player(team=team, gamedb=gamedb)
         if voted_out_player:
             gamedb.deactivate_player(player=voted_out_player)
-            _log_message("Deactivated player {}.".format(voted_out_player))
-            engine.add_event(events.NotifyPlayerVotedOutEvent(
-                player=voted_out_player))
+            log_message("Deactivated player {}.".format(voted_out_player))
+            engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id,
+                                                              player=voted_out_player))
 
         # notify all players of what happened at tribal council
-        engine.add_event(events.NotifyTribalCouncilCompletionEvent())
+        engine.add_event(
+            events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id))
 
     def _run_finalist_tribe_council(self, finalists: List[Player], gamedb: Database, engine: Engine) -> Player:
         gamedb.clear_votes()
 
         engine.add_event(
-            events.NotifyFinalTribalCouncilEvent(finalists=finalists))
+            events.NotifyFinalTribalCouncilEvent(
+                game_id=self._game_id, finalists=finalists))
         tribal_council_start_timestamp = _unixtime()
 
         # wait for votes
         while (((_unixtime() - tribal_council_start_timestamp)
                 < self._options.final_tribal_council_time_sec) and not self._stop.is_set()):
-            _log_message("Waiting for tribal council to end.")
+            log_message("Waiting for tribal council to end.")
             time.sleep(self._options.game_wait_sleep_interval_sec)
 
         # count votes
@@ -300,7 +300,8 @@ class Game(object):
                 winner = gamedb.player_from_id(id=player_id)
 
         # announce winner
-        engine.add_event(events.NotifyWinnerAnnouncementEvent(winner=winner))
+        engine.add_event(events.NotifyWinnerAnnouncementEvent(
+            game_id=self._game_id, winner=winner))
         return winner
 
     def _merge_teams(self, target_team_size: int, tribe: Tribe, gamedb: Database, engine: Engine):
@@ -314,20 +315,20 @@ class Game(object):
         merge_candidates = Queue()
 
         for team in small_teams:
-            _log_message("Found team of 2. Deacticating team {}.".format(team))
+            log_message("Found team of 2. Deacticating team {}.".format(team))
 
             # do not deactivate the last active team in the tribe
             if gamedb.count_teams(from_tribe=tribe, active_team_predicate_value=True) > 1:
                 gamedb.deactivate_team(team)
 
             for player in gamedb.list_players(from_team=team):
-                _log_message("Adding merge candidate {}.".format(player))
+                log_message("Adding merge candidate {}.".format(player))
                 merge_candidates.put(player)
 
         sorted_teams = gamedb.stream_teams(
             from_tribe=tribe, order_by_size=True, descending=False)
 
-        _log_message("Redistributing merge candidates...")
+        log_message("Redistributing merge candidates...")
         # round robin redistribution strategy
         # simplest case, could use more thought.
         visited = {}
@@ -337,15 +338,15 @@ class Game(object):
                 visited[team.id] = True
 
                 if (team.size >= target_team_size and other_options_available):
-                    _log_message("Team {} has size >= target {} and other options are available. "
-                                 "Continuing search...".format(team, target_team_size))
+                    log_message("Team {} has size >= target {} and other options are available. "
+                                "Continuing search...".format(team, target_team_size))
                     continue
 
                 player = merge_candidates.get()
                 if player.team_id == team.id:
                     continue
 
-                _log_message("Merging player {} from team {} into team {}.".format(
+                log_message("Merging player {} from team {} into team {}.".format(
                     player, player.team_id, team.id))
                 player.team_id = team.id
                 team.size = team.size + 1
@@ -353,13 +354,13 @@ class Game(object):
                 gamedb.save(player)
 
                 # notify player of new team assignment
-                engine.add_event(events.NotifyTeamReassignmentEvent(player=player,
+                engine.add_event(events.NotifyTeamReassignmentEvent(game_id=self._game_id, player=player,
                                                                     team=team))
 
     def _get_challenge(self, gamedb: Database) -> Challenge:
         available_challenge_count = 0
         while available_challenge_count == 0 and not self._stop.is_set():
-            _log_message("Waiting for next challenge to become available.")
+            log_message("Waiting for next challenge to become available.")
             time.sleep(self._options.game_wait_sleep_interval_sec)
             available_challenges = gamedb.list_challenges(
                 challenge_completed_predicate_value=False)
@@ -369,17 +370,17 @@ class Game(object):
     def _run_challenge(self, challenge: Challenge, gamedb: Database, engine: Engine):
         # wait for challenge to begin
         while (_unixtime() < challenge.start_timestamp) and not self._stop.is_set():
-            _log_message("Waiting {}s for challenge to {} to begin.".format(
+            log_message("Waiting {}s for challenge to {} to begin.".format(
                 challenge.start_timestamp - _unixtime(), challenge))
             time.sleep(self._options.game_wait_sleep_interval_sec)
 
         # notify players
         engine.add_event(
-            events.NotifyTribalChallengeEvent(challenge=challenge))
+            events.NotifyTribalChallengeEvent(game_id=self._game_id, challenge=challenge))
 
         # wait for challenge to end
         while (_unixtime() < challenge.end_timestamp) and not self._stop.is_set():
-            _log_message("Waiting {}s for challenge to {} to end.".format(
+            log_message("Waiting {}s for challenge to {} to end.".format(
                 challenge.end_timestamp - _unixtime(), challenge))
             time.sleep(self._options.game_wait_sleep_interval_sec)
 
@@ -415,7 +416,7 @@ class Game(object):
                             entries=entries, challenge=challenge, score_dict=score_dict, gamedb=gamedb, engine=engine)
 
         # tribe score = avg score of all tribe members
-        _log_message("_score_entries_tribe_agg = {}.".format(
+        log_message("_score_entries_tribe_agg = {}.".format(
             score_dict['score']))
         return score_dict['score'] / players
 
@@ -424,12 +425,12 @@ class Game(object):
         while not self._stop.is_set():
             try:
                 entry = next(entries_iter)
-                _log_message("Entry {}.".format(entry))
+                log_message("Entry {}.".format(entry))
                 points = entry.likes / entry.views
                 player = gamedb.player_from_id(entry.player_id)
-                engine.add_event(events.NotifyPlayerScoreEvent(
-                    player=player, challenge=challenge,
-                    entry=entry, points=points))
+                engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id,
+                                                               player=player, challenge=challenge,
+                                                               entry=entry, points=points))
 
                 if player.team_id not in score_dict:
                     score_dict[player.team_id] = points
@@ -457,25 +458,25 @@ class Game(object):
                                         team_id))
 
         rank_threshold = float(k * len(top_scores))
-        _log_message("Rank threshold = {}".format(rank_threshold))
+        log_message("Rank threshold = {}".format(rank_threshold))
 
         # note that the default python heap pops in ascending order,
         # so the rank here is actually worst to best.
         num_scores = len(top_scores)
         if num_scores == 1:
             score, team_id = heapq.heappop(top_scores)
-            _log_message("Winner {}.".format(team_id))
+            log_message("Winner {}.".format(team_id))
             winning_teams = [gamedb.team_from_id(team_id)]
         else:
             for rank in range(num_scores):
                 score, team_id = heapq.heappop(top_scores)
-                _log_message("Team {} rank {} with score {}.".format(
+                log_message("Team {} rank {} with score {}.".format(
                     team_id, rank, score))
                 if rank >= rank_threshold:
-                    _log_message("Winner {}.".format(team_id))
+                    log_message("Winner {}.".format(team_id))
                     winning_teams.append(gamedb.team_from_id(team_id))
                 else:
-                    _log_message("Loser {}.".format(team_id))
+                    log_message("Loser {}.".format(team_id))
                     losing_teams.append(gamedb.team_from_id(team_id))
 
         return (winning_teams, losing_teams)
@@ -485,12 +486,12 @@ class Game(object):
         while not self._stop.is_set():
             try:
                 entry = next(entries_iter)
-                _log_message("Entry {}.".format(entry))
+                log_message("Entry {}.".format(entry))
                 points = entry.likes / entry.views
                 player = gamedb.player_from_id(entry.player_id)
-                engine.add_event(events.NotifyPlayerScoreEvent(
-                    player=player, challenge=challenge,
-                    entry=entry, points=points))
+                engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id,
+                                                               player=player, challenge=challenge,
+                                                               entry=entry, points=points))
                 score_dict[player.id] = points
             except StopIteration:
                 break
@@ -518,7 +519,7 @@ class Game(object):
         else:
             for rank in range(num_scores):
                 score, player_id = heapq.heappop(top_scores)
-                _log_message("Player {} rank {} with score {}.".format(
+                log_message("Player {} rank {} with score {}.".format(
                     player_id, rank, score))
 
                 # all but the highest scorer lose
@@ -536,8 +537,9 @@ class Game(object):
 
 if __name__ == '__main__':
     options = GameOptions()
-    game = Game(options=options)
-    engine = Engine(options=options)
+    game = Game(game_id=str(uuid.uuid4), options=options)
+    engine = Engine(options=options,
+                    sqs_config_path=_AMAZON_SQS_PROD_CONF_JSON_PATH)
     database = FirestoreDB(json_config_path=_FIRESTORE_PROD_CONF_JSON_PATH)
     game.play(tribe1=database.tribe_from_id(_TRIBE_1_ID),
               tribe2=database.tribe_from_id(_TRIBE_2_ID),

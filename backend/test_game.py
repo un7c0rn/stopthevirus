@@ -16,8 +16,8 @@ from multiprocessing import Process
 from game_engine import events
 from queue import Queue
 
-TEST_CHALLENGE_START_OFFSET_SEC = 1
-TEST_CHALLENGE_END_OFFSET_SEC = 1
+_TEST_CHALLENGE_START_OFFSET_SEC = 1
+_TEST_CHALLENGE_END_OFFSET_SEC = 1
 
 
 class MockDatabase(Database):
@@ -97,15 +97,17 @@ class MockDatabase(Database):
                 self._players[key].tribe_id = to_tribe.id
                 if self._players[key].active:
                     new_active_players_count = new_active_players_count + 1
-        self._tribes[to_tribe.id].size = self._tribes[to_tribe.id].size + new_active_players_count
-    
-    def stream_entries(self, from_tribe: Tribe=None, from_team: Team=None, from_challenge: Challenge=None) -> Iterable[Entry]:
+        self._tribes[to_tribe.id].size = self._tribes[to_tribe.id].size + \
+            new_active_players_count
+
+    def stream_entries(self, from_tribe: Tribe = None, from_team: Team = None, from_challenge: Challenge = None) -> Iterable[Entry]:
         if from_tribe:
             return [entry for entry in self._entries.values() if
                     (entry.challenge_id == from_challenge.id and entry.tribe_id == from_tribe.id)]
-        
+
         if from_team:
-            players_ids = [player.id for player in self._players.values() if player.team_id == from_team.id]
+            players_ids = [player.id for player in self._players.values(
+            ) if player.team_id == from_team.id]
             return [entry for entry in self._entries.values() if
                     (entry.challenge_id == from_challenge.id and entry.player_id in players_ids)]
 
@@ -151,7 +153,7 @@ class MockDatabase(Database):
         self._teams[team.id].active = False
         pprint.pprint(self._teams)
 
-    def count_votes(self, from_team: Team=None, is_for_win: bool=False) -> Dict[Text, int]:
+    def count_votes(self, from_team: Team = None, is_for_win: bool = False) -> Dict[Text, int]:
         player_counts = {}
 
         if from_team:
@@ -169,7 +171,7 @@ class MockDatabase(Database):
             for vote in self._votes.values():
                 if not vote.is_for_win:
                     continue
-                
+
                 if vote.to_id not in player_counts:
                     player_counts[vote.to_id] = 1
                 else:
@@ -220,7 +222,7 @@ class MockDatabase(Database):
 
 class GameTest(unittest.TestCase):
     def setUp(self):
-        self._game = Game(options=GameOptions(
+        self._game = Game(game_id=str(uuid.uuid4()), options=GameOptions(
             game_wait_sleep_interval_sec=0.5,
             single_tribe_council_time_sec=2,
             single_tribe_top_k_threshold=0.5,
@@ -372,7 +374,8 @@ class GameTest(unittest.TestCase):
             # round 4: [a$apmob (team L: r1 r2 g1 g2 b1) (team R: y1 y2 k1 k2 x1 x2)]
             # team L wins
             # team R votes out x2
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/4'),
                 'entry/2': Entry(id='entry/2', likes=1, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/4'),
@@ -392,7 +395,8 @@ class GameTest(unittest.TestCase):
             # round 5: [a$apmob (team L: r1 r2 g1 g2 b1) (team R: y1 y2 k1 k2 x1)]
             # team L wins
             # team R votes out x1
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/5'),
                 'entry/2': Entry(id='entry/2', likes=1, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/5'),
@@ -411,7 +415,8 @@ class GameTest(unittest.TestCase):
             # round 6: [a$apmob (team L: r1 r2 g1 g2 b1) (team R: y1 y2 k1 k2)]
             # team R wins
             # team L votes out b1
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/6'),
                 'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/6'),
@@ -430,7 +435,8 @@ class GameTest(unittest.TestCase):
             # round 7: [a$apmob (team L: r1 r2 g1 g2) (team R: y1 y2 k1 k2)]
             # team R wins
             # team L votes out g2
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/7'),
                 'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/7'),
@@ -450,7 +456,8 @@ class GameTest(unittest.TestCase):
             # team L votes out g1
             # team L would deadlock and must merge
             # a$apmob: r1 r2 y1 y2 k1 k2
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/8'),
                 'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/8'),
@@ -467,7 +474,8 @@ class GameTest(unittest.TestCase):
             # round 9: a$apmob: r1 r2 y1 y2 k1 k2
             # r1 wins immunity
             # team votes out k2
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=6, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
                 'entry/2': Entry(id='entry/2', likes=5, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
@@ -491,7 +499,8 @@ class GameTest(unittest.TestCase):
             # round 10: a$apmob: r1 r2 y1 y2 k1
             # r1 wins immunity
             # team votes out k1
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=5, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
                 'entry/2': Entry(id='entry/2', likes=4, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
@@ -513,7 +522,8 @@ class GameTest(unittest.TestCase):
             # round 11: a$apmob: r1 r2 y1 y2
             # r1 wins immunity
             # team votes out y2
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=4, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
                 'entry/2': Entry(id='entry/2', likes=3, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
@@ -533,7 +543,8 @@ class GameTest(unittest.TestCase):
             # round 12: a$apmob: r1 r2 y1
             # y1 wins immunity
             # team votes out r1
-            tribe_id = [tribe for tribe in gamedb._tribes.values() if tribe.name == "a$apmob"][0].id
+            tribe_id = [tribe for tribe in gamedb._tribes.values()
+                        if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
                 'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
@@ -593,7 +604,7 @@ class GameTest(unittest.TestCase):
 
         engine.add_event = event_fn
         winner = self._game.play(tribe1=gamedb.tribe_from_id('AFRICA'), tribe2=gamedb.tribe_from_id('ASIA'),
-                                    gamedb=gamedb, engine=engine)
+                                 gamedb=gamedb, engine=engine)
 
         self.assertEqual(winner, gamedb.player_from_id('y1'))
 
@@ -1015,7 +1026,8 @@ class GameTest(unittest.TestCase):
             'vote/4': Vote(id='vote/4', from_id='player/04', to_id='player/01', is_for_win=True),
         }
 
-        winner = self._game._run_finalist_tribe_council(finalists=finalists, gamedb=gamedb, engine=engine)
+        winner = self._game._run_finalist_tribe_council(
+            finalists=finalists, gamedb=gamedb, engine=engine)
         engine.add_event.assert_called()
         self.assertEqual(winner, gamedb._players['player/04'])
 
@@ -1287,8 +1299,8 @@ class GameTest(unittest.TestCase):
         engine = Mock()
         gamedb = MockDatabase()
         challenge = gamedb.challenge_from_id('challenge/1')
-        challenge.start_timestamp = time.time() + TEST_CHALLENGE_START_OFFSET_SEC
-        challenge.end_timestamp = challenge.start_timestamp + TEST_CHALLENGE_END_OFFSET_SEC
+        challenge.start_timestamp = time.time() + _TEST_CHALLENGE_START_OFFSET_SEC
+        challenge.end_timestamp = challenge.start_timestamp + _TEST_CHALLENGE_END_OFFSET_SEC
         self._game._run_challenge(
             challenge=challenge, gamedb=gamedb, engine=engine)
         engine.add_event.assert_called_once()
@@ -1367,7 +1379,8 @@ class GameTest(unittest.TestCase):
             'entry/3': Entry(id='entry/3', likes=1, views=1, player_id='player/3', tribe_id='tribe/1', challenge_id='challenge/1'),
         }
 
-        losing_players = self._game._score_entries_top_k_players(team=gamedb.team_from_id('team/1'), challenge=challenge, gamedb=gamedb, engine=engine)
+        losing_players = self._game._score_entries_top_k_players(team=gamedb.team_from_id(
+            'team/1'), challenge=challenge, gamedb=gamedb, engine=engine)
 
         self.assertListEqual(losing_players, [
             gamedb.player_from_id('player/3'),
