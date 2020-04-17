@@ -1,5 +1,7 @@
 # Front end development team guidance
 
+Duplication is far cheaper than the wrong absctraction. - Sandi Metz
+
 Information about where files are and what does what and goes where is listed below.
 
 **Files are in**
