@@ -62,7 +62,7 @@ export default function JoinGameInputs() {
       <Paper square>
         <form className={classes.form} autoComplete="off">
           <TextField
-            id="start-game-inputs-tiktok"
+            id="join-game-inputs-tiktok"
             label="Tik Tok"
             variant="outlined"
             inputRef={tikTokRef}
@@ -74,7 +74,7 @@ export default function JoinGameInputs() {
           label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
           onChange={handleOnPhoneChange}
           value={phone}
-          id="start-game-inputs-phone"
+          id="join-game-inputs-phone"
           />
           <Button variant="contained" onClick={submit}>
             Join This Game

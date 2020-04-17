@@ -11,6 +11,7 @@ export const toCurrency = number => {
 };
 
 export const isSm = () => {
+  //check to see if user resolution is considered "small"
   return useMediaQuery.bind(null, "(max-height:650px)")();//for iphone 5SE
 };
 
