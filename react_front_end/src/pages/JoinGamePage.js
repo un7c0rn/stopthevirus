@@ -3,8 +3,8 @@ import React from "react";
 import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
-import StartGamePrompt from "./components/StartGamePrompt";
-import StartGameInputs from "./components/StartGameInputs";
+import JoinGamePrompt from "./components/JoinGamePrompt";
+import JoinGameInputs from "./components/JoinGameInputs";
 
 export default function JoinGamePage() {
   const useStyles = makeStyles(theme => ({
@@ -25,8 +25,8 @@ export default function JoinGamePage() {
       <section className={classes.root}>
         <ButtonAppBar />
         <AppTitle />
-        <StartGamePrompt />
-        <StartGameInputs />
+        <JoinGamePrompt />
+        <JoinGameInputs />
         <Footer />
       </section>
     </>
