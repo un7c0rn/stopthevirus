@@ -8,7 +8,7 @@ class Engine(object):
 
     def __init__(self, options: object, sqs_config_path: Text):
         self._options = options
-        self._input_events = AmazonSQS(
+        self._output_events = AmazonSQS(
             json_config_path=sqs_config_path)
         self._stop = threading.Event()
         self._workers = list()

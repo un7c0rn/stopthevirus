@@ -33,7 +33,7 @@ class Serializable(object):
             return v.to_dict()
         else:
             raise GameError(
-                'Serializable object contains unsupported attribute {}={}'.format(k, v))
+                'Serializable object contains unsupported attribute {}'.format(v))
 
     def to_dict(self):
         log_message('to_dict called for {}'.format(self.__class__))
