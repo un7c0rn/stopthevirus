@@ -2,6 +2,7 @@ import attr
 from game_engine.database import Player, Challenge, Entry, Team, Tribe
 from game_engine.common import Serializable, GameError
 from game_engine.common import log_message
+from game_engine.database import Database
 from typing import Iterable, List
 import boto3
 import json
@@ -20,11 +21,11 @@ _THREAD_POOL_SIZE = 100
 class SMSEvent(Serializable):
     game_id: Text = attr.ib()
 
-    def message_content(self) -> Text:
-        pass
+    def message_content(self, gamedb: Database) -> Text:
+        return str(self.__class__.__name__)
 
-    def recipient_list(self) -> List[Text]:
-        pass
+    def recipient_list(self, gamedb: Database) -> List[Text]:
+        return ["7742593288"]
 
     @classmethod
     def from_json(cls, json_text: Text) -> Serializable:
@@ -82,6 +83,10 @@ class AmazonSQS(EventQueue):
                 region_name='us-east-2'
             )
 
+    def _delete_message(self, receipt_handle: Text) -> None:
+        self._client.delete_message(QueueUrl=self._url,
+                                    ReceiptHandle=receipt_handle)
+
     def get(self) -> SMSEvent:
         response = self._client.receive_message(
             QueueUrl=self._url,
@@ -93,9 +98,11 @@ class AmazonSQS(EventQueue):
         log_message(str(response))
 
         if 'Messages' in response:
-            message_body = response['Messages'][0]['Body']
+            message = response['Messages'][0]
+            message_body = message['Body']
             log_message(
                 'Received event with message body {}'.format(message_body))
+            self._delete_message(message['ReceiptHandle'])
             return SMSEvent.from_json(json_text=message_body)
         else:
             raise EventQueueError('Queue empty.')

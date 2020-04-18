@@ -11,6 +11,24 @@ class GameError(Exception):
     pass
 
 
+@attr.s
+class GameOptions(object):
+    engine_worker_thread_count: int = attr.ib(default=5)
+    engine_worker_sleep_interval_sec: int = attr.ib(default=1)
+    game_wait_sleep_interval_sec: int = attr.ib(default=30)
+    target_team_size: int = attr.ib(default=5)
+    target_finalist_count: int = attr.ib(default=2)
+    single_tribe_council_time_sec: int = attr.ib(300)
+    single_team_council_time_sec: int = attr.ib(300)
+    final_tribal_council_time_sec: int = attr.ib(300)
+    multi_tribe_min_tribe_size: int = attr.ib(default=10)
+    multi_tribe_target_team_size: int = attr.ib(default=5)
+    multi_tribe_council_time_sec: int = attr.ib(300)
+    multi_tribe_team_immunity_likelihood: float = attr.ib(0.0)
+    merge_tribe_name: Text = attr.ib(default='a$apmob')
+    single_tribe_top_k_threshold: float = attr.ib(default=0.5)
+
+
 def _isprimitive(value: Any):
     if (isinstance(value, int) or
             isinstance(value, str) or isinstance(value, float) or isinstance(value, bool)):
