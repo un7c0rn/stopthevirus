@@ -38,7 +38,7 @@ After thirty days a group of two finalists will have made it to the end. All pre
 
 ## Architecture Block Diagram
 
-<img src="documentation/blockdiagram.svg" width="1000">
+<img src="documentation/stopthevirus_20200325-2.svg" width="1000">
 
 # Frontend Development
 

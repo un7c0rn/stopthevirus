@@ -142,6 +142,14 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 # Pages / features built
 
+# Start game page
+This is the page for route **http://localhost:8888/start-game** used for starting
+a new game.
+
+#Join game page
+This is the page for route **http://localhost:8888/join-game** used for joining
+an existing game.
+
 ## Challenge submission page
 
 After running `netlify dev` in the **react_front_end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
@@ -167,3 +175,17 @@ Current work around is run the function. And then to **open the lambda function*
 1. `yarn && netlify dev`
 2. `yarn test`
 3. `netlify functions:invoke batch_update_tribe --payload '{"game":"7rPwCJaiSkxYgDocGDw4", "from":"77TMV9omdLeW7ORvuheX", "to":"cbTgYdPh97K6rRTDdEPL"}' --no-identity`
+
+## Firebase API **count_votes**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `count_votes.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke count_votes --payload '{"game":"7rPwCJaiSkxYgDocGDw4", "from_tribe":"Q09FeEtoIgjNI57Bnl1E", "is_for_win":"false"}' --no-identity`
