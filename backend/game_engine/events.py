@@ -25,7 +25,7 @@ class SMSEvent(Serializable):
         return str(self.__class__.__name__)
 
     def recipient_list(self, gamedb: Database) -> List[Text]:
-        return ["7742593288"]
+        return ["555-555-5555"]
 
     @classmethod
     def from_json(cls, json_text: Text) -> Serializable:
