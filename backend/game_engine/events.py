@@ -25,6 +25,8 @@ class SMSEvent(Serializable):
         return str(self.__class__.__name__)
 
     def recipient_list(self, gamedb: Database) -> List[Text]:
+        # TODO(brandon) get recipient phone numbers from game db
+        # and return as a list.
         return ["555-555-5555"]
 
     @classmethod

@@ -32,10 +32,10 @@ class Engine(object):
         log_message('Shutting down all engine workers.')
         self._stop.set()
 
-    def add_event(self, event: SMSEvent):
+    def add_event(self, event: SMSEvent) -> None:
         self._output_events.put(event, blocking=False)
 
-    def _do_work_fn(self):
+    def _do_work_fn(self) -> None:
         event = None
         queue = AmazonSQS(json_config_path=self._sqs_config_path)
         notifier = TwilioSMSNotifier(json_config_path=self._twilio_config_path)
