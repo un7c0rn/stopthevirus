@@ -27,7 +27,6 @@ export default function JoinGamePrompt() {
       margin: "1em",
       fontSize: "1em",
       textAlign: "center",
-    //  lineHeight: "2"
     }
   }));
 

@@ -121,4 +121,55 @@ describe("Firestore service", () => {
     });
     expect(response.length).toBeGreaterThan(-1);
   });
+
+  it("should get a player from an ID", async () => {
+    const response = await Firestore.player_from_id({
+      game: _TEST_GAME_ID,
+      id: _TEST_BOSTON_ROB_PLAYER_ID,
+    });
+    expect(response.id).toBe(_TEST_BOSTON_ROB_PLAYER_ID);
+  });
+
+  it("should get a player from an ID", async () => {
+    const response = await Firestore.team_from_id({
+      game: _TEST_GAME_ID,
+      id: _TEST_TEAM_BLUE_ID,
+    });
+    expect(response.id).toBe(_TEST_TEAM_BLUE_ID);
+  });
+
+  it("should count the votes", async () => {
+    const obj = {};
+    obj[_TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID] = 5;
+
+    const response = await Firestore.count_votes({
+      game: _TEST_GAME_ID,
+      from_team: _TEST_TEAM_YELLOW_ID,
+      is_for_win: false,
+    });
+    expect(response).toEqual(obj);
+  });
+
+  it("should count the votes for a player in a team", async () => {
+    const obj = {};
+    obj[_TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID] = 5;
+
+    const response = await Firestore.count_votes({
+      game: _TEST_GAME_ID,
+      from_team: _TEST_TEAM_YELLOW_ID,
+      is_for_win: false,
+    });
+    expect(response).toEqual(obj);
+  });
+
+  it("should count the votes a player in in a game", async () => {
+    const obj = {};
+    obj[_TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID] = 5;
+
+    const response = await Firestore.count_votes({
+      game: _TEST_GAME_ID,
+      is_for_win: false,
+    });
+    expect(response).toEqual(obj);
+  });
 });
