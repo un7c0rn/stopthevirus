@@ -4,3 +4,8 @@ google-cloud-firestore
 mock
 attrs
 boto3
+twilio==6.5.0
+phonenumbers
+
+
+
