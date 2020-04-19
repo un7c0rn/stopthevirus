@@ -139,6 +139,8 @@ _TEST_EVENTS = [
 class EngineTest(unittest.TestCase):
 
     def test_event_processing(self):
+        pass
+
         engine = Engine(
             options=GameOptions(),
             # TODO(brandon) each game can instantiate its own queue
