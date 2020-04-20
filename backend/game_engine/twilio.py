@@ -8,6 +8,9 @@ import re
 import uuid
 import json
 
+# TODO(brandon) move this into this class and rename SMSNotification
+from game_engine.events import SMSEventMessage
+
 
 class SMSNotifier(ABC):
 
@@ -28,6 +31,22 @@ class TwilioSMSNotifier(SMSNotifier):
             self._client = Client(config['account_sid'], config['auth_token'])
             self._notify_service_sid = config['notify_service_sid']
             self._phone_number = config['phone_number']
+
+    def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
+        for m in sms_event_messages:
+            if len(m.recipient_phone_numbers) > 1:
+                self.send_bulk_sms(
+                    message=m.content,
+                    # TODO(brandon): re-enable after testing
+                    # recipient_addresses=m.recipient_phone_numbers
+                    recipient_addresses=["7742593288"]
+                )
+            elif len(m.recipient_phone_numbers) == 1:
+                self.send_sms(
+                    message=m.content,
+                    # recipient_address=m.recipient_phone_numbers[0]
+                    recipient_address="7742593288"
+                )
 
     def _normalize_sms_address(self, sms_phone_number: Text) -> Text:
         number = phonenumbers.parse(sms_phone_number, 'US')

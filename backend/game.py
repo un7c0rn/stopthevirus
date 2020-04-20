@@ -166,12 +166,12 @@ class Game(object):
                 non_immune_teams.append(team)
             else:
                 engine.add_event(events.NotifyImmunityAwardedEvent(
-                    game_id=self._game_id, team=team))
+                    game_id=self._game_id, game_options=self._options, team=team))
 
         # announce winner and tribal council for losing tribe
         tribal_council_start_timestamp = _unixtime()
         gamedb.clear_votes()
-        engine.add_event(events.NotifyMultiTribeCouncilEvent(game_id=self._game_id,
+        engine.add_event(events.NotifyMultiTribeCouncilEvent(game_id=self._game_id, game_options=self._options,
                                                              winning_tribe=winning_tribe, losing_tribe=losing_tribe))
 
         # wait for votes
@@ -188,12 +188,12 @@ class Game(object):
             if voted_out_player:
                 gamedb.deactivate_player(player=voted_out_player)
                 log_message("Deactivated player {}.".format(voted_out_player))
-                engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id,
+                engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id, game_options=self._options,
                                                                   player=voted_out_player))
 
         # notify all players of what happened at tribal council
         engine.add_event(events.NotifyTribalCouncilCompletionEvent(
-            game_id=self._game_id, ))
+            game_id=self._game_id, game_options=self._options))
 
     # keep top K teams
     def _run_single_tribe_council(self, winning_teams: List[Team], losing_teams: List[Team],
@@ -202,7 +202,7 @@ class Game(object):
         # announce winner and tribal council for losing teams
         gamedb.clear_votes()
         engine.add_event(events.NotifySingleTribeCouncilEvent(
-            game_id=self._game_id,
+            game_id=self._game_id, game_options=self._options,
             winning_teams=winning_teams, losing_teams=losing_teams))
         tribal_council_start_timestamp = _unixtime()
 
@@ -219,7 +219,7 @@ class Game(object):
             if voted_out_player:
                 gamedb.deactivate_player(player=voted_out_player)
                 log_message("Deactivated player {}.".format(voted_out_player))
-                engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id,
+                engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id, game_options=self._options,
                                                                   player=voted_out_player))
             else:
                 log_message("For some reason no one got voted out...")
@@ -228,7 +228,7 @@ class Game(object):
 
         # notify all players of what happened at tribal council
         engine.add_event(
-            events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id))
+            events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id, game_options=self._options))
 
     def _run_single_team_council(self, team: Team, losing_players: List[Player], gamedb: Database, engine: Engine):
         # announce winner and tribal council for losing teams
@@ -236,7 +236,7 @@ class Game(object):
 
         winning_player = [player for player in gamedb.list_players(
             from_team=team) if player not in losing_players][0]
-        engine.add_event(events.NotifySingleTeamCouncilEvent(game_id=self._game_id,
+        engine.add_event(events.NotifySingleTeamCouncilEvent(game_id=self._game_id, game_options=self._options,
                                                              winning_player=winning_player, losing_players=losing_players))
         tribal_council_start_timestamp = _unixtime()
 
@@ -251,19 +251,19 @@ class Game(object):
         if voted_out_player:
             gamedb.deactivate_player(player=voted_out_player)
             log_message("Deactivated player {}.".format(voted_out_player))
-            engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id,
+            engine.add_event(events.NotifyPlayerVotedOutEvent(game_id=self._game_id, game_options=self._options,
                                                               player=voted_out_player))
 
         # notify all players of what happened at tribal council
         engine.add_event(
-            events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id))
+            events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id, game_options=self._options))
 
     def _run_finalist_tribe_council(self, finalists: List[Player], gamedb: Database, engine: Engine) -> Player:
         gamedb.clear_votes()
 
         engine.add_event(
             events.NotifyFinalTribalCouncilEvent(
-                game_id=self._game_id, finalists=finalists))
+                game_id=self._game_id, game_options=self._options, finalists=finalists))
         tribal_council_start_timestamp = _unixtime()
 
         # wait for votes
@@ -284,7 +284,7 @@ class Game(object):
 
         # announce winner
         engine.add_event(events.NotifyWinnerAnnouncementEvent(
-            game_id=self._game_id, winner=winner))
+            game_id=self._game_id, game_options=self._options, winner=winner))
         return winner
 
     def _merge_teams(self, target_team_size: int, tribe: Tribe, gamedb: Database, engine: Engine):
@@ -337,7 +337,7 @@ class Game(object):
                 gamedb.save(player)
 
                 # notify player of new team assignment
-                engine.add_event(events.NotifyTeamReassignmentEvent(game_id=self._game_id, player=player,
+                engine.add_event(events.NotifyTeamReassignmentEvent(game_id=self._game_id, game_options=self._options, player=player,
                                                                     team=team))
 
     def _get_challenge(self, gamedb: Database) -> Challenge:
@@ -359,7 +359,7 @@ class Game(object):
 
         # notify players
         engine.add_event(
-            events.NotifyTribalChallengeEvent(game_id=self._game_id, challenge=challenge))
+            events.NotifyTribalChallengeEvent(game_id=self._game_id, game_options=self._options, challenge=challenge))
 
         # wait for challenge to end
         while (_unixtime() < challenge.end_timestamp) and not self._stop.is_set():
@@ -382,7 +382,7 @@ class Game(object):
                 points = entry.likes / entry.views
                 player = gamedb.player_from_id(entry.player_id)
                 engine.add_event(events.NotifyPlayerScoreEvent(
-                    game_id=self._game_id,
+                    game_id=self._game_id, game_options=self._options,
                     player=player, challenge=challenge,
                     entry=entry, points=points))
                 score_dict['score'] += points
@@ -412,7 +412,7 @@ class Game(object):
                 log_message("Entry {}.".format(entry))
                 points = entry.likes / entry.views
                 player = gamedb.player_from_id(entry.player_id)
-                engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id,
+                engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id, game_options=self._options,
                                                                player=player, challenge=challenge,
                                                                entry=entry, points=points))
 
@@ -473,7 +473,7 @@ class Game(object):
                 log_message("Entry {}.".format(entry))
                 points = entry.likes / entry.views
                 player = gamedb.player_from_id(entry.player_id)
-                engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id,
+                engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id, game_options=self._options,
                                                                player=player, challenge=challenge,
                                                                entry=entry, points=points))
                 score_dict[player.id] = points
@@ -522,6 +522,8 @@ class Game(object):
 if __name__ == '__main__':
     options = GameOptions()
     game = Game(game_id=str(uuid.uuid4), options=options)
+    # TODO(brandon) for production each game should instantiate a separate AWS FIFO
+    # on the fly.
     engine = Engine(options=options,
                     sqs_config_path=_AMAZON_SQS_PROD_CONF_JSON_PATH)
     database = FirestoreDB(json_config_path=_FIRESTORE_PROD_CONF_JSON_PATH)

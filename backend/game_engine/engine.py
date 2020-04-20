@@ -29,11 +29,14 @@ class Engine(object):
             self._executor.submit(self._do_work_fn)
 
     def __del__(self):
-        log_message('Shutting down all engine workers.')
-        self._stop.set()
+        self.stop()
 
     def add_event(self, event: SMSEvent) -> None:
         self._output_events.put(event, blocking=False)
+
+    def stop(self):
+        log_message('Shutting down all engine workers.')
+        self._stop.set()
 
     def _do_work_fn(self) -> None:
         event = None
@@ -41,28 +44,13 @@ class Engine(object):
         notifier = TwilioSMSNotifier(json_config_path=self._twilio_config_path)
         while not self._stop.is_set():
             try:
+                log_message('Getting event from queue...')
                 event = queue.get()
                 log_message(
                     'Engine worker processing event {}'.format(event.to_json()))
-                recipient_list = event.recipient_list(gamedb=self._gamedb)
-                message = event.message_content(gamedb=self._gamedb)
-                if len(recipient_list) > 1:
-                    notifier.send_bulk_sms(
-                        message=message,
-                        recipient_addresses=recipient_list
-                    )
-                elif len(recipient_list) == 1:
-                    notifier.send_sms(
-                        message=message,
-                        recipient_address=recipient_list[0]
-                    )
-                else:
-                    pass
+                notifier.send(sms_event_messages=event.messages)
             except Exception as e:
                 log_message(
                     'Engine worker failed with exception {}.'.format(e))
-                if event:
-                    # TODO(brandon) implement error resolution and monitoring system
-                    self._output_events.put(event)
         log_message('Shutting down workder thread {}.'.format(
             threading.current_thread().ident))

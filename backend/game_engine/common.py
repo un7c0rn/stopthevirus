@@ -180,6 +180,8 @@ class Serializable(object):
             return l
         elif isinstance(v, Serializable):
             return v.to_dict()
+        elif isinstance(v, GameOptions):
+            pass
         else:
             raise GameError(
                 'Serializable object contains unsupported attribute {}'.format(v))

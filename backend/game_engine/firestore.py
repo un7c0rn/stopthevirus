@@ -2,7 +2,7 @@ from game_engine.database import Database, Data
 import attr
 from typing import Dict, Iterable, Text, Tuple
 from game_engine.database import Player, Team, Tribe
-from game_engine.database import Challenge, Entry, Vote
+from game_engine.database import Challenge, Entry, Vote, Game
 from multiprocessing import Pool
 from itertools import product
 import firebase_admin
@@ -13,6 +13,7 @@ import logging
 import sys
 from concurrent.futures import ThreadPoolExecutor
 import copy
+import json
 
 # TODO(brandon): change Data interface to use counters instead of size
 # by convention.
@@ -38,6 +39,10 @@ class FirestoreData(Data):
             return self._document.id
         else:
             return self._document.get(name)
+
+
+class FirestoreGame(FirestoreData, Game):
+    pass
 
 
 class FirestorePlayer(FirestoreData, Player):
@@ -108,6 +113,38 @@ class FirestoreDB(Database):
         self._game_id = game_id if game_id else self._create_game_id
         self._client = firestore.client()
         self._thread_pool_size = _THREAD_POOL_SIZE
+
+    def import_collections(self, collections_json: Text) -> None:
+        """Function for restoring test DB data."""
+
+        batch = self._client.batch()
+        collections_dict = json.loads(collections_json)
+        for path in collections_dict:
+            for document_id in collections_dict[path]:
+                document_ref = self._client.document(
+                    "{}/{}".format(path, document_id))
+                properties_dict = collections_dict[path][document_id]
+                properties_dict['id'] = document_id
+                batch.set(document_ref, properties_dict, merge=True)
+        batch.commit()
+
+    def export_collections(self, collection_paths):
+        """Function for persisting test DB data."""
+
+        paths = collection_paths
+        collections = dict()
+        dict4json = dict()
+        doc_count = 0
+
+        for path in paths:
+            collections[path] = self._client.collection(path).stream()
+            dict4json[path] = {}
+            for document in collections[path]:
+                docdict = document.to_dict()
+                dict4json[path][document.id] = docdict
+                doc_count += 1
+
+        return json.dumps(dict4json)
 
     def _create_game_id(self) -> Text:
         return ""
@@ -185,6 +222,12 @@ class FirestoreDB(Database):
                 'count_players', direction=Query.DESCENDING if descending else Query.ASCENDING)
         return FirestoreTeamStream(stream=query.stream())
 
+    def stream_players(self, active_player_predicate_value=True) -> Iterable[Player]:
+        query = self._client.collection('games/{}/players'.format(self._game_id)).where(
+            'active', '==', active_player_predicate_value
+        )
+        return FirestorePlayerStream(stream=query.stream())
+
     def count_players(self, from_tribe: Tribe = None, from_team: Team = None) -> int:
         if from_tribe:
             return self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)).get().get('count_players')
@@ -251,6 +294,9 @@ class FirestoreDB(Database):
             'games/{}/teams'.format(self._game_id)).where(
                 'active', '==', active_team_predicate_value)
         return FirestoreTeamStream(query.stream())
+
+    def game_from_id(self, id: Text) -> Player:
+        return FirestoreGame(self._client.document("games/{}".format(self._game_id)).get())
 
     def player_from_id(self, id: Text) -> Player:
         return FirestorePlayer(self._client.document("games/{}/players/{}".format(self._game_id, id)).get())

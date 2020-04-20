@@ -3,6 +3,7 @@ import attr
 from typing import Any, Iterable, Dict, Text, Tuple
 from game_engine.common import Serializable
 
+
 class Data(ABC, Serializable):
     def save(self):
         pass
@@ -10,6 +11,13 @@ class Data(ABC, Serializable):
     def sync(self):
         pass
 
+
+@attr.s
+class Game(Data):
+    id: Text = attr.ib('')
+    name: Text = attr.ib('')
+    hashtag: Text = attr.ib('')
+    size: int = attr.ib(default=0)
 
 
 @attr.s
@@ -22,6 +30,7 @@ class Player(Data):
     team_id: Text = attr.ib(default='')
     active: bool = attr.ib(default=True)
 
+
 @attr.s
 class Vote(Data):
     id: Text = attr.ib('')
@@ -29,13 +38,15 @@ class Vote(Data):
     to_id: Text = attr.ib('')
     is_for_win: bool = attr.ib(default=False)
 
+
 @attr.s
 class Team(Data):
     id: Text = attr.ib('')
     name: Text = attr.ib('')
-    size: int = attr.ib('')
+    size: int = attr.ib(default=0)
     tribe_id: Text = attr.ib('')
     active: bool = attr.ib(default=True)
+
 
 @attr.s
 class Tribe(Data):
@@ -44,14 +55,18 @@ class Tribe(Data):
     size: int = attr.ib(default=0)
     active: bool = attr.ib(default=True)
 
+
 @attr.s
 class Challenge(Data):
     id: Text = attr.ib('')
     name: Text = attr.ib('')
     message: Text = attr.ib('')
+    # TODO(brandon): game schedules make these timestamps
+    # obsolete.
     start_timestamp: int = attr.ib(default=0)
     end_timestamp: int = attr.ib(default=0)
     complete: bool = attr.ib(default=False)
+
 
 @attr.s
 class Entry(Data):
@@ -65,6 +80,7 @@ class Entry(Data):
     team_id: Text = attr.ib('')
     url: Text = attr.ib('')
 
+
 class Database(ABC):
 
     @abstractmethod
@@ -72,15 +88,19 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def stream_entries(self, from_tribe: Tribe=None, from_team: Team=None, from_challenge: Challenge=None) -> Iterable[Entry]:
+    def stream_entries(self, from_tribe: Tribe = None, from_team: Team = None, from_challenge: Challenge = None) -> Iterable[Entry]:
         pass
 
     @abstractmethod
-    def stream_teams(self, from_tribe: Tribe, 
-        team_size_predicate_value: [int, None]=None,
-        order_by_size=True,
-        descending=False
-        ) -> Iterable[Team]:
+    def stream_teams(self, from_tribe: Tribe,
+                     team_size_predicate_value: [int, None] = None,
+                     order_by_size=True,
+                     descending=False
+                     ) -> Iterable[Team]:
+        pass
+
+    @abstractmethod
+    def stream_players(self, active_player_predicate_value=True) -> Iterable[Player]:
         pass
 
     @abstractmethod
@@ -88,7 +108,7 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def count_teams(self, from_tribe: Tribe=None, active_team_predicate_value=True) -> int:
+    def count_teams(self, from_tribe: Tribe = None, active_team_predicate_value=True) -> int:
         pass
 
     @abstractmethod
@@ -96,10 +116,10 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def count_votes(self, from_team: Team, is_for_win: bool=False) -> Tuple[Player, int]:
+    def count_votes(self, from_team: Team, is_for_win: bool = False) -> Tuple[Player, int]:
         pass
-    
-    @abstractmethod 
+
+    @abstractmethod
     def clear_votes(self) -> None:
         pass
 
@@ -114,7 +134,7 @@ class Database(ABC):
     @abstractmethod
     def list_teams(self, active_team_predicate_value=True) -> Iterable[Team]:
         pass
-    
+
     @abstractmethod
     def player(self, name: Text) -> Player:
         pass
@@ -124,13 +144,17 @@ class Database(ABC):
         pass
 
     @abstractmethod
+    def game_from_id(self, id: Text) -> Game:
+        pass
+
+    @abstractmethod
     def tribe(self, name: Text) -> Tribe:
         pass
 
     @abstractmethod
     def tribe_from_id(self, id: Text) -> Tribe:
         pass
-    
+
     @abstractmethod
     def team_from_id(self, id: Text) -> Team:
         pass
