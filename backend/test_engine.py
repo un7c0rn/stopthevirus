@@ -18,7 +18,7 @@ import random
 import time
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE
 
-_TEST_EVENT_WAIT_TIME = 10
+_TEST_EVENT_WAIT_TIME = 30
 _TEST_AMAZON_SQS_CONFIG_PATH = '../amazon/stopthevirus.fifo.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
