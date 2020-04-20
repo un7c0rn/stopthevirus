@@ -96,16 +96,16 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Firestore; });
-/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
-/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dotenv */ "dotenv");
-/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! dotenv */ "dotenv");
+/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
+/* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_1__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 // Google FireStore implementation
 
 
-dotenv__WEBPACK_IMPORTED_MODULE_1___default.a.config();
+dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
 class Firestore {}
 /*
 
@@ -157,13 +157,13 @@ _defineProperty(Firestore, "initialise", () => {
     client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url
   }; // Initialize Firebase
 
-  const app = firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.initializeApp({
-    credential: firebase_admin__WEBPACK_IMPORTED_MODULE_0___default.a.credential.cert(credentials),
+  const app = firebase_admin__WEBPACK_IMPORTED_MODULE_1___default.a.initializeApp({
+    credential: firebase_admin__WEBPACK_IMPORTED_MODULE_1___default.a.credential.cert(credentials),
     databaseURL: "https://stv-game-db-test.firebaseio.com"
   }, "VIR-US");
-  Firestore.firestore = Object(firebase_admin__WEBPACK_IMPORTED_MODULE_0__["firestore"])(app);
+  Firestore.firestore = Object(firebase_admin__WEBPACK_IMPORTED_MODULE_1__["firestore"])(app);
   return {
-    firebase: (firebase_admin__WEBPACK_IMPORTED_MODULE_0___default()),
+    firebase: (firebase_admin__WEBPACK_IMPORTED_MODULE_1___default()),
     firestore: Firestore.firestore
   };
 });
