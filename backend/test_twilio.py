@@ -55,7 +55,7 @@ class TwilioSMSTest(unittest.TestCase):
         self.assertRegex(twilio._user_sms_identity(
             address='19-49-89-636-48018'
         ),
-            '[0-9\-a-z]+')
+            r'[0-9\-a-z]+')
 
     @mock.patch('twilio.rest.Client.notify')
     def test_send_bulk_sms(self, notify):
