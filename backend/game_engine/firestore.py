@@ -14,6 +14,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 import copy
 import json
+import uuid
 
 # TODO(brandon): change Data interface to use counters instead of size
 # by convention.
@@ -109,7 +110,8 @@ class FirestoreDB(Database):
 
     def __init__(self, json_config_path: Text, game_id: Text = None):
         cred = credentials.Certificate(json_config_path)
-        firebase_admin.initialize_app(cred)
+        if not firebase_admin._apps:
+            firebase_admin.initialize_app(cred)
         self._game_id = game_id if game_id else self._create_game_id
         self._client = firestore.client()
         self._thread_pool_size = _THREAD_POOL_SIZE
