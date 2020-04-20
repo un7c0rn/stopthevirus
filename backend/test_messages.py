@@ -13,7 +13,7 @@ from game_engine.twilio import TwilioSMSNotifier
 import json
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
-_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
+_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 _TEST_GAME_ID = "f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"
 _TEST_GAME_ENVIRONMENT = """
 {

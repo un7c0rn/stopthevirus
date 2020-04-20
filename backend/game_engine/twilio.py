@@ -37,15 +37,12 @@ class TwilioSMSNotifier(SMSNotifier):
             if len(m.recipient_phone_numbers) > 1:
                 self.send_bulk_sms(
                     message=m.content,
-                    # TODO(brandon): re-enable after testing
-                    # recipient_addresses=m.recipient_phone_numbers
-                    recipient_addresses=["7742593288"]
+                    recipient_addresses=m.recipient_phone_numbers
                 )
             elif len(m.recipient_phone_numbers) == 1:
                 self.send_sms(
                     message=m.content,
-                    # recipient_address=m.recipient_phone_numbers[0]
-                    recipient_address="7742593288"
+                    recipient_address=m.recipient_phone_numbers[0]
                 )
 
     def _normalize_sms_address(self, sms_phone_number: Text) -> Text:
