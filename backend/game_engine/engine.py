@@ -29,7 +29,7 @@ class Engine(object):
             self._executor.submit(self._do_work_fn)
 
     def add_event(self, event: SMSEvent) -> None:
-        self._output_events.put(event, blocking=False)
+        self._output_events.put(event, blocking=True)
 
     def stop(self):
         log_message('Shutting down all engine workers.')
