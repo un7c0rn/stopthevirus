@@ -28,9 +28,6 @@ class Engine(object):
         for _ in range(options.engine_worker_thread_count):
             self._executor.submit(self._do_work_fn)
 
-    def __del__(self):
-        self.stop()
-
     def add_event(self, event: SMSEvent) -> None:
         self._output_events.put(event, blocking=False)
 
