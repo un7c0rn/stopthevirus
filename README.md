@@ -1,4 +1,4 @@
-<center><img src="documentation/banner.png" width=900></center>
+<center><img src="documentation/banner.png" width=1000></center>
 
 ![Python application](https://github.com/un7c0rn/stopthevirus/workflows/Python%20application/badge.svg?branch=develop) ![JavaScript tests](https://github.com/un7c0rn/stopthevirus/workflows/JavaScript%20tests/badge.svg?branch=develop)
 
