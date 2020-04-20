@@ -8,7 +8,7 @@ Selected as a winner of <a href="https://covidglobalhackathon.com">COVID-19 Glob
 
 WATCH PROJECT VIDEO <a href="https://vimeo.com/402226460">HERE</a>
 
-Please reach out if interested in collaborating! <a href="mailto:brandon@formless.la">brandon@formless.la</a>
+Please reach out if interested in collaborating. <a href="mailto:brandon@formless.la">brandon@formless.la</a>
 
 Official Contributors: Bernard Baker, David Zeifman, DL Warfield, Daniel Francois, Edward Alcide, Brandon Tory
 
