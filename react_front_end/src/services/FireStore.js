@@ -247,4 +247,35 @@ export default class Firestore {
 
     return (await response.get()).data();
   };
+
+  static add_challenge = async ({
+    game = null,
+    name = null,
+    message = null,
+    testId = null,
+  }) => {
+    if (!game) return false;
+    if (!name) return false;
+    if (!message) return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`challenges`)
+      .add({
+        name,
+        message,
+        start_timestamp: Date.now(),
+        end_timestamp: Date.now() + 10080000,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
 }
