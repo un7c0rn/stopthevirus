@@ -40,6 +40,8 @@ describe("Firestore service", () => {
   const _TEST_GAME_TIKTOK_USER_HANDLE = "@user1234";
   const _TEST_GAME_USER_EMAIL = "user@domain.com";
   const _TEST_USER_IS_ACTIVE = "true";
+  const _TEST_USER_FROM_ID = "a1b2c3CJaiSkxYgDocGDw4";
+  const _TEST_USER_TO_ID = "a1b2c3CJaiSkxYgDocGDw4";
 
   const { firebase, firestore } = Firestore.initialise();
 
@@ -280,6 +282,25 @@ describe("Firestore service", () => {
       testId: _TEST_ID,
     };
     const response = await Firestore.add_player(obj);
+    expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should return false if data is missing when adding a vote", async () => {
+    const obj = {};
+    const response = await Firestore.add_vote(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a vote", async () => {
+    const obj = {
+      game: _TEST_ID,
+      from_id: _TEST_USER_FROM_ID,
+      to_id: _TEST_USER_TO_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      is_for_win: _TEST_USER_IS_ACTIVE,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_vote(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 });

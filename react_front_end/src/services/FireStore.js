@@ -354,4 +354,36 @@ export default class Firestore {
 
     return (await response.get()).data();
   };
+
+  // id, from_id, to_id, team_id, is_for_win
+  static add_vote = async ({
+    game = null,
+    from_id = null,
+    to_id = null,
+    team_id = null,
+    is_for_win = null,
+    testId = null,
+  }) => {
+    if (!game || !from_id || !to_id || !team_id || !is_for_win) return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`votes`)
+      .add({
+        from_id,
+        to_id,
+        team_id,
+        is_for_win,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
 }
