@@ -225,4 +225,38 @@ export default class Firestore {
     ).data();
     return response;
   };
+
+  static add_game = async ({ game = null, hashtag = null, testId = null }) => {
+    if (!game) return false;
+    if (!hashtag) return false;
+    const response = await this.firestore.collection(`games`).add({
+      game,
+      hashtag,
+      count_players: 0,
+      count_teams: 0,
+      count_tribes: 0,
+    });
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+    await response.set(map);
+
+    await this.firestore
+      .collection(`games`)
+      .doc(`${response.id}`)
+      .collection(`players`);
+
+    await this.firestore
+      .collection(`games`)
+      .doc(`${response.id}`)
+      .collection(`teams`);
+
+    await this.firestore
+      .collection(`games`)
+      .doc(`${response.id}`)
+      .collection(`tribes`);
+
+    return (await response.get()).data();
+  };
 }

@@ -27,6 +27,10 @@ describe("Firestore service", () => {
     "games/7rPwCJaiSkxYgDocGDw4/votes",
   ];
 
+  const _TEST_GAME_NAME = "A NEW GAME";
+  const _TEST_GAME_HASHTAG = "#ANEWGAME";
+  const _TEST_ADD_GAME__GAME_ID = "a1b2c3CJaiSkxYgDocGDw4";
+
   const { firebase, firestore } = Firestore.initialise();
 
   beforeAll(async () => {
@@ -192,5 +196,21 @@ describe("Firestore service", () => {
       game: _TEST_GAME_THAT_HAS_UUID_AS_ID,
     });
     expect(response.id).toBe(obj.id);
+  });
+
+  it("should return false if no name or hashtag is provided", async () => {
+    const obj = {};
+    const response = await Firestore.add_game(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a game", async () => {
+    const obj = {
+      game: _TEST_GAME_NAME,
+      hashtag: _TEST_GAME_HASHTAG,
+      testId: _TEST_ADD_GAME__GAME_ID,
+    };
+    const response = await Firestore.add_game(obj);
+    expect(response.id).toBe(_TEST_ADD_GAME__GAME_ID);
   });
 });
