@@ -37,6 +37,9 @@ describe("Firestore service", () => {
     "https://www.tiktok.com/@the_trickstars/video/6817172036767485190";
   const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_LIKES = 1000;
   const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_VIEWS = 2000;
+  const _TEST_GAME_TIKTOK_USER_HANDLE = "@user1234";
+  const _TEST_GAME_USER_EMAIL = "user@domain.com";
+  const _TEST_USER_IS_ACTIVE = "true";
 
   const { firebase, firestore } = Firestore.initialise();
 
@@ -257,6 +260,26 @@ describe("Firestore service", () => {
       testId: _TEST_ID,
     };
     const response = await Firestore.add_submission_entry(obj);
+    expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should return false if data is missing when adding a player", async () => {
+    const obj = {};
+    const response = await Firestore.add_player(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a player", async () => {
+    const obj = {
+      game: _TEST_ID,
+      tiktok: _TEST_GAME_TIKTOK_USER_HANDLE,
+      email: _TEST_GAME_USER_EMAIL,
+      tribe_id: _TEST_TRIBE_TIGRAWAY_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      active: _TEST_USER_IS_ACTIVE,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_player(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 });

@@ -279,7 +279,6 @@ export default class Firestore {
     return (await response.get()).data();
   };
 
-  // id, likes, views, player_id, team_id, tribe_id, challenge_id, url
   static add_submission_entry = async ({
     game = null,
     likes = null,
@@ -310,6 +309,40 @@ export default class Firestore {
         tribe_id,
         challenge_id,
         url,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_player = async ({
+    game = null,
+    tiktok = null,
+    email = null,
+    tribe_id = null,
+    team_id = null,
+    active = null,
+    testId = null,
+  }) => {
+    if ((!game || !tiktok || !email || !tribe_id, !team_id, !active))
+      return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`players`)
+      .add({
+        tiktok,
+        email,
+        tribe_id,
+        team_id,
+        active,
       });
 
     const map = {
