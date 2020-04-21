@@ -143,6 +143,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 # Pages / features built
 
 # Start game page
+
 This is the page for route **http://localhost:8888/start-game** used for starting
 a new game.
 
@@ -189,3 +190,17 @@ Current work around is run the function. And then to **open the lambda function*
 1. `yarn && netlify dev`
 2. `yarn test`
 3. `netlify functions:invoke count_votes --payload '{"game":"7rPwCJaiSkxYgDocGDw4", "from_tribe":"Q09FeEtoIgjNI57Bnl1E", "is_for_win":"false"}' --no-identity`
+
+## Firebase API **get_game_info**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `count_votes.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke get_game_info --payload '{"game":"f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"}' --no-identity`
