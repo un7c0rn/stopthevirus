@@ -33,6 +33,10 @@ describe("Firestore service", () => {
   const _TEST_ADD_GAME__GAME_ID = "a1b2c3CJaiSkxYgDocGDw4";
   const _TEST_GAME_CHALLENGE_NAME = "A NEW CHALLENGE";
   const _TEST_ID = "a1b2c3d4e5f6g7h8i9j10";
+  const _TEST_TIKTOK_VIDEO_ID =
+    "https://www.tiktok.com/@the_trickstars/video/6817172036767485190";
+  const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_LIKES = 1000;
+  const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_VIEWS = 2000;
 
   const { firebase, firestore } = Firestore.initialise();
 
@@ -217,7 +221,7 @@ describe("Firestore service", () => {
     expect(response.id).toBe(_TEST_ADD_GAME__GAME_ID);
   });
 
-  it("should return false if data is missing from the challenge submission", async () => {
+  it("should return false if data is missing from the challenge", async () => {
     const obj = {};
     const response = await Firestore.add_challenge(obj);
     expect(response).toBe(false);
@@ -231,7 +235,28 @@ describe("Firestore service", () => {
       testId: _TEST_ID,
     };
     const response = await Firestore.add_challenge(obj);
-    console.log(response);
+    expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should return false if data is missing from the entry (submission)", async () => {
+    const obj = {};
+    const response = await Firestore.add_submission_entry(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a submission entry", async () => {
+    const obj = {
+      game: _TEST_ID,
+      likes: _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_LIKES,
+      views: _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_VIEWS,
+      player_id: _TEST_BOSTON_ROB_PLAYER_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      tribe_id: _TEST_TRIBE_TIGRAWAY_ID,
+      challenge_id: _TEST_ID,
+      url: _TEST_TIKTOK_VIDEO_ID,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_submission_entry(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 });
