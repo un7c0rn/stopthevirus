@@ -29,7 +29,10 @@ describe("Firestore service", () => {
 
   const _TEST_GAME_NAME = "A NEW GAME";
   const _TEST_GAME_HASHTAG = "#ANEWGAME";
+  const _TEST_GAME_MESSAGE = "A MESSAGE FOR THE NEW GAME CHALLENGE";
   const _TEST_ADD_GAME__GAME_ID = "a1b2c3CJaiSkxYgDocGDw4";
+  const _TEST_GAME_CHALLENGE_NAME = "A NEW CHALLENGE";
+  const _TEST_ID = "a1b2c3d4e5f6g7h8i9j10";
 
   const { firebase, firestore } = Firestore.initialise();
 
@@ -191,9 +194,9 @@ describe("Firestore service", () => {
   });
 
   it("should return game information for a given game ID", async () => {
-    const obj = { id: _TEST_GAME_THAT_HAS_UUID_AS_ID };
+    const obj = { id: _TEST_GAME_ID };
     const response = await Firestore.get_game_info({
-      game: _TEST_GAME_THAT_HAS_UUID_AS_ID,
+      game: _TEST_GAME_ID,
     });
     expect(response.id).toBe(obj.id);
   });
@@ -212,5 +215,23 @@ describe("Firestore service", () => {
     };
     const response = await Firestore.add_game(obj);
     expect(response.id).toBe(_TEST_ADD_GAME__GAME_ID);
+  });
+
+  it("should return false if data is missing from the challenge submission", async () => {
+    const obj = {};
+    const response = await Firestore.add_challenge(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a challenge", async () => {
+    const obj = {
+      game: _TEST_ID,
+      name: _TEST_GAME_CHALLENGE_NAME,
+      message: _TEST_GAME_MESSAGE,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_challenge(obj);
+    console.log(response);
+    expect(response.id).toBe(_TEST_ID);
   });
 });
