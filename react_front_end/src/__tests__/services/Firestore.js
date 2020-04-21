@@ -11,6 +11,7 @@ describe("Firestore service", () => {
   const _TEST_TRIBE_TIGRAWAY_ID = "77TMV9omdLeW7ORvuheX";
   const _TEST_TRIBE_SIDAMA_ID = "cbTgYdPh97K6rRTDdEPL";
   const _TEST_GAME_ID = "7rPwCJaiSkxYgDocGDw4";
+  const _TEST_GAME_THAT_HAS_UUID_AS_ID = "f49f0cfd-c93b-4132-8c5b-ebea4bf81eae";
   const _TEST_TEAM_BLUE_ID = "GQnxhYXnV86oJXLklbGB";
   const _TEST_TEAM_YELLOW_ID = "Q09FeEtoIgjNI57Bnl1E";
   const _TEST_CHALLENGE_KARAOKE_ID = "2JQ5ZvttkFafjxvrN07Q";
@@ -171,5 +172,25 @@ describe("Firestore service", () => {
       is_for_win: false,
     });
     expect(response).toEqual(obj);
+  });
+
+  it("should return false if no ID parameter is provided when requesting game information", async () => {
+    const obj = {};
+    const response = await Firestore.get_game_info({});
+    expect(response).toBe(false);
+  });
+
+  it("should return undeind if the ID for a game is not found when requesting game information", async () => {
+    const obj = { game: ";lhsdfk3lrhkl3" };
+    const response = await Firestore.get_game_info(obj);
+    expect(response).toBe(undefined);
+  });
+
+  it("should return game information for a given game ID", async () => {
+    const obj = { id: _TEST_GAME_THAT_HAS_UUID_AS_ID };
+    const response = await Firestore.get_game_info({
+      game: _TEST_GAME_THAT_HAS_UUID_AS_ID,
+    });
+    expect(response.id).toBe(obj.id);
   });
 });

@@ -217,37 +217,12 @@ export default class Firestore {
 
     return player_counts;
   };
+
+  static get_game_info = async ({ game = null }) => {
+    if (!game) return false;
+    const response = (
+      await this.firestore.collection(`games`).doc(`${game}`).get()
+    ).data();
+    return response;
+  };
 }
-
-/*
-
-def count_votes(self, from_team: Team = None, is_for_win: bool = False) -> Dict[Text, int]:
-    player_counts = {}
-
-    query = self._client.collection(
-        'games/{}/votes'.format(self._game_id))
-    if from_team:
-        query = query.where('team_id', '==', from_team.id)
-
-        for vote in FirestoreVoteStream(query.stream()):
-            voter = self.player_from_id(vote.from_id)
-            team = self.team_from_id(voter.team_id)
-            if team.id != from_team.id or not voter.active:
-                continue
-
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
-    else:
-        for vote in FirestoreVoteStream(query.stream()):
-            if not vote.is_for_win:
-                continue
-
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
-
-    return player_counts
-*/
