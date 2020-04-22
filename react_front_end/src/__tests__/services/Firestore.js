@@ -27,6 +27,22 @@ describe("Firestore service", () => {
     "games/7rPwCJaiSkxYgDocGDw4/votes",
   ];
 
+  const _TEST_GAME_NAME = "A NEW GAME";
+  const _TEST_GAME_HASHTAG = "#ANEWGAME";
+  const _TEST_GAME_MESSAGE = "A MESSAGE FOR THE NEW GAME CHALLENGE";
+  const _TEST_ADD_GAME__GAME_ID = "a1b2c3CJaiSkxYgDocGDw4";
+  const _TEST_GAME_CHALLENGE_NAME = "A NEW CHALLENGE";
+  const _TEST_ID = "a1b2c3d4e5f6g7h8i9j10";
+  const _TEST_TIKTOK_VIDEO_ID =
+    "https://www.tiktok.com/@the_trickstars/video/6817172036767485190";
+  const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_LIKES = 1000;
+  const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_VIEWS = 2000;
+  const _TEST_GAME_TIKTOK_USER_HANDLE = "@user1234";
+  const _TEST_GAME_USER_EMAIL = "user@domain.com";
+  const _TEST_USER_IS_ACTIVE = "true";
+  const _TEST_USER_FROM_ID = "a1b2c3CJaiSkxYgDocGDw4";
+  const _TEST_USER_TO_ID = "a1b2c3CJaiSkxYgDocGDw4";
+
   const { firebase, firestore } = Firestore.initialise();
 
   beforeAll(async () => {
@@ -187,10 +203,104 @@ describe("Firestore service", () => {
   });
 
   it("should return game information for a given game ID", async () => {
-    const obj = { id: _TEST_GAME_THAT_HAS_UUID_AS_ID };
+    const obj = { id: _TEST_GAME_ID };
     const response = await Firestore.get_game_info({
-      game: _TEST_GAME_THAT_HAS_UUID_AS_ID,
+      game: _TEST_GAME_ID,
     });
     expect(response.id).toBe(obj.id);
+  });
+
+  it("should return false if no name or hashtag is provided", async () => {
+    const obj = {};
+    const response = await Firestore.add_game(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a game", async () => {
+    const obj = {
+      game: _TEST_GAME_NAME,
+      hashtag: _TEST_GAME_HASHTAG,
+      testId: _TEST_ADD_GAME__GAME_ID,
+    };
+    const response = await Firestore.add_game(obj);
+    expect(response.id).toBe(_TEST_ADD_GAME__GAME_ID);
+  });
+
+  it("should return false if data is missing from the challenge", async () => {
+    const obj = {};
+    const response = await Firestore.add_challenge(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a challenge", async () => {
+    const obj = {
+      game: _TEST_ID,
+      name: _TEST_GAME_CHALLENGE_NAME,
+      message: _TEST_GAME_MESSAGE,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_challenge(obj);
+    expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should return false if data is missing from the entry (submission)", async () => {
+    const obj = {};
+    const response = await Firestore.add_submission_entry(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a submission entry", async () => {
+    const obj = {
+      game: _TEST_ID,
+      likes: _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_LIKES,
+      views: _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_VIEWS,
+      player_id: _TEST_BOSTON_ROB_PLAYER_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      tribe_id: _TEST_TRIBE_TIGRAWAY_ID,
+      challenge_id: _TEST_ID,
+      url: _TEST_TIKTOK_VIDEO_ID,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_submission_entry(obj);
+    expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should return false if data is missing when adding a player", async () => {
+    const obj = {};
+    const response = await Firestore.add_player(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a player", async () => {
+    const obj = {
+      game: _TEST_ID,
+      tiktok: _TEST_GAME_TIKTOK_USER_HANDLE,
+      email: _TEST_GAME_USER_EMAIL,
+      tribe_id: _TEST_TRIBE_TIGRAWAY_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      active: _TEST_USER_IS_ACTIVE,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_player(obj);
+    expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should return false if data is missing when adding a vote", async () => {
+    const obj = {};
+    const response = await Firestore.add_vote(obj);
+    expect(response).toBe(false);
+  });
+
+  it("should add a vote", async () => {
+    const obj = {
+      game: _TEST_ID,
+      from_id: _TEST_USER_FROM_ID,
+      to_id: _TEST_USER_TO_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      is_for_win: _TEST_USER_IS_ACTIVE,
+      testId: _TEST_ID,
+    };
+    const response = await Firestore.add_vote(obj);
+    expect(response.id).toBe(_TEST_ID);
   });
 });
