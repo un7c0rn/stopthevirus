@@ -225,4 +225,165 @@ export default class Firestore {
     ).data();
     return response;
   };
+
+  static add_game = async ({ game = null, hashtag = null, testId = null }) => {
+    if (!game) return false;
+    if (!hashtag) return false;
+
+    const response = await this.firestore.collection(`games`).add({
+      game,
+      hashtag,
+      count_players: 0,
+      count_teams: 0,
+      count_tribes: 0,
+    });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_challenge = async ({
+    game = null,
+    name = null,
+    message = null,
+    testId = null,
+  }) => {
+    if (!game) return false;
+    if (!name) return false;
+    if (!message) return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`challenges`)
+      .add({
+        name,
+        message,
+        start_timestamp: Date.now(),
+        end_timestamp: Date.now() + 10080000,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_submission_entry = async ({
+    game = null,
+    likes = null,
+    views = null,
+    player_id = null,
+    team_id = null,
+    tribe_id = null,
+    challenge_id = null,
+    url = null,
+    testId = null,
+  }) => {
+    if (
+      (!game || !likes || !views || !player_id,
+      !team_id,
+      !tribe_id || !challenge_id || !url)
+    )
+      return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`entries`)
+      .add({
+        likes,
+        views,
+        player_id,
+        team_id,
+        tribe_id,
+        challenge_id,
+        url,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_player = async ({
+    game = null,
+    tiktok = null,
+    email = null,
+    tribe_id = null,
+    team_id = null,
+    active = null,
+    testId = null,
+  }) => {
+    if ((!game || !tiktok || !email || !tribe_id, !team_id, !active))
+      return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`players`)
+      .add({
+        tiktok,
+        email,
+        tribe_id,
+        team_id,
+        active,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  // id, from_id, to_id, team_id, is_for_win
+  static add_vote = async ({
+    game = null,
+    from_id = null,
+    to_id = null,
+    team_id = null,
+    is_for_win = null,
+    testId = null,
+  }) => {
+    if (!game || !from_id || !to_id || !team_id || !is_for_win) return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`votes`)
+      .add({
+        from_id,
+        to_id,
+        team_id,
+        is_for_win,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
 }
