@@ -1,11 +1,24 @@
-// Google FireStore implementation
 import dotenv from "dotenv";
-import firebase, { firestore as fb } from "firebase-admin";
+import * as admin from "firebase-admin";
 
 dotenv.config();
 
 export default class Firestore {
+  static firebase;
   static firestore;
+
+  static getInstance = () => {
+    if (admin.apps.length < 1) {
+      const { firebase, firestore } = this.initialise();
+      this.firebase = firebase;
+      this.firestore = firestore;
+    }
+
+    this.firebase = admin;
+    this.firestore = admin.app("VIR-US").firestore();
+
+    return this;
+  };
 
   static initialise = () => {
     // Web app's Firebase configuration
@@ -23,18 +36,18 @@ export default class Firestore {
       client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url,
     };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(
+    const app = admin.initializeApp(
       {
-        credential: firebase.credential.cert(credentials),
+        credential: admin.credential.cert(credentials),
         databaseURL: "https://stv-game-db-test.firebaseio.com",
       },
       "VIR-US"
     );
 
-    Firestore.firestore = fb(app);
+    const defaultFirebase = admin;
+    const defaultFirestore = admin.firestore(app);
 
-    return { firebase, firestore: Firestore.firestore };
+    return { firebase: defaultFirebase, firestore: defaultFirestore };
   };
 
   static tribe_from_id = async (game = null, id = null) => {
@@ -189,9 +202,7 @@ export default class Firestore {
         const team = teams[i];
         const player = players[i];
         const vote = voteFromIds[i];
-        // if (team.id !== from_team || !player.active) {
-        //   continue;
-        // }
+
         const value = player_counts[vote.to_id];
         if (isNaN(value)) {
           player_counts[vote.to_id] = 1;
@@ -203,9 +214,7 @@ export default class Firestore {
       const voteFromIds = [];
       (await query.get()).forEach((vote) => {
         const data = vote.data();
-        // if (!data.is_for_win) {
-        //   continue;
-        // }
+
         const value = player_counts[data.to_id];
         if (isNaN(value)) {
           player_counts[data.to_id] = 1;
@@ -217,37 +226,173 @@ export default class Firestore {
 
     return player_counts;
   };
+
+  static get_game_info = async ({ game = null }) => {
+    if (!game) return false;
+    const response = (
+      await this.firestore.collection(`games`).doc(`${game}`).get()
+    ).data();
+    return response;
+  };
+
+  static add_game = async ({ game = null, hashtag = null, testId = null }) => {
+    if (!game) return false;
+    if (!hashtag) return false;
+
+    const response = await this.firestore.collection(`games`).add({
+      game,
+      hashtag,
+      count_players: 0,
+      count_teams: 0,
+      count_tribes: 0,
+    });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_challenge = async ({
+    game = null,
+    name = null,
+    message = null,
+    testId = null,
+  }) => {
+    if (!game) return false;
+    if (!name) return false;
+    if (!message) return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`challenges`)
+      .add({
+        name,
+        message,
+        start_timestamp: Date.now(),
+        end_timestamp: Date.now() + 10080000,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_submission_entry = async ({
+    game = null,
+    likes = null,
+    views = null,
+    player_id = null,
+    team_id = null,
+    tribe_id = null,
+    challenge_id = null,
+    url = null,
+    testId = null,
+  }) => {
+    if (
+      (!game || !likes || !views || !player_id,
+      !team_id,
+      !tribe_id || !challenge_id || !url)
+    )
+      return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`entries`)
+      .add({
+        likes,
+        views,
+        player_id,
+        team_id,
+        tribe_id,
+        challenge_id,
+        url,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  static add_player = async ({
+    game = null,
+    tiktok = null,
+    email = null,
+    tribe_id = null,
+    team_id = null,
+    active = null,
+    testId = null,
+  }) => {
+    if ((!game || !tiktok || !email || !tribe_id, !team_id, !active))
+      return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`players`)
+      .add({
+        tiktok,
+        email,
+        tribe_id,
+        team_id,
+        active,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
+
+  // id, from_id, to_id, team_id, is_for_win
+  static add_vote = async ({
+    game = null,
+    from_id = null,
+    to_id = null,
+    team_id = null,
+    is_for_win = null,
+    testId = null,
+  }) => {
+    if (!game || !from_id || !to_id || !team_id || !is_for_win) return false;
+
+    const response = await this.firestore
+      .collection(`games`)
+      .doc(`${game}`)
+      .collection(`votes`)
+      .add({
+        from_id,
+        to_id,
+        team_id,
+        is_for_win,
+      });
+
+    const map = {
+      id: testId ? testId : response.id,
+      ...(await response.get()).data(),
+    };
+
+    await response.set(map);
+
+    return (await response.get()).data();
+  };
 }
-
-/*
-
-def count_votes(self, from_team: Team = None, is_for_win: bool = False) -> Dict[Text, int]:
-    player_counts = {}
-
-    query = self._client.collection(
-        'games/{}/votes'.format(self._game_id))
-    if from_team:
-        query = query.where('team_id', '==', from_team.id)
-
-        for vote in FirestoreVoteStream(query.stream()):
-            voter = self.player_from_id(vote.from_id)
-            team = self.team_from_id(voter.team_id)
-            if team.id != from_team.id or not voter.active:
-                continue
-
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
-    else:
-        for vote in FirestoreVoteStream(query.stream()):
-            if not vote.is_for_win:
-                continue
-
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
-
-    return player_counts
-*/

@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./count_votes.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./get_game_info.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -447,10 +447,10 @@ _defineProperty(Firestore, "add_vote", async ({
 
 /***/ }),
 
-/***/ "./count_votes.js":
-/*!************************!*\
-  !*** ./count_votes.js ***!
-  \************************/
+/***/ "./get_game_info.js":
+/*!**************************!*\
+  !*** ./get_game_info.js ***!
+  \**************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -462,12 +462,9 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.from_tribe || !body.is_for_win) throw new Error("problem with data in body");
-    _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].count_votes({
-      game: body.game,
-      from_tribe: body.from_tribe,
-      is_for_win: body.is_for_win
+    if (!body.game) throw new Error("problem with data in body");
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().get_game_info({
+      game: body.game
     });
     callback(null, {
       statusCode: 200,

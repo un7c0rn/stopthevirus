@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./count_votes.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./add_vote.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -101,7 +101,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_1__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 
 
 dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
@@ -447,10 +446,10 @@ _defineProperty(Firestore, "add_vote", async ({
 
 /***/ }),
 
-/***/ "./count_votes.js":
-/*!************************!*\
-  !*** ./count_votes.js ***!
-  \************************/
+/***/ "./add_vote.js":
+/*!*********************!*\
+  !*** ./add_vote.js ***!
+  \*********************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -462,11 +461,13 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.from_tribe || !body.is_for_win) throw new Error("problem with data in body");
+    if (!body.game || !body.from_id || !body.to_id || !body.team_id || !body.is_for_win) throw new Error("problem with data in body");
     _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].count_votes({
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_vote({
       game: body.game,
-      from_tribe: body.from_tribe,
+      from_id: body.from_id,
+      to_id: body.to_id,
+      team_id: body.team_id,
       is_for_win: body.is_for_win
     });
     callback(null, {

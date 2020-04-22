@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./count_votes.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./add_challenge.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -103,13 +103,10 @@ __webpack_require__.r(__webpack_exports__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
-
 dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
 class Firestore {}
 
 _defineProperty(Firestore, "firebase", void 0);
-
-_defineProperty(Firestore, "firestore", void 0);
 
 _defineProperty(Firestore, "getInstance", () => {
   if (firebase_admin__WEBPACK_IMPORTED_MODULE_1__["apps"].length < 1) {
@@ -125,6 +122,8 @@ _defineProperty(Firestore, "getInstance", () => {
   Firestore.firestore = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["app"]("VIR-US").firestore();
   return Firestore;
 });
+  
+_defineProperty(Firestore, "firestore", void 0);
 
 _defineProperty(Firestore, "initialise", () => {
   // Web app's Firebase configuration
@@ -139,6 +138,7 @@ _defineProperty(Firestore, "initialise", () => {
     token_uri: process.env.REACT_APP_token_uri,
     auth_provider_x509_cert_url: process.env.REACT_APP_auth_provider_x509_cert_url,
     client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url
+
   };
   const app = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["initializeApp"]({
     credential: firebase_admin__WEBPACK_IMPORTED_MODULE_1__["credential"].cert(credentials),
@@ -444,13 +444,12 @@ _defineProperty(Firestore, "add_vote", async ({
   await response.set(map);
   return (await response.get()).data();
 });
-
 /***/ }),
 
-/***/ "./count_votes.js":
-/*!************************!*\
-  !*** ./count_votes.js ***!
-  \************************/
+/***/ "./add_challenge.js":
+/*!**************************!*\
+  !*** ./add_challenge.js ***!
+  \**************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -462,12 +461,12 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.from_tribe || !body.is_for_win) throw new Error("problem with data in body");
+    if (!body.game || !body.name || !body.message) throw new Error("problem with data in body");
     _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].count_votes({
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_challenge({
       game: body.game,
-      from_tribe: body.from_tribe,
-      is_for_win: body.is_for_win
+      name: body.name,
+      message: body.message
     });
     callback(null, {
       statusCode: 200,

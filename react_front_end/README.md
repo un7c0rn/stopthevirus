@@ -143,6 +143,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 # Pages / features built
 
 # Start game page
+
 This is the page for route **http://localhost:8888/start-game** used for starting
 a new game.
 
@@ -189,3 +190,161 @@ Current work around is run the function. And then to **open the lambda function*
 1. `yarn && netlify dev`
 2. `yarn test`
 3. `netlify functions:invoke count_votes --payload '{"game":"7rPwCJaiSkxYgDocGDw4", "from_tribe":"Q09FeEtoIgjNI57Bnl1E", "is_for_win":"false"}' --no-identity`
+
+## Firebase API **get_game_info**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `get_game_info.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke get_game_info --payload '{"game":"0GiiOrglZoBvfilgulzs"}' --no-identity`
+
+## Firebase API **add_game**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_game.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_game --payload '{"game":"A NEW GAME", "hashtag":"#ANEWGAME"}' --no-identity`
+
+## Firebase API **add_challenge**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_challenge.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_challenge --payload '{"game":"A NEW CHALLENGE", "name":"CHALLENGE NAME", "message":"A CHALLENGE MESSAGE"} ' --no-identity`
+
+## Firebase API **add_challenge**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_submission_entry.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_submission_entry --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "likes":"1000", "views":"2000", "player_id": "1234567890", "team_id":"Q09FeEtoIgjNI57Bnl1E", "tribe_id":"77TMV9omdLeW7ORvuheX", "challenge_id":"a1b2c3d4e5f6g7h8i9j10", "url":"https://vir-us.io"}' --no-identity`
+
+## Firebase API **add_player**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_player.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_player --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "tiktok":"@user1234", "email":"user@domain.com", "trib e_id":"77TMV9omdLeW7ORvuheX", "team_id":"Q09FeEtoIgjNI57Bnl1E", "active":"false"}' --no-identity`
+
+## Firebase API **add_vote**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_vote.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+=======
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke get_game_info --payload '{"game":"f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"}' --no-identity`
+
+## Firebase API **add_game**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_game.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_game --payload '{"game":"A NEW GAME", "hashtag":"#ANEWGAME"}' --no-identity`
+
+## Firebase API **add_challenge**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_challenge.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_challenge --payload '{"game":"A NEW CHALLENGE", "name":"CHALLENGE NAME", "message":"A CHALLENGE MESSAGE"} ' --no-identity`
+
+## Firebase API **add_challenge**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_submission_entry.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_submission_entry --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "likes":"1000", "views":"2000", "player_id": "1234567890", "team_id":"Q09FeEtoIgjNI57Bnl1E", "tribe_id":"77TMV9omdLeW7ORvuheX", "challenge_id":"a1b2c3d4e5f6g7h8i9j10", "url":"https://vir-us.io"}' --no-identity`
+
+## Firebase API **add_player**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_player.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_player --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "tiktok":"@user1234", "email":"user@domain.com", "trib e_id":"77TMV9omdLeW7ORvuheX", "team_id":"Q09FeEtoIgjNI57Bnl1E", "active":"false"}' --no-identity`
+
+## Firebase API **add_vote**
+
+All commands should be run in the **react front end** directory. Each in separate terminal windows.
+
+Please note: It appears that after running the Netlify function once. The function is cached/stored.
+
+And Firebase `initializeApp` doesn't like that and throws an error.
+
+Current work around is run the function. And then to **open the lambda function** `add_vote.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke add_vote --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "from_id":"a1b2c3CJaiSkxYgDocGDw4", "to_id":"a1b2c3CJaiS kxYgDocGDw4", "team_id":"Q09FeEtoIgjNI57Bnl1E", "is_for_win":"false"}' --no-identity`

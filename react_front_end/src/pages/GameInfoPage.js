@@ -3,10 +3,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
-import ChallengeInfo from "./components/ChallengeInfo";
-import ChallengeSubmit from "./components/ChallengeSubmit";
+import GameInfo from "./components/GameInfo";
+import GameInfoButtonOptions from "./components/GameInfoButtonOptions";
 
-const SubmitPage = () => {
+const GameInfoPage = () => {
   const useStyles = makeStyles((theme) => ({
     root: {
       background: theme.background,
@@ -26,12 +26,12 @@ const SubmitPage = () => {
       <section className={classes.root}>
         <ButtonAppBar />
         <AppTitle />
-        <ChallengeInfo />
-        <ChallengeSubmit />
+        <GameInfo />
+        <GameInfoButtonOptions />
         <Footer />
       </section>
     </>
   );
 };
 
-export default SubmitPage;
+export default GameInfoPage;

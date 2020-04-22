@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./count_votes.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./add_game.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -101,7 +101,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! firebase-admin */ "firebase-admin");
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_1__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 
 
 dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
@@ -342,6 +341,7 @@ _defineProperty(Firestore, "add_game", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
+  
   return (await response.get()).data();
 });
 
@@ -442,15 +442,16 @@ _defineProperty(Firestore, "add_vote", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
+
   return (await response.get()).data();
 });
 
 /***/ }),
 
-/***/ "./count_votes.js":
-/*!************************!*\
-  !*** ./count_votes.js ***!
-  \************************/
+/***/ "./add_game.js":
+/*!*********************!*\
+  !*** ./add_game.js ***!
+  \*********************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -462,12 +463,11 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.from_tribe || !body.is_for_win) throw new Error("problem with data in body");
+    if (!body.game || !body.hashtag) throw new Error("problem with data in body");
     _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].count_votes({
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_game({
       game: body.game,
-      from_tribe: body.from_tribe,
-      is_for_win: body.is_for_win
+      hashtag: body.hashtag
     });
     callback(null, {
       statusCode: 200,
