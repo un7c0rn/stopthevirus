@@ -1,11 +1,24 @@
-// Google FireStore implementation
 import dotenv from "dotenv";
-import firebase, { firestore as fb } from "firebase-admin";
+import * as admin from "firebase-admin";
 
 dotenv.config();
 
 export default class Firestore {
+  static firebase;
   static firestore;
+
+  static getInstance = () => {
+    if (admin.apps.length < 1) {
+      const { firebase, firestore } = this.initialise();
+      this.firebase = firebase;
+      this.firestore = firestore;
+    }
+
+    this.firebase = admin;
+    this.firestore = admin.app("VIR-US").firestore();
+
+    return this;
+  };
 
   static initialise = () => {
     // Web app's Firebase configuration
@@ -23,18 +36,18 @@ export default class Firestore {
       client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url,
     };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(
+    const app = admin.initializeApp(
       {
-        credential: firebase.credential.cert(credentials),
+        credential: admin.credential.cert(credentials),
         databaseURL: "https://stv-game-db-test.firebaseio.com",
       },
       "VIR-US"
     );
 
-    Firestore.firestore = fb(app);
+    const defaultFirebase = admin;
+    const defaultFirestore = admin.firestore(app);
 
-    return { firebase, firestore: Firestore.firestore };
+    return { firebase: defaultFirebase, firestore: defaultFirestore };
   };
 
   static tribe_from_id = async (game = null, id = null) => {
@@ -189,9 +202,7 @@ export default class Firestore {
         const team = teams[i];
         const player = players[i];
         const vote = voteFromIds[i];
-        // if (team.id !== from_team || !player.active) {
-        //   continue;
-        // }
+
         const value = player_counts[vote.to_id];
         if (isNaN(value)) {
           player_counts[vote.to_id] = 1;
@@ -203,9 +214,7 @@ export default class Firestore {
       const voteFromIds = [];
       (await query.get()).forEach((vote) => {
         const data = vote.data();
-        // if (!data.is_for_win) {
-        //   continue;
-        // }
+
         const value = player_counts[data.to_id];
         if (isNaN(value)) {
           player_counts[data.to_id] = 1;

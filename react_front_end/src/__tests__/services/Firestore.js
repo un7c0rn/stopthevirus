@@ -64,8 +64,15 @@ describe("Firestore service", () => {
     expect(firebase.SDK_VERSION).toBeDefined();
   });
 
-  it("should return an instance of the firestore client", async () => {
-    expect(firestore.settings.length).toBe(1);
+  it("should only create one instance of the firestore client", async () => {
+    expect(firebase.apps.length).toBe(1);
+  });
+
+  it("should return an instance of the service", async () => {
+    const { firebase, firestore } = Firestore.getInstance();
+
+    expect(firebase).toBeDefined();
+    expect(firestore).toBeDefined();
   });
 
   it("should return a tribe ID", async () => {
@@ -196,7 +203,7 @@ describe("Firestore service", () => {
     expect(response).toBe(false);
   });
 
-  it("should return undeind if the ID for a game is not found when requesting game information", async () => {
+  it("should return undefined if the ID for a game is not found when requesting game information", async () => {
     const obj = { game: ";lhsdfk3lrhkl3" };
     const response = await Firestore.get_game_info(obj);
     expect(response).toBe(undefined);
