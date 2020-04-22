@@ -254,7 +254,7 @@ export default class Firestore {
 
     await response.set(map);
 
-    return (await response.get()).data();
+    return response.id;
   };
 
   static add_challenge = async ({
@@ -359,12 +359,13 @@ export default class Firestore {
       ...(await response.get()).data(),
     };
 
-    await response.set(map);
+    const setResponse = await response.set(map);
 
-    return (await response.get()).data();
+    const data = await response.get().data();
+
+    return setResponse;
   };
 
-  // id, from_id, to_id, team_id, is_for_win
   static add_vote = async ({
     game = null,
     from_id = null,
