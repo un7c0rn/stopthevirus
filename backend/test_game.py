@@ -125,6 +125,9 @@ class MockDatabase(Database):
             return sorted([team for team in self._teams.values() if (team.active and team.tribe_id == from_tribe.id)],
                           key=lambda team: team.size, reverse=True)
 
+    def stream_players(self, active_player_predicate_value: bool = True) -> Iterable[Player]:
+        pass
+
     def count_players(self, from_tribe: Tribe = None, from_team: Team = None) -> int:
         count = 0
         for key in self._players:
@@ -192,6 +195,9 @@ class MockDatabase(Database):
         return [team for team in self._teams.values() if team.active == active_team_predicate_value]
 
     def player(self, name: Text) -> Player:
+        pass
+
+    def game_from_id(self, id: Text) -> Game:
         pass
 
     def player_from_id(self, id: Text) -> Player:

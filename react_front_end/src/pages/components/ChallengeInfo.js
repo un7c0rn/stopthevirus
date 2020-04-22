@@ -2,8 +2,9 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
+import { GameName } from "./GameName";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
@@ -13,13 +14,13 @@ const useStyles = makeStyles(theme => ({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      alignItems: "center"
-    }
+      alignItems: "center",
+    },
   },
   title: {
     margin: "1em 0",
-    fontSize: "1em"
-  }
+    fontSize: "1em",
+  },
 }));
 
 export default function ChallengeInfo() {
@@ -28,15 +29,7 @@ export default function ChallengeInfo() {
   return (
     <div className={classes.root}>
       <Paper square>
-        <Typography
-          variant="h3"
-          component="h4"
-          gutterBottom
-          className={classes.title}
-        >
-          <span style={{ fontWeight: "bold" }}>Game</span>: LA Moms Social
-          Survivor
-        </Typography>
+        <GameName />
         <Typography
           variant="h3"
           component="h4"

@@ -122,43 +122,11 @@ _TEST_DATA_JSON = """
 """
 
 
-def _export_collections(gamedb, collection_paths):
-    """Function for persisting test DB data."""
-
-    paths = collection_paths
-    collections = dict()
-    dict4json = dict()
-    doc_count = 0
-
-    for path in paths:
-        collections[path] = gamedb._client.collection(path).stream()
-        dict4json[path] = {}
-        for document in collections[path]:
-            docdict = document.to_dict()
-            dict4json[path][document.id] = docdict
-            doc_count += 1
-
-    print(json.dumps(dict4json))
-
 
 class FirestoreDBTest(unittest.TestCase):
 
     def setUp(self):
-        self._import_collections(_gamedb, _TEST_DATA_JSON)
-
-    def _import_collections(self, gamedb, collections_json):
-        """Function for restoring test DB data."""
-
-        batch = gamedb._client.batch()
-        collections_dict = json.loads(collections_json)
-        for path in collections_dict:
-            for document_id in collections_dict[path]:
-                document_ref = gamedb._client.document(
-                    "{}/{}".format(path, document_id))
-                properties_dict = collections_dict[path][document_id]
-                properties_dict['id'] = document_id
-                batch.set(document_ref, properties_dict, merge=True)
-        batch.commit()
+        _gamedb.import_collections(_TEST_DATA_JSON)
 
     def test_batch_update_tribe(self):
         sidama_tribe = _gamedb.tribe_from_id(_TEST_TRIBE_SIDAMA_ID)
@@ -177,7 +145,8 @@ class FirestoreDBTest(unittest.TestCase):
             from_tribe=tigraway_tribe), sidama_player_count + tigraway_player_count)
         self.assertEqual(_gamedb.count_teams(
             from_tribe=tigraway_tribe), sidama_team_count + tigraway_team_count)
-        self.assertListEqual([team.name for team in _gamedb.stream_teams(from_tribe=sidama_tribe)], [])
+        self.assertListEqual(
+            [team.name for team in _gamedb.stream_teams(from_tribe=sidama_tribe)], [])
         self.assertListEqual([team.name for team in _gamedb.stream_teams(from_tribe=tigraway_tribe)], [
             'BLUE', 'GREEN', 'RED', 'YELLOW'
         ])

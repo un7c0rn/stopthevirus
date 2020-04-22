@@ -7,15 +7,16 @@ import StartGamePrompt from "./components/StartGamePrompt";
 import StartGameInputs from "./components/StartGameInputs";
 
 export default function StartGamePage() {
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles((theme) => ({
     root: {
       background: theme.background,
       color: "white",
       height: "100vh",
+      width: "100vw",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "flex-start"
-    }
+      justifyContent: "flex-start",
+    },
   }));
 
   const classes = useStyles();

@@ -102,45 +102,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_1__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-// Google FireStore implementation
 
 
 dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
 class Firestore {}
-/*
 
-def count_votes(self, from_team: Team = None, is_for_win: bool = False) -> Dict[Text, int]:
-    player_counts = {}
-
-    query = self._client.collection(
-        'games/{}/votes'.format(self._game_id))
-    if from_team:
-        query = query.where('team_id', '==', from_team.id)
-
-        for vote in FirestoreVoteStream(query.stream()):
-            voter = self.player_from_id(vote.from_id)
-            team = self.team_from_id(voter.team_id)
-            if team.id != from_team.id or not voter.active:
-                continue
-
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
-    else:
-        for vote in FirestoreVoteStream(query.stream()):
-            if not vote.is_for_win:
-                continue
-
-            if vote.to_id not in player_counts:
-                player_counts[vote.to_id] = 1
-            else:
-                player_counts[vote.to_id] = player_counts[vote.to_id] + 1
-
-    return player_counts
-*/
+_defineProperty(Firestore, "firebase", void 0);
 
 _defineProperty(Firestore, "firestore", void 0);
+
+_defineProperty(Firestore, "getInstance", () => {
+  if (firebase_admin__WEBPACK_IMPORTED_MODULE_1__["apps"].length < 1) {
+    const {
+      firebase,
+      firestore
+    } = Firestore.initialise();
+    Firestore.firebase = firebase;
+    Firestore.firestore = firestore;
+  }
+
+  Firestore.firebase = firebase_admin__WEBPACK_IMPORTED_MODULE_1__;
+  Firestore.firestore = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["app"]("VIR-US").firestore();
+  return Firestore;
+});
 
 _defineProperty(Firestore, "initialise", () => {
   // Web app's Firebase configuration
@@ -155,16 +139,16 @@ _defineProperty(Firestore, "initialise", () => {
     token_uri: process.env.REACT_APP_token_uri,
     auth_provider_x509_cert_url: process.env.REACT_APP_auth_provider_x509_cert_url,
     client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url
-  }; // Initialize Firebase
-
-  const app = firebase_admin__WEBPACK_IMPORTED_MODULE_1___default.a.initializeApp({
-    credential: firebase_admin__WEBPACK_IMPORTED_MODULE_1___default.a.credential.cert(credentials),
+  };
+  const app = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["initializeApp"]({
+    credential: firebase_admin__WEBPACK_IMPORTED_MODULE_1__["credential"].cert(credentials),
     databaseURL: "https://stv-game-db-test.firebaseio.com"
   }, "VIR-US");
-  Firestore.firestore = Object(firebase_admin__WEBPACK_IMPORTED_MODULE_1__["firestore"])(app);
+  const defaultFirebase = firebase_admin__WEBPACK_IMPORTED_MODULE_1__;
+  const defaultFirestore = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["firestore"](app);
   return {
-    firebase: (firebase_admin__WEBPACK_IMPORTED_MODULE_1___default()),
-    firestore: Firestore.firestore
+    firebase: defaultFirebase,
+    firestore: defaultFirestore
   };
 });
 
@@ -305,10 +289,7 @@ _defineProperty(Firestore, "count_votes", async ({
     for (let i = 0; i < teams.length; i++) {
       const team = teams[i];
       const player = players[i];
-      const vote = voteFromIds[i]; // if (team.id !== from_team || !player.active) {
-      //   continue;
-      // }
-
+      const vote = voteFromIds[i];
       const value = player_counts[vote.to_id];
 
       if (isNaN(value)) {
@@ -320,10 +301,7 @@ _defineProperty(Firestore, "count_votes", async ({
   } else {
     const voteFromIds = [];
     (await query.get()).forEach(vote => {
-      const data = vote.data(); // if (!data.is_for_win) {
-      //   continue;
-      // }
-
+      const data = vote.data();
       const value = player_counts[data.to_id];
 
       if (isNaN(value)) {
@@ -335,6 +313,136 @@ _defineProperty(Firestore, "count_votes", async ({
   }
 
   return player_counts;
+});
+
+_defineProperty(Firestore, "get_game_info", async ({
+  game = null
+}) => {
+  if (!game) return false;
+  const response = (await Firestore.firestore.collection(`games`).doc(`${game}`).get()).data();
+  return response;
+});
+
+_defineProperty(Firestore, "add_game", async ({
+  game = null,
+  hashtag = null,
+  testId = null
+}) => {
+  if (!game) return false;
+  if (!hashtag) return false;
+  const response = await Firestore.firestore.collection(`games`).add({
+    game,
+    hashtag,
+    count_players: 0,
+    count_teams: 0,
+    count_tribes: 0
+  });
+  const map = {
+    id: testId ? testId : response.id,
+    ...(await response.get()).data()
+  };
+  await response.set(map);
+  return (await response.get()).data();
+});
+
+_defineProperty(Firestore, "add_challenge", async ({
+  game = null,
+  name = null,
+  message = null,
+  testId = null
+}) => {
+  if (!game) return false;
+  if (!name) return false;
+  if (!message) return false;
+  const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`challenges`).add({
+    name,
+    message,
+    start_timestamp: Date.now(),
+    end_timestamp: Date.now() + 10080000
+  });
+  const map = {
+    id: testId ? testId : response.id,
+    ...(await response.get()).data()
+  };
+  await response.set(map);
+  return (await response.get()).data();
+});
+
+_defineProperty(Firestore, "add_submission_entry", async ({
+  game = null,
+  likes = null,
+  views = null,
+  player_id = null,
+  team_id = null,
+  tribe_id = null,
+  challenge_id = null,
+  url = null,
+  testId = null
+}) => {
+  if (!game || !likes || !views || !player_id, !team_id, !tribe_id || !challenge_id || !url) return false;
+  const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`entries`).add({
+    likes,
+    views,
+    player_id,
+    team_id,
+    tribe_id,
+    challenge_id,
+    url
+  });
+  const map = {
+    id: testId ? testId : response.id,
+    ...(await response.get()).data()
+  };
+  await response.set(map);
+  return (await response.get()).data();
+});
+
+_defineProperty(Firestore, "add_player", async ({
+  game = null,
+  tiktok = null,
+  email = null,
+  tribe_id = null,
+  team_id = null,
+  active = null,
+  testId = null
+}) => {
+  if (!game || !tiktok || !email || !tribe_id, !team_id, !active) return false;
+  const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`players`).add({
+    tiktok,
+    email,
+    tribe_id,
+    team_id,
+    active
+  });
+  const map = {
+    id: testId ? testId : response.id,
+    ...(await response.get()).data()
+  };
+  await response.set(map);
+  return (await response.get()).data();
+});
+
+_defineProperty(Firestore, "add_vote", async ({
+  game = null,
+  from_id = null,
+  to_id = null,
+  team_id = null,
+  is_for_win = null,
+  testId = null
+}) => {
+  if (!game || !from_id || !to_id || !team_id || !is_for_win) return false;
+  const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`votes`).add({
+    from_id,
+    to_id,
+    team_id,
+    is_for_win
+  });
+  const map = {
+    id: testId ? testId : response.id,
+    ...(await response.get()).data()
+  };
+  await response.set(map);
+  return (await response.get()).data();
 });
 
 /***/ }),
