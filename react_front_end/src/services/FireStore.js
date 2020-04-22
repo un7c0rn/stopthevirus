@@ -359,11 +359,11 @@ export default class Firestore {
       ...(await response.get()).data(),
     };
 
-    const setResponse = await response.set(map);
+    await response.set(map);
 
-    const data = await response.get().data();
+    const data = (await response.get()).data();
 
-    return setResponse;
+    return data;
   };
 
   static add_vote = async ({
