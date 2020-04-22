@@ -6,9 +6,7 @@ exports.handler = async (event, context, callback) => {
     if (!body.game || !body.hashtag)
       throw new Error("problem with data in body");
 
-    Firestore.initialise();
-
-    const response = await Firestore.add_game({
+    const response = await Firestore.getInstance().add_game({
       game: body.game,
       hashtag: body.hashtag,
     });

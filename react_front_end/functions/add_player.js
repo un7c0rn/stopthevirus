@@ -13,9 +13,7 @@ exports.handler = async (event, context, callback) => {
     )
       throw new Error("problem with data in body");
 
-    Firestore.initialise();
-
-    const response = await Firestore.add_player({
+    const response = Firestore.getInstance().add_player({
       game: body.game,
       tiktok: body.tiktok,
       email: body.email,
