@@ -203,7 +203,7 @@ Current work around is run the function. And then to **open the lambda function*
 
 1. `yarn && netlify dev`
 2. `yarn test`
-3. `netlify functions:invoke get_game_info --payload '{"game":"f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"}' --no-identity`
+3. `netlify functions:invoke get_game_info --payload '{"game":"0GiiOrglZoBvfilgulzs"}' --no-identity`
 
 ## Firebase API **add_game**
 
