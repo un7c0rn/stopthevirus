@@ -7,15 +7,16 @@ import ChallengeInfo from "./components/ChallengeInfo";
 import ChallengeSubmit from "./components/ChallengeSubmit";
 
 const SubmitPage = () => {
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles((theme) => ({
     root: {
       background: theme.background,
       color: "white",
       height: "100vh",
+      width: "100vw",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "flex-start"
-    }
+      justifyContent: "flex-start",
+    },
   }));
 
   const classes = useStyles();

@@ -13,13 +13,13 @@ const useStyles = makeStyles(theme => ({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      alignItems: "center"
-    }
+      alignItems: "center",
+    },
   },
   title: {
     margin: "1em 0",
-    fontSize: "1em"
-  }
+    fontSize: "1em",
+  },
 }));
 
 export default function ChallengeInfo() {
