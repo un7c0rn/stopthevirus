@@ -28,7 +28,7 @@ export const GameName = () => {
       gutterBottom
       className={classes.title}
     >
-      <p>
+      <p data-testid="Game Name">
         <span style={{ fontWeight: "bold" }}>Game</span>: {`${gameInfo.name}`}
       </p>
     </Typography>

@@ -24,7 +24,18 @@ describe("GameInfoPage", () => {
         render(<AppContext.Provider value={{ gameInfo, setGameInfo }}>
           <GameInfoPage />
         </AppContext.Provider>);
-        expect(screen.getByText("Game")).toBeTruthy();
+        expect(screen.getByTestId("Game Name")).toBeTruthy();
+      });
+
+      it ("should display the game name", async () => {
+        const testName = "My Test";
+        const gameInfo = {name: testName};
+        const setGameInfo = () => {};
+        render(<AppContext.Provider value={{ gameInfo, setGameInfo }}>
+          <GameInfoPage />
+        </AppContext.Provider>);
+        let el = screen.getByTestId("Game Name");
+        expect(el).toHaveTextContent(testName);
       });
     });
   });
