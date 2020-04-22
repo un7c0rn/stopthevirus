@@ -102,6 +102,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var firebase_admin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(firebase_admin__WEBPACK_IMPORTED_MODULE_1__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+
+
 dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
 class Firestore {}
 
@@ -442,6 +444,7 @@ _defineProperty(Firestore, "add_vote", async ({
   await response.set(map);
   return (await response.get()).data();
 });
+
 /***/ }),
 
 /***/ "./add_submission_entry.js":
