@@ -147,13 +147,18 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 This is the page for route **http://localhost:8888/start-game/a1b2c3d4e5f6g7h8** used for starting
 a new game.
 
-#Join game page
+# Join game page
+
 This is the page for route **http://localhost:8888/join-game** used for joining
 an existing game.
 
 ## Challenge submission page
 
 After running `netlify dev` in the **react_front_end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
+
+# Game info page
+
+This is the page for route **http://localhost:8888/game-info/0JnfIU9ke5gWO3TxXTt5** displays information about a game.
 
 ---
 
