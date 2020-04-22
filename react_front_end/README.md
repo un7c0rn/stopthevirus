@@ -155,13 +155,25 @@ an existing game.
 
 After running `netlify dev` in the **react_front_end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
 
+---
+
 ## TicTok metric parser
 
 All commands should be run in the **react_front_end** directory. Each in separate terminal windows.
 
 1. `yarn && netlify dev`
 2. `yarn test`
-3. `netlify functions:invoke tiktok --no-identity --querystring "url=https://www.tiktok.com/@jadethirlwall/video/6813412701310635269"`
+3. `netlify functions:invoke tiktok_video --no-identity --querystring "url=https://www.tiktok.com/@jadethirlwall/video/6813412701310635269"`
+
+## TicTok profile
+
+All commands should be run in the **react_front_end** directory. Each in separate terminal windows.
+
+1. `yarn && netlify dev`
+2. `yarn test`
+3. `netlify functions:invoke tiktok_profile --no-identity --querystring "handle=who"`
+
+---
 
 ## Firebase API **batch-update-tribe**
 
@@ -272,12 +284,11 @@ And Firebase `initializeApp` doesn't like that and throws an error.
 Current work around is run the function. And then to **open the lambda function** `add_vote.js` **and save the file** before running the Netlify `functions:invoke` command again. So that the function is reloaded.
 
 1. `yarn && netlify dev`
-2. `yarn test`
-=======
+2. # `yarn test`
 
-1. `yarn && netlify dev`
-2. `yarn test`
-3. `netlify functions:invoke get_game_info --payload '{"game":"f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"}' --no-identity`
+3. `yarn && netlify dev`
+4. `yarn test`
+5. `netlify functions:invoke get_game_info --payload '{"game":"f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"}' --no-identity`
 
 ## Firebase API **add_game**
 
