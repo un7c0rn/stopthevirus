@@ -1,14 +1,14 @@
+import { CircularProgress } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
-import React, { useEffect, useContext } from "react";
+import fetch from "node-fetch";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { AppContext } from "../../App";
 import { GameName } from "./GameName";
 import { NextChallenge } from "./NextChallenge";
 import { NextTribalCouncil } from "./NextTribalCouncil";
 import { NumberOfPlayers } from "./NumberOfPlayers";
-import { useParams } from "react-router-dom";
-import fetch from "node-fetch";
-import { AppContext } from "../../App";
-import { CircularProgress } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,19 +48,32 @@ export default function GameInfo() {
       (async () => {
         const response = await fetch(`/.netlify/functions/get_game_info`, {
           method: "POST",
-          body: JSON.stringify({ game: gameId }),
+          body: JSON.stringify({
+            game: gameId,
+          }),
         });
         const json = await response.json();
-        console.log("API", json);
         setGameInfo(json);
       })();
     }
   }, []);
 
+  // Refactor into a group of custom errors
+  const problemWithUi = () => {
+    throw new Error("error with game info request");
+  };
+
+  useEffect(() => {
+    if (gameInfo === undefined) {
+      problemWithUi();
+    }
+  }, [gameInfo]);
+
   return (
     <div className={classes.root}>
       <Paper square>
-        {gameInfo ? (
+        {gameInfo === undefined ? problemWithUi() : null}
+        {gameInfo?.game ? (
           <>
             <GameName />
             <NumberOfPlayers />
