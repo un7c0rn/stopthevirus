@@ -23,7 +23,8 @@ const GameInfoPage = () => {
 
   return (
     <>
-      <section className={classes.root}>
+      <section className={classes.root}
+      data-testid="Game Info Page">
         <ButtonAppBar />
         <AppTitle />
         <GameInfo />

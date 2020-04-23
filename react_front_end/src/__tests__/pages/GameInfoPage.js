@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import React from "react";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import GameInfoPage from "../../pages/GameInfoPage";
 import {AppContext} from "../../App";
 import "@testing-library/jest-dom";
@@ -13,7 +13,17 @@ describe("GameInfoPage", () => {
     render(<AppContext.Provider value={{ gameInfo, setGameInfo }}>
       <GameInfoPage />
     </AppContext.Provider>);
+    //will throw errors if the component fails to initialize
     expect(true).toBe(true);
+  });
+
+  it("should exist", async () => {
+    const gameInfo = {};
+    const setGameInfo = () => {};
+    render(<AppContext.Provider value={{ gameInfo, setGameInfo }}>
+      <GameInfoPage />
+    </AppContext.Provider>);
+    expect(screen.getByTestId("Game Info Page")).toBeTruthy();
   });
 
   describe("GameInfo component", () => {
