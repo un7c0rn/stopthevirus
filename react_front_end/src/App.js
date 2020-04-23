@@ -54,14 +54,14 @@ function App() {
         <ThemeProvider theme={theme}>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/start-game" element={<StartGamePage />} />
+              <Route path="/start-game/:gameId" element={<StartGamePage />} />
               <Route path="/join-game" element={<JoinGamePage />} />
               <Route path="/game-info/:gameId" element={<GameInfoPage />} />
               <Route
                 path="/challenge-submission/:phone/:game"
                 element={<SubmitPage />}
               />
+              <Route path="/*" element={<LandingPage />} />
             </Routes>
           </BrowserRouter>
         </ThemeProvider>
