@@ -58,6 +58,8 @@ function App() {
                 path="/challenge-submission/:phone/:game"
                 element={<SubmitPage />}
               />
+              {/* David, I've purposely left it like this so you can see the preloader */}
+              <Route path="/" element={<Preloader />} />
               <Route path="/" element={<LandingPage />} />
             </Routes>
           </BrowserRouter>
