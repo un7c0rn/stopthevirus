@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Button } from "./components/Button";
 import { withStyles } from "@material-ui/core";
-import "./LandingPage.scss";
 // put your custom styles in here
 const styles = (theme) => ({});
 
