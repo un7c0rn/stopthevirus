@@ -19,6 +19,8 @@ const useStyles = makeStyles((theme) => ({
 export const GameName = () => {
   const classes = useStyles();
 
+  const { gameInfo } = useContext(AppContext);
+
   return (
     <Typography
       variant="h3"
