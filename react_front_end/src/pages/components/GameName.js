@@ -19,8 +19,6 @@ const useStyles = makeStyles((theme) => ({
 export const GameName = () => {
   const classes = useStyles();
 
-  const { gameInfo } = useContext(AppContext);
-
   return (
     <Typography
       variant="h3"
@@ -29,7 +27,7 @@ export const GameName = () => {
       className={classes.title}
     >
       <p data-testid="Game Name">
-        <span style={{ fontWeight: "bold" }}>Game</span>: {`${gameInfo.name}`}
+        <span style={{ fontWeight: "bold" }}>Game</span>: {`${gameInfo.game}`}
       </p>
     </Typography>
   );
