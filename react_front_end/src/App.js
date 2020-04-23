@@ -1,9 +1,13 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+  withTheme,
+} from "@material-ui/core/styles";
 import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.scss";
-import { makeStyles } from "@material-ui/core/styles";
+import Preloader from "./pages/components/Preloader";
 
 const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -20,21 +24,13 @@ export const AppContext = createContext();
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    flexWrap: "wrap",
-    "& > *": {
-      width: "100vw",
-      height: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "flex-end",
-    },
-  },
-  preloader: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignSelf: "center",
+    alignItems: "center",
+    display: "flex",
+    flexWrap: "wrap",
+    width: "100vw",
+    height: "100vh",
   },
 }));
 
@@ -48,7 +44,7 @@ function App() {
       <Suspense
         fallback={
           <div className={classes.root}>
-            <CircularProgress className={classes.preloader} />
+            <Preloader />
           </div>
         }
       >
@@ -62,7 +58,7 @@ function App() {
                 path="/challenge-submission/:phone/:game"
                 element={<SubmitPage />}
               />
-              <Route path="/*" element={<LandingPage />} />
+              <Route path="/" element={<LandingPage />} />
             </Routes>
           </BrowserRouter>
         </ThemeProvider>
