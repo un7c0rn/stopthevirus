@@ -1,9 +1,14 @@
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from "@material-ui/core/styles";
 import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import useErrorBoundary from "use-error-boundary";
+import { CustomUiError } from "./utilities/Utilities";
 import "./App.scss";
-import { makeStyles } from "@material-ui/core/styles";
 
 const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -40,34 +45,48 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
+  const [gameInfo, setGameInfo] = useState(false);
 
-  const [gameInfo, setGameInfo] = useState();
+  const {
+    ErrorBoundary, // class - The react component to wrap your children in. This WILL NOT CHANGE
+    didCatch, // boolean - Whether the ErrorBoundary catched something
+    // error, // null or the error
+    // errorInfo, // null or the error info as described in the react docs
+  } = useErrorBoundary();
 
   return (
-    <AppContext.Provider value={{ gameInfo, setGameInfo }}>
-      <Suspense
-        fallback={
-          <div className={classes.root}>
-            <CircularProgress className={classes.preloader} />
-          </div>
-        }
-      >
-        <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/start-game/:gameId" element={<StartGamePage />} />
-              <Route path="/join-game" element={<JoinGamePage />} />
-              <Route path="/game-info/:gameId" element={<GameInfoPage />} />
-              <Route
-                path="/challenge-submission/:phone/:game"
-                element={<SubmitPage />}
-              />
-              <Route path="/*" element={<LandingPage />} />
-            </Routes>
-          </BrowserRouter>
-        </ThemeProvider>
-      </Suspense>
-    </AppContext.Provider>
+    <ErrorBoundary
+      render={() => (
+        <AppContext.Provider value={{ gameInfo, setGameInfo }}>
+          <Suspense
+            fallback={
+              <div className={classes.root}>
+                <CircularProgress className={classes.preloader} />
+              </div>
+            }
+          >
+            <ThemeProvider theme={theme}>
+              <BrowserRouter>
+                <Routes>
+                  <Route
+                    path="/start-game/:gameId"
+                    element={<StartGamePage />}
+                  />
+                  <Route path="/join-game" element={<JoinGamePage />} />
+                  <Route path="/game-info/:gameId" element={<GameInfoPage />} />
+                  <Route
+                    path="/challenge-submission/:phone/:game"
+                    element={<SubmitPage />}
+                  />
+                  <Route path="/*" element={<LandingPage />} />
+                </Routes>
+              </BrowserRouter>
+            </ThemeProvider>
+          </Suspense>
+        </AppContext.Provider>
+      )}
+      renderError={({ error }) => <CustomUiError error={error} type="app" />}
+    />
   );
 }
 export default App;

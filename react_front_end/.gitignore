@@ -12,6 +12,7 @@
 # production
 /build
 .env
+/lambda/**
 
 # misc
 .DS_Store
