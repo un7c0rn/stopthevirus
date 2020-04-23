@@ -24,7 +24,6 @@ export default function StartGamePage() {
   return (
     <>
       <section className={classes.root}>
-        <ButtonAppBar />
         <AppTitle />
         <StartGamePrompt />
         <StartGameInputs />

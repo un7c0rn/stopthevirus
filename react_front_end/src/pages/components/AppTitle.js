@@ -3,6 +3,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 
+const url = "../../../assets/vir-us_logotype_new.png";
+
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
@@ -13,7 +15,7 @@ const useStyles = makeStyles(theme => ({
       display: "flex",
       justifyContent: "center",
       alignItems: "center"
-    }
+    },
   },
   title: {
     margin: 0,
@@ -25,15 +27,18 @@ export default function AppTitle() {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root}
+    >
       <Paper square>
         <Typography
           variant="h1"
           component="h2"
           gutterBottom
           className={classes.title}
+          style ={ { backgroundImage: "url('../../assets/vir-us_logotype_new.png')" } }
+
+
         >
-          VIR-"US"
         </Typography>
       </Paper>
     </div>
