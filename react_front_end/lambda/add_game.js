@@ -342,7 +342,7 @@ _defineProperty(Firestore, "add_game", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
-  return (await response.get()).data();
+  return response.id;
 });
 
 _defineProperty(Firestore, "add_challenge", async ({
@@ -419,7 +419,8 @@ _defineProperty(Firestore, "add_player", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
-  return (await response.get()).data();
+  const data = (await response.get()).data();
+  return data;
 });
 
 _defineProperty(Firestore, "add_vote", async ({
@@ -463,8 +464,7 @@ exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
     if (!body.game || !body.hashtag) throw new Error("problem with data in body");
-    _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_game({
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().add_game({
       game: body.game,
       hashtag: body.hashtag
     });

@@ -342,7 +342,7 @@ _defineProperty(Firestore, "add_game", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
-  return (await response.get()).data();
+  return response.id;
 });
 
 _defineProperty(Firestore, "add_challenge", async ({
@@ -419,7 +419,8 @@ _defineProperty(Firestore, "add_player", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
-  return (await response.get()).data();
+  const data = (await response.get()).data();
+  return data;
 });
 
 _defineProperty(Firestore, "add_vote", async ({
