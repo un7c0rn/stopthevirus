@@ -2,16 +2,19 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-
-const url = "../../../assets/vir-us_logotype_new.png";
+import logo from "../../assets/vir-us_logotype_white.jpeg";
+import bg from "./vir-us_world_map.jpeg";
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
+    //background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+    backgroundColor:"#424242",
+    //backgroundImage:"url('./vir-us_world_map.jpeg')",
     flexWrap: "wrap",
     "& > *": {
       width: "100vw",
-      height: "15vh",
+      height: "20vh",
       display: "flex",
       justifyContent: "center",
       alignItems: "center"
@@ -29,18 +32,7 @@ export default function AppTitle() {
   return (
     <div className={classes.root}
     >
-      <Paper square>
-        <Typography
-          variant="h1"
-          component="h2"
-          gutterBottom
-          className={classes.title}
-          style ={ { backgroundImage: "url('../../assets/vir-us_logotype_new.png')" } }
-
-
-        >
-        </Typography>
-      </Paper>
+    <img src={logo}/>
     </div>
   );
 }
