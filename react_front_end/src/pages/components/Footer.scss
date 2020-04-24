@@ -1,0 +1,32 @@
+.footer {
+  background-color: transparent;
+
+  &:before {
+    content: "";
+    position: absolute;
+    width: 100vw;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgb(97, 214, 219),
+      rgb(153, 221, 122),
+      rgb(218, 133, 72),
+      rgb(214, 48, 90)
+    );
+    bottom: 15vh;
+    left: 0;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    a {
+      margin: 0.256em 0;
+      color: black;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}
