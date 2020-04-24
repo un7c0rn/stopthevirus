@@ -1,0 +1,8 @@
+@keyframes ui-component-blur-up {
+  0% {
+    filter: blur(0.2rem);
+  }
+  100% {
+    filter: blur(0);
+  }
+}

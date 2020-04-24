@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!-- Generator: Gravit.io --><svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  style="isolation: isolate;"
+  viewBox="16.101 92.248 380.258 38.078"
+  width="380.258pt"
+  height="38.078pt"
+>
+  <defs>
+    <clipPath id="_clipPath_qvdHn2SbzPTQXNHYAH6G2OojpdPkX4vf">
+      <rect x="16.101" y="92.248" width="380.258" height="38.078" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#_clipPath_qvdHn2SbzPTQXNHYAH6G2OojpdPkX4vf)">
+    <linearGradient
+      id="_lgradient_1"
+      x1="0.0000014792588189926903"
+      y1="0.5000028730500548"
+      x2="1.000000986172546"
+      y2="0.5000028730500548"
+      gradientTransform="matrix(380.258,0,0,38.078,16.101,92.248)"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop
+        offset="0%"
+        stop-opacity="1"
+        style="stop-color: rgb(0, 217, 222);"
+      />
+      <stop
+        offset="10%"
+        stop-opacity="1"
+        style="stop-color: rgb(89, 222, 145);"
+      />
+      <stop
+        offset="20%"
+        stop-opacity="1"
+        style="stop-color: rgb(190, 227, 56);"
+      />
+      <stop
+        offset="30.000000000000004%"
+        stop-opacity="1"
+        style="stop-color: rgb(250, 217, 7);"
+      />
+      <stop
+        offset="40%"
+        stop-opacity="1"
+        style="stop-color: rgb(236, 180, 27);"
+      />
+      <stop
+        offset="50%"
+        stop-opacity="1"
+        style="stop-color: rgb(223, 142, 46);"
+      />
+      <stop
+        offset="60%"
+        stop-opacity="1"
+        style="stop-color: rgb(237, 117, 62);"
+      />
+      <stop
+        offset="70%"
+        stop-opacity="1"
+        style="stop-color: rgb(250, 91, 77);"
+      />
+      <stop
+        offset="80%"
+        stop-opacity="1"
+        style="stop-color: rgb(249, 62, 84);"
+      />
+      <stop
+        offset="89.99999999999999%"
+        stop-opacity="1"
+        style="stop-color: rgb(239, 31, 87);"
+      />
+      <stop
+        offset="99.99999999999999%"
+        stop-opacity="1"
+        style="stop-color: rgb(230, 0, 89);"
+      />
+    </linearGradient>
+    <path
+      d=" M 16.101 130.326 L 396.359 130.326 L 396.359 92.248 L 16.101 92.248 L 16.101 130.326 Z "
+      fill="url(#_lgradient_1)"
+    />
+  </g>
+</svg>

@@ -2,6 +2,10 @@
 @include normalize();
 
 /* rest of app styles */
+html {
+  background: #d7d7d7;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

@@ -1,0 +1,33 @@
+.header {
+  color: white;
+  height: 50vh;
+  width: calc(100vw - 4em);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 2em;
+
+  background-color: #d7d7d7;
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 30px;
+    background: linear-gradient(315deg, #ffffff, #d7d7d7);
+    box-shadow: -10px -10px 15px #cbcbcb, 10px 10px 25px #ffffff;
+
+    padding: 2em 2em;
+
+    z-index: 0;
+  }
+
+  .logo {
+    animation-name: ui-component-blur-up;
+    animation-fill-mode: forwards;
+    animation-duration: 1s;
+    animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  }
+}

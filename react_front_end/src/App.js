@@ -1,4 +1,3 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   createMuiTheme,
   makeStyles,
@@ -7,8 +6,9 @@ import {
 import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
-import { CustomUiError } from "./utilities/Utilities";
 import "./App.scss";
+import Preloader from "./pages/components/Preloader";
+import { CustomUiError } from "./utilities/Utilities";
 
 const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -25,21 +25,13 @@ export const AppContext = createContext();
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    flexWrap: "wrap",
-    "& > *": {
-      width: "100vw",
-      height: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "flex-end",
-    },
-  },
-  preloader: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignSelf: "center",
+    alignItems: "center",
+    display: "flex",
+    flexWrap: "wrap",
+    width: "100vw",
+    height: "100vh",
   },
 }));
 
@@ -57,14 +49,13 @@ function App() {
   return (
     <ErrorBoundary
       render={() => (
-        <AppContext.Provider value={{ gameInfo, setGameInfo }}>
-          <Suspense
-            fallback={
-              <div className={classes.root}>
-                <CircularProgress className={classes.preloader} />
-              </div>
-            }
-          >
+        <AppContext.Provider
+          value={{
+            gameInfo,
+            setGameInfo,
+          }}
+        >
+          <Suspense fallback={<Preloader />}>
             <ThemeProvider theme={theme}>
               <BrowserRouter>
                 <Routes>
