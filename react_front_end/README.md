@@ -142,6 +142,10 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 # Pages / features built
 
+# Landing page
+
+This is the page for route **http://localhost:8888/** used as a visitor landing page.
+
 # Start game page
 
 This is the page for route **http://localhost:8888/start-game/a1b2c3d4e5f6g7h8** used for starting
