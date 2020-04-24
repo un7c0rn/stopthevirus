@@ -17,6 +17,11 @@ const theme = createMuiTheme({
     type: 'dark',
     background:"black"
   },
+  typography: {
+    fontFamily: [
+      'Helvetica Neue',
+    ].join(','),
+  }
 });
 
 export const AppContext = createContext();
