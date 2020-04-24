@@ -10,6 +10,13 @@
 
   background-color: #d7d7d7;
 
+  // default ui state
+  opacity: 0;
+  animation-name: ui-component-blur-up;
+  animation-fill-mode: forwards;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+
   .logo-container {
     display: flex;
     justify-content: center;
@@ -27,7 +34,9 @@
   .logo {
     animation-name: ui-component-blur-up;
     animation-fill-mode: forwards;
-    animation-duration: 1s;
+    animation-duration: 2s;
     animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    // default ui state
+    opacity: 0;
   }
 }

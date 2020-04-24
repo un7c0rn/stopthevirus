@@ -23,6 +23,7 @@
 
     // default ui state
     filter: blur(0.2rem);
+    opacity: 0;
 
     // ui transition
     animation-name: ui-component-blur-up;

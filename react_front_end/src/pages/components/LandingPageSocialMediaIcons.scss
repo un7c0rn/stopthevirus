@@ -29,6 +29,8 @@
       animation-duration: 1s;
       animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
       animation-delay: 0.5s;
+      // default ui state
+      opacity: 0;
     }
   }
 }
