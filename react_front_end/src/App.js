@@ -1,4 +1,3 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   createMuiTheme,
   makeStyles,
@@ -7,9 +6,9 @@ import {
 import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
-import { CustomUiError } from "./utilities/Utilities";
 import "./App.scss";
 import Preloader from "./pages/components/Preloader";
+import { CustomUiError } from "./utilities/Utilities";
 
 const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -50,14 +49,13 @@ function App() {
   return (
     <ErrorBoundary
       render={() => (
-        <AppContext.Provider value={{ gameInfo, setGameInfo }}>
-          <Suspense
-            fallback={
-              <div className={classes.root}>
-                <CircularProgress className={classes.preloader} />
-              </div>
-            }
-          >
+        <AppContext.Provider
+          value={{
+            gameInfo,
+            setGameInfo,
+          }}
+        >
+          <Suspense fallback={<Preloader />}>
             <ThemeProvider theme={theme}>
               <BrowserRouter>
                 <Routes>
@@ -71,8 +69,6 @@ function App() {
                     path="/challenge-submission/:phone/:game"
                     element={<SubmitPage />}
                   />
-                  {/* David, I've purposely left it like this so you can see the preloader */}
-                  <Route path="/" element={<Preloader />} />
                   <Route path="/*" element={<LandingPage />} />
                 </Routes>
               </BrowserRouter>
