@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     //background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-    backgroundColor:"#424242",
+  //  backgroundColor:"#424242",
     //backgroundImage:"url('./vir-us_world_map.jpeg')",
     flexWrap: "wrap",
     "& > *": {
