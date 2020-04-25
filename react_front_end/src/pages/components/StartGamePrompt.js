@@ -34,7 +34,7 @@ export default function StartGamePrompt() {
           gutterBottom
           className={classes.title}
         >
-          Can a high stakes social media game help inspire millions of Gen-Z and Millennial individuals to engage in social distancing and stop the spread of COVID-19?
+          Can a global high stakes social media game help inspire millions of Gen-Z and Millennial individuals to engage in social distancing and stop the spread of COVID-19?
 
         </Typography>
       </Paper>

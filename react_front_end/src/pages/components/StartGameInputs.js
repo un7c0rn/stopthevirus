@@ -75,16 +75,17 @@ export default function StartGameInputs() {
         <form className={classes.form} autoComplete="off">
           <TextField
             id="start-game-inputs-tiktok"
-            label="Tik Tok"
+            label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
+            inputProps={{ style: {textAlign: 'center'} }}
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
-            label="SMS Phone Number"
+            label="PHONE NUMBER"
             defaultCountry={"us"}
             disableAreaCodes={true}
             onChange={handleOnPhoneChange}
@@ -100,11 +101,17 @@ export default function StartGameInputs() {
             inputRef={gameNameRef}
             value={gameName}
           />
-          <Button variant="contained" onClick={submit}>
-            Start a game
+        </form>
+        <form className={classes.form} autoComplete="off">
+          <Button variant="contained" onClick={submit}
+          style={{backgroundColor:'white',
+        width:'100vw'}}>
+            START A GAME
           </Button>
         </form>
+
       </Paper>
+
     </div>
   );
 }
