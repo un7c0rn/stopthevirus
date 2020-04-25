@@ -8,6 +8,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    backgroundColor:"black",
     "& > *": {
       width: "100vw",//10 by 9 aspect ratio
       height: "10vh",

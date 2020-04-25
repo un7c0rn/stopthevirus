@@ -11,6 +11,7 @@ export default function StartGameInputs() {
   const sm = isSm();
   const useStyles = makeStyles((theme) => ({
     root: {
+      backgroundColor:"black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
