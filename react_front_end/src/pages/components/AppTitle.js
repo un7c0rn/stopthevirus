@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import logo from "../../assets/vir-us_logotype_white.jpeg";
-import bg from "./vir-us_world_map.jpeg";
 //aspect ratio 310/2744
 
 const useStyles = makeStyles(theme => ({
