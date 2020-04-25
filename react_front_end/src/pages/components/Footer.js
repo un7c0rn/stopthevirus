@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
     "& > *": {
       width: "100vw",
-      height: "10vh",
+      height: "20vh",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
@@ -26,15 +26,14 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column"
   },
-  text: { display: "flex", flexDirection: "column" }
+  text: {textAlign:"justify",
+  fontSize:"0.6rem" }
 }));
 
 export default function Footer() {
   const classes = useStyles();
 
-  const rules = e => {
-    console.log("rules");
-  };
+  const rules = "If the GLC, in its sole discretion, has authorized a Retailer to sell Tickets for On-Line Games at one or more of its Retailer Business Locations, in addition to all provisions, terms, and conditions of the Act, other Rules and Regulations, and the Retailer Contract, the On-Line Games Rules and Regulations herein shall apply to all On-Line Games. To the extent of any inconsistency with either the Retailer Contract or with the Retailer Rules and Regulations found in Chapter 2 of the GLC Policies and Procedures Manual, the On-Line Game Rules and Regulations shall govern the On-Line Games.";
 
   const preventDefault = event => event.preventDefault();
 
@@ -43,20 +42,10 @@ export default function Footer() {
       <Paper square>
         <section className={classes.links}>
           <Typography className={classes.text}>
-            <Link href="#" onClick={preventDefault}>
-              Terms of service
-            </Link>
-            <Link href="#" onClick={preventDefault}>
-              Privacy Policy
-            </Link>
-            <Link href="#" onClick={preventDefault}>
-              Social
-            </Link>
+             <b> Rules:</b>{rules}
+
           </Typography>
         </section>
-        <Button variant="contained" onClick={rules}>
-          rules
-        </Button>
       </Paper>
     </footer>
   );
