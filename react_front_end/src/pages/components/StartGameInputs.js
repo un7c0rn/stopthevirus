@@ -105,7 +105,9 @@ export default function StartGameInputs() {
         <form className={classes.form} autoComplete="off">
           <Button variant="contained" onClick={submit}
           style={{backgroundColor:'white',
-        width:'100vw'}}>
+                width:'100vw',
+                fontWeight: 'bold',
+            }}>
             START A GAME
           </Button>
         </form>
