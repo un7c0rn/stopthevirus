@@ -5,6 +5,7 @@ import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import StartGamePrompt from "./components/StartGamePrompt";
 import StartGameInputs from "./components/StartGameInputs";
+import TriangleLogo from "./components/TriangleLogo";
 
 export default function StartGamePage() {
   const useStyles = makeStyles((theme) => ({
@@ -26,6 +27,7 @@ export default function StartGamePage() {
       <section className={classes.root}>
         <AppTitle />
         <StartGamePrompt />
+        <TriangleLogo />
         <StartGameInputs />
         <Footer />
       </section>
