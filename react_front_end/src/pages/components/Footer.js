@@ -9,25 +9,23 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    backgroundColor: "black",
     "& > *": {
       width: "100vw",
       height: "20vh",
-      display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       padding: "1em 1em"
     }
   },
-  title: {
-    margin: 0,
-    fontSize: "4em"
-  },
   links: {
     display: "flex",
     flexDirection: "column"
   },
-  text: {textAlign:"justify",
-  fontSize:"0.6rem" }
+  text: {
+    textAlign:"justify",
+    fontSize:"0.6rem"
+ }
 }));
 
 export default function Footer() {
@@ -40,12 +38,10 @@ export default function Footer() {
   return (
     <footer className={classes.root}>
       <Paper square>
-        <section className={classes.links}>
-          <Typography className={classes.text}>
-             <b> Rules:</b>{rules}
+        <Typography className={classes.text}>
+           <b> Rules:</b>{rules}
 
-          </Typography>
-        </section>
+        </Typography>
       </Paper>
     </footer>
   );
