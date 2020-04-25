@@ -12,7 +12,6 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
     "& > *": {
       width: "100vw",
-      height: "11.29vw",
       display: "flex",
       justifyContent: "center",
       alignItems: "center"
@@ -26,11 +25,18 @@ const useStyles = makeStyles(theme => ({
 
 export default function AppTitle() {
   const classes = useStyles();
+  const imgHeight = 20;
 
   return (
     <div className={classes.root}
     >
-    <img src={logo}/>
+    <img src ={bg} style={{
+      height:imgHeight+"vh"
+    }}/>
+    <img src={logo} style = {{
+      position:"absolute",
+      marginTop:imgHeight/4+"vh"
+    }}/>
     </div>
   );
 }
