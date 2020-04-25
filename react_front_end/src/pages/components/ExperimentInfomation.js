@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { blue, green, red, grey } from "@material-ui/core/colors";
@@ -17,7 +18,10 @@ const ExperimentInformation = ({ params }) => {
         label="Get started"
         open={state.open}
         onClose={() => setState({ open: false })}
-        onStart={() => setState({ open: false })}
+        onStart={() => {
+          setState({ open: false });
+          location.href = "/start-game";
+        }}
         style={{ position: "absolute" }}
         ButtonProps={{ className: "button" }}
       >
