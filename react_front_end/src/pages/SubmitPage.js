@@ -1,6 +1,5 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import ChallengeInfo from "./components/ChallengeInfo";
@@ -24,7 +23,6 @@ const SubmitPage = () => {
   return (
     <>
       <section className={classes.root}>
-        <ButtonAppBar />
         <AppTitle />
         <ChallengeInfo />
         <ChallengeSubmit />
