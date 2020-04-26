@@ -10,11 +10,13 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    justifyContent: "center",
+
     "& > *": {
       width: "100vw",
+      maxWidth:"850px",
       height: "11vh",
       display: "flex",
-      justifyContent: "center",
       alignItems: "center"
     },
   },
@@ -31,13 +33,13 @@ export default function AppTitle() {
   return (
     <div className={classes.root}
     >
-    <img src ={bg} style={{
-      height:imgHeight+"vh"
-    }}/>
-    <img src={logo} style = {{
-      position:"absolute",
-      marginTop:imgHeight/4+"vh"
-    }}/>
+      <img src ={bg} style={{
+        height:imgHeight+"vh"
+      }}/>
+      <img src={logo} style = {{
+        position:"absolute",
+        marginTop:imgHeight/4+"vh"
+      }}/>
     </div>
   );
 }
