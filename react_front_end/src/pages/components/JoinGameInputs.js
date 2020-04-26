@@ -3,18 +3,19 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { isSm } from "../../utilities/Utilities";
+import {isSm} from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 
 export default function JoinGameInputs() {
   const sm = isSm();
-  const useStyles = makeStyles(() => ({
+  const useStyles = makeStyles(theme => ({
     root: {
+      backgroundColor:"black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "40vh" : "35vh",
+        //height: sm ? "40vh" : "35vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -37,10 +38,10 @@ export default function JoinGameInputs() {
 
   const tikTokRef = useRef();
 
-  const [tikTok, setTikTok] = useState("");
-  const [didSubmit, setDidSubmit] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [country, setCountry] = useState({});
+ const [tikTok, setTikTok] = useState("");
+ const [didSubmit, setDidSubmit] = useState(false);
+ const [phone, setPhone] = useState("");
+ const [country, setCountry] = useState({});
 
   const submit = (event) => {
     console.log("send to API endpoint");
@@ -62,26 +63,24 @@ export default function JoinGameInputs() {
         <form className={classes.form} autoComplete="off">
           <TextField
             id="join-game-inputs-tiktok"
-            label="Tik Tok"
+            label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
           />
-          <MuiPhoneNumber
-            error={didSubmit && phone.length <= 6}
-            label="SMS Phone Number"
-            defaultCountry={"us"}
-            disableAreaCodes={true}
-            onChange={handleOnPhoneChange}
-            value={phone}
-            id="join-game-inputs-phone"
+          <MuiPhoneNumber error={didSubmit && phone.length <= 6}
+          label="PHONE NUMBER" defaultCountry={'us'} disableAreaCodes={true}
+          onChange={handleOnPhoneChange}
+          value={phone}
+          id="join-game-inputs-phone"
           />
           <Button variant="contained" onClick={submit}>
             Join This Game
           </Button>
         </form>
+
       </Paper>
     </div>
   );

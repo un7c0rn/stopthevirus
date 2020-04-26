@@ -9,46 +9,39 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    backgroundColor: "black",
     "& > *": {
       width: "100vw",
-      height: "10vh",
-      display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: "1em 1em",
-    },
+      padding: "1em 1em"
+    }
   },
-  paper: {
-    backgroundColor: "transparent",
+  links: {
+    display: "flex",
+    flexDirection: "column"
   },
+
+  text: {
+    textAlign:"justify",
+    fontSize:"0.6rem"
+ }
 }));
 
 export default function Footer() {
   const classes = useStyles();
 
-  const rules = (e) => {
-    console.log("rules");
-  };
+  const rules = "If the GLC, in its sole discretion, has authorized a Retailer to sell Tickets for On-Line Games at one or more of its Retailer Business Locations, in addition to all provisions, terms, and conditions of the Act, other Rules and Regulations, and the Retailer Contract, the On-Line Games Rules and Regulations herein shall apply to all On-Line Games. To the extent of any inconsistency with either the Retailer Contract or with the Retailer Rules and Regulations found in Chapter 2 of the GLC Policies and Procedures Manual, the On-Line Game Rules and Regulations shall govern the On-Line Games.";
 
   const preventDefault = (event) => event.preventDefault();
 
   return (
     <footer className={classes.root}>
-      <Paper square className="footer">
-        <div className="footer-links">
-          <Link href="#" onClick={preventDefault}>
-            Terms of service
-          </Link>
-          <Link href="#" onClick={preventDefault}>
-            Privacy Policy
-          </Link>
-          <Link href="#" onClick={preventDefault}>
-            Media
-          </Link>
-        </div>
-        <Button variant="contained" onClick={rules}>
-          rules
-        </Button>
+      <Paper square>
+        <Typography className={classes.text}>
+           <b> Rules:</b>{rules}
+
+        </Typography>
       </Paper>
     </footer>
   );

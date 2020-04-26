@@ -57,9 +57,16 @@ export default function ChallengeSubmit() {
             variant="outlined"
             inputRef={inputRef}
           />
-          <Button variant="contained" onClick={submit}>
+        </form>
+        <form className={classes.form} noValidate autoComplete="off">
+          <Button variant="contained" onClick={submit}
+          style={{backgroundColor:'white',
+                width:'100vw',
+                fontWeight: 'bold',
+            }}>
             submit
           </Button>
+
         </form>
       </Paper>
     </div>

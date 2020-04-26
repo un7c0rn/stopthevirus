@@ -1,6 +1,5 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import GameInfo from "./components/GameInfo";
@@ -24,7 +23,6 @@ const GameInfoPage = () => {
   return (
     <>
       <section className={classes.root} data-testid="Game Info Page">
-        <ButtonAppBar />
         <AppTitle />
         <GameInfo />
         <GameInfoButtonOptions />

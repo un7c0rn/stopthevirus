@@ -26,4 +26,9 @@ export const CustomUiError = ({ error, type }) => {
   }
 };
 
+export const isL = () => {
+  //check to see if user resolution is considered "large" (Desktop)
+  return useMediaQuery.bind(null, "(min-width:1024px)")();
+};
+
 // the next help function

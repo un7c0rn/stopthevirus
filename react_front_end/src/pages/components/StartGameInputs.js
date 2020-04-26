@@ -11,11 +11,12 @@ export default function StartGameInputs() {
   const sm = isSm();
   const useStyles = makeStyles(() => ({
     root: {
+      backgroundColor:"black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "55vh" : "45vh",
+        //height: sm ? "55vh" : "45vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -75,7 +76,7 @@ export default function StartGameInputs() {
         <form className={classes.form} autoComplete="off">
           <TextField
             id="start-game-inputs-tiktok"
-            label="Tik Tok"
+            label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
             error={didSubmit && tikTok === ""}
@@ -84,7 +85,7 @@ export default function StartGameInputs() {
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
-            label="SMS Phone Number"
+            label="PHONE NUMBER"
             defaultCountry={"us"}
             disableAreaCodes={true}
             onChange={handleOnPhoneChange}
@@ -93,18 +94,26 @@ export default function StartGameInputs() {
           />
           <TextField
             id="start-game-inputs-game-name"
-            label="Game Hashtag"
+            label="GAME HASHTAG"
             variant="outlined"
             error={didSubmit && gameName === ""}
             onChange={(event) => setGameName(event.target.value)}
             inputRef={gameNameRef}
             value={gameName}
           />
-          <Button variant="contained" onClick={submit}>
-            Start a game
+        </form>
+        <form className={classes.form} autoComplete="off">
+          <Button variant="contained" onClick={submit}
+          style={{backgroundColor:'white',
+                width:'100vw',
+                fontWeight: 'bold',
+            }}>
+            START A GAME
           </Button>
         </form>
+
       </Paper>
+
     </div>
   );
 }
