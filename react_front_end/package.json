@@ -34,6 +34,7 @@
     "use-error-boundary": "^1.2.0"
   },
   "scripts": {
+    "start": "run-p start:*",
     "start:app": "react-scripts start",
     "start:lambda": "yarn watch:functions",
     "build": "react-scripts build",
@@ -58,9 +59,14 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
+    "babel-eslint": "^10.1.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^3.0.0",
     "webpack-node-externals": "^1.7.2"
   },
   "watch": {
