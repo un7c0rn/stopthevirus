@@ -37,16 +37,18 @@ const LandingPageInformation = () => {
             gutterBottom
             className={classes.title}
           >
-          Can a global scale high stakes social game help inspire millions of
-          Millennial and Gen-Z individuals across the world to engage in
-          social distancing?
-          Can a global scale high stakes social game help inspire millions of
-          Millennial and Gen-Z individuals across the world to engage in
-          social distancing?
-          Can a global scale high stakes social game help inspire millions of
-          Millennial and Gen-Z individuals across the world to engage in
-          social distancing?
-
+          It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the
+          Tokyo Olympics are cancelled this year. We’re at the height of human
+          technology and innovation, but at the same time facing one of the
+          most devastating viral pandemics in history. The economy is
+          suffering, countries around the world are facing mandatory lockdown
+          orders and hospitals are overwhelmed. Despite this, many people are
+          still unaware of the seriousness of COVID-19 and actions they can
+          take to support our health care professionals such as social
+          distancing to flatten the health care demand curve. Reducing the
+          doubling rate of COVID-19 by even a few days can have massive
+          impact. Can we use a high stakes social game to help inspire the
+          youth to stop the virus?
           </Typography>
           <Typography
             variant="h3"

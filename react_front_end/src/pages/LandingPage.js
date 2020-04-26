@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import LandingPageHeaderLogoSvg from "./components/LandingPageHeaderLogoSvg";
 import LandingPageInformation from "./components/LandingPageInformation";
 import AppTitle from "./components/AppTitle";
+import TriangleLogo from "./components/TriangleLogo";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,6 +26,7 @@ const LandingPage = () => {
     <>
       <section className={classes.root}>
         <AppTitle />
+        <TriangleLogo />
         <LandingPageInformation />
         <Footer />
       </section>
