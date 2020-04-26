@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function TriangleLogo() {
+export default function TriangleLogo(props) {
   const classes = useStyles();
   const large = isL();
   const dd=78, hh="06", mm=26, ss=47;
@@ -44,8 +44,10 @@ export default function TriangleLogo() {
   return (
     <div className={classes.root}
     >
-    <img src={logo} style={{width:large? "40vh": "30vh",
+    {props.removeLogo ? '' :
+      <img src={logo} style={{width:large? "40vh": "30vh",
     height: large? "40vh": "30vh", margin:"0 auto"}}/>
+    }
 
     <Grid container justify="center">
       <Grid item>
