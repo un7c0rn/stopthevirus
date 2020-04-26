@@ -26,7 +26,7 @@ const LandingPage = () => {
     <>
       <section className={classes.root}>
         <AppTitle />
-        <TriangleLogo />
+        <TriangleLogo removeLogo={true} />
         <LandingPageInformation />
         <Footer />
       </section>

@@ -43,6 +43,7 @@ export default function TriangleLogo(props) {
 
   return (
     <div className={classes.root}
+    style={{height:props.removeLogo ? "40vh":''}}
     >
     {props.removeLogo ? '' :
       <img src={logo} style={{width:large? "40vh": "30vh",
