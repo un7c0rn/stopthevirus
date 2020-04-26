@@ -16,7 +16,7 @@ export default function StartGameInputs() {
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "55vh" : "45vh",
+        //height: sm ? "55vh" : "45vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",

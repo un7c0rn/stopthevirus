@@ -12,7 +12,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "black",
     "& > *": {
       width: "100vw",
-      height: "20vh",
       justifyContent: "space-between",
       alignItems: "center",
       padding: "1em 1em"
