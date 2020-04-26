@@ -24,7 +24,6 @@ export default function JoinGamePage() {
   return (
     <>
       <section className={classes.root}>
-        <ButtonAppBar />
         <AppTitle />
         <JoinGamePrompt />
         <JoinGameInputs />

@@ -63,7 +63,7 @@ export default function JoinGameInputs() {
         <form className={classes.form} autoComplete="off">
           <TextField
             id="join-game-inputs-tiktok"
-            label="Tik Tok"
+            label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
             error={didSubmit && tikTok === ""}
@@ -71,15 +71,23 @@ export default function JoinGameInputs() {
             value={tikTok}
           />
           <MuiPhoneNumber error={didSubmit && phone.length <= 6}
-          label="SMS Phone Number" defaultCountry={'us'} disableAreaCodes={true}
+          label="PHONE NUMBER" defaultCountry={'us'} disableAreaCodes={true}
           onChange={handleOnPhoneChange}
           value={phone}
           id="join-game-inputs-phone"
           />
-          <Button variant="contained" onClick={submit}>
-            Join This Game
+        </form>
+        <form className={classes.form} autoComplete="off">
+
+          <Button variant="contained" onClick={submit}
+          style={{backgroundColor:'white',
+                width:'100vw',
+                fontWeight: 'bold',
+            }}>
+            JOIN THIS GAME
           </Button>
         </form>
+
 
       </Paper>
     </div>
