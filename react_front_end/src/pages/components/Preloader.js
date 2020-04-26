@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React from "react";
 import "./Preloader.scss";
 
 export default function Preloader() {
