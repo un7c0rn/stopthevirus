@@ -4,10 +4,11 @@ import Footer from "./components/Footer";
 import { makeStyles } from "@material-ui/core/styles";
 import LandingPageHeaderLogoSvg from "./components/LandingPageHeaderLogoSvg";
 import LandingPageInformation from "./components/LandingPageInformation";
+import AppTitle from "./components/AppTitle";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // background: theme.background,
+    background: theme.background,
     color: "white",
     height: "100vh",
     width: "100vw",
@@ -23,7 +24,7 @@ const LandingPage = () => {
   return (
     <>
       <section className={classes.root}>
-        <LandingPageHeaderLogoSvg />
+        <AppTitle />
         <LandingPageInformation />
         <Footer />
       </section>
