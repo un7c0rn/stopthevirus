@@ -50,20 +50,23 @@ const LandingPageInformation = () => {
           impact. Can we use a high stakes social game to help inspire the
           youth to stop the virus?
           </Typography>
-          <Typography
-            variant="h3"
-            component="h4"
-            gutterBottom
-            className={classes.title}
-
-          >
-            <Link to='/start-game' style={{ textDecoration: "none" }} >
-              <Button style={{fontWeight: "bold"}} >
-                GET STARTED
-              </Button>
-            </Link>
-          </Typography>
         </Paper>
+        <Typography
+          variant="h3"
+          component="h4"
+          gutterBottom
+          className={classes.title}
+
+        >
+          <Link to='/start-game' style={{ textDecoration: "none" }} >
+            <Button style={{backgroundColor:'white',
+                  width:'100vw',fontWeight: "bold",
+                color:"black"}} >
+              GET STARTED
+            </Button>
+          </Link>
+        </Typography>
+
       </section>
     </>
   );
