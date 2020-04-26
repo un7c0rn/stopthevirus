@@ -3,11 +3,12 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import {isSm} from "../../utilities/Utilities";
+import {isSm, isL} from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 
 export default function JoinGameInputs() {
   const sm = isSm();
+  const isLarge = isL();
   const useStyles = makeStyles(theme => ({
     root: {
       backgroundColor:"black",
@@ -15,7 +16,7 @@ export default function JoinGameInputs() {
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        //height: sm ? "40vh" : "35vh",
+        height: isLarge ? "50vh" : "",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
