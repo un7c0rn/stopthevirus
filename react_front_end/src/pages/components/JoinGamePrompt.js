@@ -79,7 +79,7 @@ export default function JoinGamePrompt() {
 
         >
           <Link to='/game-info' style={{ textDecoration: "none" }} >
-            <Button  >
+            <Button style={{fontWeight: "bold"}} >
               HOW THE GAME WORKS
             </Button>
           </Link>
