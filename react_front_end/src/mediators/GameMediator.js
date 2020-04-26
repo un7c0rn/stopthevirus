@@ -9,7 +9,7 @@ export const startGame = async ({
 }) => {
   if (!handle || !phone || !hashtag) return false;
 
-  const { user } = await getProfile(handle);
+  await getProfile(handle);
 
   const gameData = {
     game: "PREDEFINED GAME NAME",

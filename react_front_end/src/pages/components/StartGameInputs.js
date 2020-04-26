@@ -9,7 +9,7 @@ import { startGame } from "../../mediators/GameMediator";
 
 export default function StartGameInputs() {
   const sm = isSm();
-  const useStyles = makeStyles((theme) => ({
+  const useStyles = makeStyles(() => ({
     root: {
       display: "flex",
       flexWrap: "wrap",
@@ -45,7 +45,7 @@ export default function StartGameInputs() {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState({});
 
-  const submit = async (event) => {
+  const submit = async () => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
     console.log(gameNameRef.current.value);

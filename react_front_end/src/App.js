@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import {
   createMuiTheme,
   makeStyles,
@@ -22,13 +23,13 @@ const theme = createMuiTheme({
 
 export const AppContext = createContext();
 
+// eslint-disable-next-line
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    display: "flex",
     flexWrap: "wrap",
     width: "100vw",
     height: "100vh",
@@ -36,11 +37,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
+  // eslint-disable-next-line
   const classes = useStyles();
   const [gameInfo, setGameInfo] = useState(false);
+  const [blurUi, setBlurUi] = useState(false);
 
   const {
     ErrorBoundary, // class - The react component to wrap your children in. This WILL NOT CHANGE
+    // eslint-disable-next-line
     didCatch, // boolean - Whether the ErrorBoundary catched something
     // error, // null or the error
     // errorInfo, // null or the error info as described in the react docs
@@ -53,6 +57,8 @@ function App() {
           value={{
             gameInfo,
             setGameInfo,
+            blurUi,
+            setBlurUi,
           }}
         >
           <Suspense fallback={<Preloader />}>

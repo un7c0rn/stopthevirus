@@ -1,36 +1,62 @@
 /* eslint-disable no-restricted-globals */
-import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
-import { blue, green, red, grey } from "@material-ui/core/colors";
-import { AutoRotatingCarousel, Slide } from "material-auto-rotating-carousel";
+import { grey } from "@material-ui/core/colors";
+import { AutoRotatingCarousel } from "material-auto-rotating-carousel";
+import React, { useState } from "react";
 import "./ExperimentInformation.scss";
-import {} from "./LandingPageSocialMediaButtons";
+import Slide from "./ExperimentInformationSlide";
 
-const ExperimentInformation = ({ params }) => {
+const ExperimentInformation = () => {
   const [state, setState] = useState({});
+
+  const handleSlideButtonClick = (e) => {
+    setState({ open: false });
+    location.href = "/start-game";
+  };
 
   return (
     <div className="experiment-information-container">
-      <Button className="button" onClick={() => setState({ open: true })}>
+      <Button
+        className="button"
+        onClick={() => {
+          setState({ open: true });
+        }}
+      >
         What is this?
       </Button>
       <AutoRotatingCarousel
         label="Get started"
         open={state.open}
-        onClose={() => setState({ open: false })}
-        onStart={() => {
+        onClose={() => {
           setState({ open: false });
-          location.href = "/start-game";
         }}
-        style={{ position: "absolute" }}
-        ButtonProps={{ className: "button" }}
+        // onStart={() => {
+        //   setState({ open: false });
+        // }}
+        ButtonProps={{
+          style: { visibility: "hidden" },
+        }}
+        style={{ height: "50vh !important" }}
       >
         <Slide
+          buttonClickHandler={handleSlideButtonClick}
           media={
-            <img src="http://www.icons101.com/icon_png/size_256/id_79394/youtube.png" />
+            <img
+              src="http://www.icons101.com/icon_png/size_256/id_79394/youtube.png"
+              alt="1st slide description"
+            />
           }
-          mediaBackgroundStyle={{ backgroundColor: grey[100], height: "40%" }}
-          style={{ backgroundColor: "rgb(97, 214,,220)" }}
+          mediaBackgroundStyle={{
+            backgroundColor: grey[100],
+            height: "40%",
+          }}
+          style={{
+            backgroundColor: "#d7d7d7",
+            height: "auto",
+            minHeight: "100%",
+            paddingBottom: "2em",
+            overflowX: "hidden",
+          }}
           title="Why is this important and what's the social impact?"
           subtitle="It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the
       Tokyo Olympics are cancelled this year. We’re at the height of human
@@ -46,11 +72,21 @@ const ExperimentInformation = ({ params }) => {
       youth to stop the virus?"
         />
         <Slide
+          buttonClickHandler={handleSlideButtonClick}
           media={
-            <img src="http://www.icons101.com/icon_png/size_256/id_80975/GoogleInbox.png" />
+            <img
+              src="http://www.icons101.com/icon_png/size_256/id_80975/GoogleInbox.png"
+              alt="1st slide description"
+            />
           }
           mediaBackgroundStyle={{ backgroundColor: grey[100], height: "40%" }}
-          style={{ backgroundColor: blue[600] }}
+          style={{
+            backgroundColor: "#d7d7d7",
+            height: "auto",
+            minHeight: "100%",
+            paddingBottom: "2em",
+            overflowX: "hidden",
+          }}
           title="What inspired this game?"
           subtitle="This social game was inspired by the TV show Survivor (Watch before
       reading more). It's a game based on fun challenges, alliances and
@@ -68,11 +104,21 @@ const ExperimentInformation = ({ params }) => {
       risk mitigation."
         />
         <Slide
+          buttonClickHandler={handleSlideButtonClick}
           media={
-            <img src="http://www.icons101.com/icon_png/size_256/id_76704/Google_Settings.png" />
+            <img
+              src="http://www.icons101.com/icon_png/size_256/id_76704/Google_Settings.png"
+              alt="1st slide description"
+            />
           }
           mediaBackgroundStyle={{ backgroundColor: grey[100], height: "60%" }}
-          style={{ backgroundColor: green[600] }}
+          style={{
+            backgroundColor: "#d7d7d7",
+            height: "auto",
+            minHeight: "100%",
+            paddingBottom: "2em",
+            overflowX: "hidden",
+          }}
           title="What's in it for me?"
           subtitle="Also, since the game is digital and based on social media, we aren't
       limited to the standard 20 players. Everyone can play. With the hope

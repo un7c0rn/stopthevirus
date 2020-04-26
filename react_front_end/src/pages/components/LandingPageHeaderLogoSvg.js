@@ -14,8 +14,6 @@ export const Logo = () => {
 };
 
 const LandingPageHeaderLogoSvg = () => {
-  const classes = useStyles();
-
   return (
     <header className="header">
       <div className="logo-container">

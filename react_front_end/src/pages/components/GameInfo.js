@@ -2,7 +2,7 @@ import { CircularProgress } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import fetch from "node-fetch";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../App";
 import { GameName } from "./GameName";
@@ -56,6 +56,7 @@ export default function GameInfo() {
         setGameInfo(json);
       })();
     }
+    // eslint-disable-next-line
   }, []);
 
   // Refactor into a group of custom errors
