@@ -15,4 +15,9 @@ export const isSm = () => {
   return useMediaQuery.bind(null, "(max-height:650px)")();//for iphone 5SE
 };
 
+export const isL = () => {
+  //check to see if user resolution is considered "large" (Desktop)
+  return useMediaQuery.bind(null, "(max-width:1024px)")();
+};
+
 // the next help function

@@ -4,7 +4,7 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import logo from "../../assets/vir-us_triangle_logo_white.jpeg";
 import Grid from "@material-ui/core/Grid";
-
+import {isL} from "../../utilities/Utilities";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -25,25 +25,27 @@ const useStyles = makeStyles(theme => ({
   },
   text: {
     margin:"0em 2em",
-    fontSize:"0.7em",
+    fontSize:"1em",
     fontFamily: "Helvetica Neue",
     fontWeight:"bold",
   },
   unit: {
     margin:"0 2em",
-    fontSize:"0.5em",
+    fontSize:"0.7em",
     fontFamily: "Helvetica Neue"
   }
 }));
 
 export default function TriangleLogo() {
   const classes = useStyles();
+  const large = isL();
   const dd=78, hh="06", mm=26, ss=47;
 
   return (
     <div className={classes.root}
     >
-    <img src={logo} style={{width:"30vw",height:"27vw", margin:"0 auto"}}/>
+    <img src={logo} style={{width:large? "30vw": "40vh",
+    height: large? "30vw": "40vh", margin:"0 auto"}}/>
 
     <Grid container justify="center">
       <Grid item>
