@@ -82,7 +82,6 @@ export default function StartGameInputs() {
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
-            inputProps={{ style: {textAlign: 'center'} }}
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
@@ -95,7 +94,7 @@ export default function StartGameInputs() {
           />
           <TextField
             id="start-game-inputs-game-name"
-            label="Game Hashtag"
+            label="GAME HASHTAG"
             variant="outlined"
             error={didSubmit && gameName === ""}
             onChange={(event) => setGameName(event.target.value)}
