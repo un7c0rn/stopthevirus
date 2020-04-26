@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "center",
 
     "& > *": {
-      width: "100vw",
+      width: "80vw",
       maxWidth:"850px",
       height: "11vh",
       display: "flex",
