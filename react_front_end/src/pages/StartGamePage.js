@@ -1,6 +1,5 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import StartGamePrompt from "./components/StartGamePrompt";

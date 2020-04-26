@@ -46,10 +46,16 @@ export default function GameInfoButtonOptions() {
     <div className={classes.root}>
       <Paper square>
         <form className={classes.form} noValidate autoComplete="off">
-          <Button variant="contained" onClick={watchAciveVirusVideos}>
+          <Button variant="contained" onClick={watchAciveVirusVideos}
+          style={{backgroundColor:'white',
+                width:'100vw',
+                fontWeight: 'bold',}}>
             watch active #vir-us videos
           </Button>
-          <Button variant="contained" onClick={copyLinkToClipBoard}>
+          <Button variant="contained" onClick={copyLinkToClipBoard}
+          style={{backgroundColor:'white',
+                width:'100vw',
+                fontWeight: 'bold',}}>
             copy game invitation link
           </Button>
         </form>
