@@ -76,9 +76,15 @@ export default function JoinGameInputs() {
           value={phone}
           id="join-game-inputs-phone"
           />
-          <Button variant="contained" onClick={submit}>
-            Join This Game
-          </Button>
+        </form>
+        <form className={classes.form} autoComplete="off">
+          <Button variant="contained" onClick={submit}
+          style={{backgroundColor:'white',
+                width:'100vw',
+                fontWeight: 'bold',
+            }}>
+            JOIN THIS GAME
+            </Button>
         </form>
 
       </Paper>

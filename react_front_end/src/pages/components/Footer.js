@@ -3,6 +3,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Link from "@material-ui/core/Link";
+import Typography from "@material-ui/core/Typography";
+
 import "./Footer.scss";
 
 const useStyles = makeStyles((theme) => ({

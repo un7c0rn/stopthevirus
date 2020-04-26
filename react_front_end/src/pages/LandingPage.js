@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { withStyles } from "@material-ui/core";
+import { AppContext } from "../App";
+
 import Footer from "./components/Footer";
 import { makeStyles } from "@material-ui/core/styles";
 import LandingPageHeaderLogoSvg from "./components/LandingPageHeaderLogoSvg";
