@@ -17,7 +17,7 @@ export const isSm = () => {
 
 export const isL = () => {
   //check to see if user resolution is considered "large" (Desktop)
-  return useMediaQuery.bind(null, "(max-width:1024px)")();
+  return useMediaQuery.bind(null, "(min-width:1024px)")();
 };
 
 // the next help function

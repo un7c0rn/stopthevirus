@@ -44,8 +44,8 @@ export default function TriangleLogo() {
   return (
     <div className={classes.root}
     >
-    <img src={logo} style={{width:large? "30vw": "40vh",
-    height: large? "30vw": "40vh", margin:"0 auto"}}/>
+    <img src={logo} style={{width:large? "30vw": "30vh",
+    height: large? "30vw": "30vh", margin:"0 auto"}}/>
 
     <Grid container justify="center">
       <Grid item>
