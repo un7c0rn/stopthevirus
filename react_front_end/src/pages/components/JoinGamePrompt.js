@@ -16,7 +16,6 @@ export default function JoinGamePrompt() {
       flexWrap: "nowrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "36vh" : "30vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",

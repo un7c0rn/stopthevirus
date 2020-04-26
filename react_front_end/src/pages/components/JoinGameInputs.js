@@ -10,11 +10,12 @@ export default function JoinGameInputs() {
   const sm = isSm();
   const useStyles = makeStyles(theme => ({
     root: {
+      backgroundColor:"black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "40vh" : "35vh",
+        //height: sm ? "40vh" : "35vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
