@@ -4,7 +4,6 @@ import { AppContext } from "../App";
 
 import Footer from "./components/Footer";
 import { makeStyles } from "@material-ui/core/styles";
-import LandingPageHeaderLogoSvg from "./components/LandingPageHeaderLogoSvg";
 import LandingPageInformation from "./components/LandingPageInformation";
 import AppTitle from "./components/AppTitle";
 import TriangleLogo from "./components/TriangleLogo";
