@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import {Link} from "react-router-dom";
 import Button from "@material-ui/core/Button";
+import {maxButtonWidth} from "../../utilities/Constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,12 +29,10 @@ const useStyles = makeStyles((theme) => ({
 const LandingPageInformation = () => {
   const classes = useStyles();
 
-  const maxWidth = "850px";
-
   return (
     <>
       <section className={classes.root}>
-        <Paper square style={{maxWidth:maxWidth}}>
+        <Paper square style={{maxWidth:maxButtonWidth}}>
           <Typography
             gutterBottom
             className={classes.title}
@@ -62,7 +61,7 @@ const LandingPageInformation = () => {
           <Link to='/start-game' style={{ textDecoration: "none" }} >
             <Button style={{backgroundColor:'white',
                   width:'100vw',fontWeight: "bold",
-                  maxWidth:maxWidth,
+                  maxWidth:maxButtonWidth,
                 color:"black"}} >
               GET STARTED
             </Button>

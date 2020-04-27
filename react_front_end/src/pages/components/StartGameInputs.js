@@ -6,6 +6,7 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import { isSm } from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 import { startGame } from "../../mediators/GameMediator";
+import {maxButtonWidth} from "../../utilities/Constants";
 
 export default function StartGameInputs() {
   const sm = isSm();
@@ -106,6 +107,7 @@ export default function StartGameInputs() {
           <Button variant="contained" onClick={submit}
           style={{backgroundColor:'white',
                 width:'100vw',
+                maxWidth:maxButtonWidth,
                 fontWeight: 'bold',
             }}>
             START A GAME

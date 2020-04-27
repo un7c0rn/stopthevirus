@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import React, { useRef } from "react";
 import { useParams } from "react-router-dom";
+import {maxButtonWidth} from "../../utilities/Constants";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,6 +64,7 @@ export default function ChallengeSubmit() {
           style={{backgroundColor:'white',
                 width:'100vw',
                 fontWeight: 'bold',
+                maxWidth: maxButtonWidth,
             }}>
             submit
           </Button>

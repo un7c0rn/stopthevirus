@@ -5,6 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
 import {isSm, isL} from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
+import {maxButtonWidth} from "../../utilities/Constants";
 
 export default function JoinGameInputs() {
   const sm = isSm();
@@ -82,6 +83,7 @@ export default function JoinGameInputs() {
           <Button variant="contained" onClick={submit}
           style={{backgroundColor:'white',
                 width:'100vw',
+                maxWidth: maxButtonWidth,
                 fontWeight: 'bold',
             }}>
             JOIN THIS GAME
