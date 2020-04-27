@@ -28,10 +28,12 @@ const useStyles = makeStyles((theme) => ({
 const LandingPageInformation = () => {
   const classes = useStyles();
 
+  const maxWidth = "850px";
+
   return (
     <>
       <section className={classes.root}>
-        <Paper square style={{maxWidth:"850px"}}>
+        <Paper square style={{maxWidth:maxWidth}}>
           <Typography
             gutterBottom
             className={classes.title}
@@ -60,6 +62,7 @@ const LandingPageInformation = () => {
           <Link to='/start-game' style={{ textDecoration: "none" }} >
             <Button style={{backgroundColor:'white',
                   width:'100vw',fontWeight: "bold",
+                  maxWidth:maxWidth,
                 color:"black"}} >
               GET STARTED
             </Button>
