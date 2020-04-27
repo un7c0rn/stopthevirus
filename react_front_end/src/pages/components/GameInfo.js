@@ -74,7 +74,7 @@ export default function GameInfo() {
     <div className={classes.root}>
       <Paper square>
         {gameInfo === undefined ? problemWithUi() : null}
-        {gameInfo&&gameInfo.name ? (
+        {gameInfo&&gameInfo.game ? (
           <>
             <GameName />
             <NumberOfPlayers />

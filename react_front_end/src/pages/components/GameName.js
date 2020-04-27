@@ -29,7 +29,7 @@ export const GameName = () => {
       className={classes.title}
     >
       <p data-testid="Game Name">
-        <span style={{ fontWeight: "bold" }}>Game</span>: {`${gameInfo.name}`}
+        <span style={{ fontWeight: "bold" }}>Game</span>: {`${gameInfo.game}`}
       </p>
     </Typography>
   );
