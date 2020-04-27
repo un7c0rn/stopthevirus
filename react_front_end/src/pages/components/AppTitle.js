@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import logo from "../../assets/vir-us_logotype_white.jpeg";
+import logo from "../../assets/vir-us.logo.type.white.letters.svg";
 import bg from "../../assets/vir-us_world_map_white.jpeg";
 //aspect ratio 310/2744
 
