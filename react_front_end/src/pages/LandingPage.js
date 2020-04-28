@@ -35,7 +35,7 @@ const LandingPage = () => {
     <>
       <section className={classes.root}>
         <AppTitle />
-        <TriangleLogo removeLogo={true} />
+        <TriangleLogo hideTriangle={true} />
         <LandingPageInformation />
         <Footer />
       </section>

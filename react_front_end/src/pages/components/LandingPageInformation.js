@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: "1em",
-    fontSize: "1em",
+    fontSize: "120%",
     textAlign: "center",
   }
 

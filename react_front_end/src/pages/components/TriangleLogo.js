@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
     height: "60vh",
     justifyContent: "center",
     flexDirection: "row",
-    border: "1px dotted red",
   },
   image: {
     [theme.breakpoints.down("md")]: {
@@ -20,7 +19,10 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("md")]: {
       width: "30vw",
     },
-    border: "1px dotted green",
+    [theme.breakpoints.up("lg")]: {
+      width: "25vw",
+    },
+
   },
 }));
 
@@ -47,7 +49,7 @@ export default function TriangleLogo(props) {
         </div>
       </div>
 
-      <img src={logo} className={classes.image} />
+      {props.hideTriangle ? '' : <img src={logo} className={classes.image} />}
 
       <div className="statistics right">
         <div>
