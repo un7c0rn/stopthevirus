@@ -24,6 +24,15 @@ const useStyles = makeStyles((theme) => ({
     },
 
   },
+  digits: {
+    fontFamily: "Helvetica Neue",
+    fontWeight:"bold",
+    fontSize: "120%"
+},
+  unit: {
+    fontFamily: "Helvetica Neue",
+    fontSize: "120%",
+}
 }));
 
 export default function TriangleLogo(props) {
@@ -36,16 +45,16 @@ export default function TriangleLogo(props) {
     <div className={classes.root}>
       <div className="statistics left">
         <div>
-          <span>
+          <span className={classes.digits}>
             {dd} <br />
           </span>
-          <span>DAYS</span>
+          <span className={classes.unit}>DAYS</span>
         </div>
         <div>
-          <span>
+          <span className={classes.digits}>
             {hh} <br />
           </span>
-          <span>HOURS</span>
+          <span className={classes.unit}>HOURS</span>
         </div>
       </div>
 
@@ -54,16 +63,16 @@ export default function TriangleLogo(props) {
 
       <div className="statistics right">
         <div>
-          <span>
+          <span className={classes.digits}>
             {mm} <br />
           </span>
-          <span>MINUTES</span>
+          <span className={classes.unit}>MINUTES</span>
         </div>
         <div>
-          <span>
+          <span className={classes.digits}>
             {ss} <br />
           </span>
-          <span>SECONDS</span>
+          <span className={classes.unit}>SECONDS</span>
         </div>
       </div>
     </div>
