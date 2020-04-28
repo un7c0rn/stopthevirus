@@ -49,7 +49,8 @@ export default function TriangleLogo(props) {
         </div>
       </div>
 
-      {props.hideTriangle ? '' : <img src={logo} className={classes.image} />}
+      <img src={logo} className={classes.image}
+      style={{visibility: props.hideTriangle ? 'hidden' : '' }} />
 
       <div className="statistics right">
         <div>
