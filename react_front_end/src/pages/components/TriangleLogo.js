@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../../assets/vir-us_triangle_logo_white.jpeg";
 import "./TriangleLogo.scss";
-
+import {isL} from "../../utilities/Utilities";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -13,15 +13,16 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "row",
   },
   image: {
-    [theme.breakpoints.down("md")]: {
-      width: "50vw",
-    },
-    [theme.breakpoints.up("md")]: {
-      width: "30vw",
-    },
-    [theme.breakpoints.up("lg")]: {
-      width: "25vw",
-    },
+    // [theme.breakpoints.down("md")]: {
+    //   width: "50vw",
+    // },
+    // [theme.breakpoints.up("md")]: {
+    //   width: "30vw",
+    //
+    // },
+    // [theme.breakpoints.up("lg")]: {
+    //   width: "25vw",
+    // },
 
   },
   digits: {
@@ -59,7 +60,10 @@ export default function TriangleLogo(props) {
       </div>
 
       <img src={logo} className={classes.image}
-      style={{visibility: props.hideTriangle ? 'hidden' : '' }} />
+      style={{visibility: props.hideTriangle ? 'hidden' : '',
+      width: isL() ? "40vh" : "30vh",
+      height: isL() ? "40vh" : "30vh"
+ }} />
 
       <div className="statistics right">
         <div>

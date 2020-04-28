@@ -12,7 +12,6 @@ export const toCurrency = (number) => {
   return formatter.format(v);
 };
 
-// DAVID use these to make it easier for you https://material-ui.com/customization/breakpoints/
 
 export const isSm = () => {
   //check to see if user resolution is considered "small"
