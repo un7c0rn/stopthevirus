@@ -5,8 +5,8 @@
   height: 6.25em;
   overflow: hidden;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: -10px -10px 15px #cbcbcb, 10px 10px 25px #ffffff;
+  border: 1px solid rgba(50, 50, 50, 0.6);
+  box-shadow: -10px -10px 15px #111111, 10px 10px 25px #111111;
 }
 
 .loader:before {
@@ -17,10 +17,10 @@
   right: 0.5625em;
   bottom: 0.5625em;
   z-index: 10;
-  background: rgba(215, 215, 215, 1);
+  background: rgba(0, 0, 0, 1);
   border-radius: 50%;
-  border: 1px solid #d3d3d3;
-  box-shadow: inset 2px 2px 5px rgba(215, 215, 215, 0.2),
+  border: 1px solid #999999;
+  box-shadow: inset 2px 2px 5px rgba(60, 60, 60, 0.2),
     inset 3px 3px 5px rgba(0, 0, 0, 0.5);
 }
 

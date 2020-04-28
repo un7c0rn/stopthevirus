@@ -3,23 +3,28 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
     "& > *": {
       width: "100vw",
-      height: "20vh",
+      height: "30vh",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      alignItems: "center"
-    }
+      alignItems: "center",
+    },
   },
   title: {
     margin: "1em",
     fontSize: "1em",
-  }
+    textAlign: "center",
+    width: "40vw",
+    [theme.breakpoints.down("md")]: {
+      width: "90vw",
+    },
+  },
 }));
 
 export default function StartGamePrompt() {
@@ -34,8 +39,9 @@ export default function StartGamePrompt() {
           gutterBottom
           className={classes.title}
         >
-          Can a global high stakes social media game help inspire millions of Gen-Z and Millennial individuals to engage in social distancing and stop the spread of COVID-19?
-
+          Can a global high stakes social media game help inspire millions of
+          Gen-Z and Millennial individuals to engage in social distancing and
+          stop the spread of COVID-19?
         </Typography>
       </Paper>
     </div>
