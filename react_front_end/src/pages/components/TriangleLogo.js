@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     flexDirection: "row",
   },
+
   image: {
     [theme.breakpoints.down("md")]: {
       width: "50vw",
@@ -42,15 +43,18 @@ export default function TriangleLogo(props) {
     mm = 26,
     ss = 47;
   return (
-    <div className={classes.root}>
-      <div className="statistics left">
-        <div>
+    <div className={classes.root}
+    style={{alignItems: props.hideTriangle ? "center" : ""}}
+    >
+      <div className="statistics left"
+      style = {{flexDirection: props.hideTriangle ? 'row' : 'column'}}>
+        <div style={{marginRight: props.hideTriangle ? '2em' : ''}}>
           <span className={classes.digits}>
             {dd} <br />
           </span>
           <span className={classes.unit}>DAYS</span>
         </div>
-        <div>
+        <div style={{marginRight: props.hideTriangle ? '2em' : ''}}>
           <span className={classes.digits}>
             {hh} <br />
           </span>
@@ -59,17 +63,18 @@ export default function TriangleLogo(props) {
       </div>
 
       <img src={logo} className={classes.image}
-      style={{visibility: props.hideTriangle ? 'hidden' : '',
+      style={{display: props.hideTriangle ? 'none' : '',
  }} />
 
-      <div className="statistics right">
-        <div>
+      <div className="statistics right"
+      style = {{flexDirection: props.hideTriangle ? 'row' : 'column'}}>
+        <div style={{marginRight: props.hideTriangle ? '2em' : ''}}>
           <span className={classes.digits}>
             {mm} <br />
           </span>
           <span className={classes.unit}>MINUTES</span>
         </div>
-        <div>
+        <div style={{marginRight: props.hideTriangle ? '2em' : ''}}>
           <span className={classes.digits}>
             {ss} <br />
           </span>
