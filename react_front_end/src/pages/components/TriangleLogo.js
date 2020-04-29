@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import logo from "../../assets/vir-us_triangle_logo_white.jpeg";
+import logo from "../../assets/vir-us_triangle_logo_white.svg";
 import "./TriangleLogo.scss";
 import {isL} from "../../utilities/Utilities";
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +62,7 @@ export default function TriangleLogo(props) {
       <img src={logo} className={classes.image}
       style={{visibility: props.hideTriangle ? 'hidden' : '',
       width: isL() ? "40vh" : "30vh",
-      height: isL() ? "40vh" : "30vh"
+      //height: isL() ? "40vh" : "30vh"
  }} />
 
       <div className="statistics right">
