@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: "wrap",
     "& > *": {
       width: "100vw",
-      height: "30vh",
+      height: "20vh",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
