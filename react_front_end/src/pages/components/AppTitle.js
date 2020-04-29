@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import logo from "../../assets/vir-us.logo.type.white.letters.svg";
-import bg from "../../assets/vir-us_world_map_white.jpeg";
+import bg from "../../assets/vir-us_world_map_transparent_canvas.svg";
 //aspect ratio 310/2744
 
 const useStyles = makeStyles(theme => ({
@@ -28,13 +28,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function AppTitle() {
   const classes = useStyles();
-  const imgHeight = 20;
+  const imgHeight = 30;
 
   return (
     <div className={classes.root}
     >
       <img src ={bg} style={{
-        height:imgHeight+"vh"
+        height:imgHeight+"vh",
       }}/>
       <img src={logo} style = {{
         position:"absolute",
