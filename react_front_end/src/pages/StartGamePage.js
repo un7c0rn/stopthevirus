@@ -28,7 +28,7 @@ export default function StartGamePage() {
       <section className={classes.root}>
         <AppTitle />
         <StartGamePrompt />
-        <LogoContainer layout="center">
+        <LogoContainer>
           <StatisticsLeft />
           <TriangleLogo />
           <StatisticsRight />

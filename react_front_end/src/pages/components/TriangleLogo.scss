@@ -1,6 +1,5 @@
 .triangle-logo {
   min-height: 50vh;
-
   animation-name: scale-triangle;
   animation-duration: 2s;
   animation-fill-mode: forwards;
@@ -16,23 +15,30 @@
   }
 
   @media screen and (min-width: 0px) {
-    // background-color: orange;
     width: 50vw;
+    @media screen and (orientation: landscape) {
+      max-width: 25vw;
+    }
   }
   @media screen and (min-width: 600px) {
-    // background-color: red;
     max-width: 45vw;
+
+    @media screen and (orientation: landscape) {
+      max-width: 25vw;
+    }
+
   }
   @media screen and (min-width: 960px) {
-    // background-color: green;
     max-width: 30vw;
+    @media screen and (orientation: landscape) {
+      max-width: 20vw;
+    }
+
   }
   @media screen and (min-width: 1280px) {
-    // background-color: blue;
     max-width: 25vw;
   }
   @media screen and (min-width: 1920px) {
-    // background-color: purple;
-    max-width: 20vw;
+    max-width: 15vw;
   }
 }

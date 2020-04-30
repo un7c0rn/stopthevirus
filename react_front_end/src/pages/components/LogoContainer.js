@@ -3,7 +3,7 @@ import React from "react";
 import "./LogoContainer.scss";
 import { useLocation } from "react-router-dom";
 
-const LogoContainer = ({ children, layout }) => {
+const LogoContainer = ({ children }) => {
   const location = useLocation();
 
   return (

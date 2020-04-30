@@ -35,7 +35,7 @@ const LandingPage = () => {
     <>
       <section className={classes.root}>
         <AppTitle />
-        <LogoContainer layout="center">
+        <LogoContainer>
           <StatisticsLeft layout="row" />
           <StatisticsRight layout="row" />
         </LogoContainer>

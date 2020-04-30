@@ -28,4 +28,8 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  button {
+    max-width: 300px !important;
+  }
 }

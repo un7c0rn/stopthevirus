@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: "1em",
-    fontSize: "120%",
+    fontSize: "100%",
     textAlign: "center",
     width: "40vw",
     [theme.breakpoints.down("md")]: {

@@ -19,7 +19,7 @@ const dd = 78,
   mm = 26,
   ss = 47;
 
-export const StatisticsLeft = ({ layout }) => {
+export const StatisticsLeft = ({ layout="column" }) => {
   const classes = useStyles();
 
   return (
@@ -40,7 +40,7 @@ export const StatisticsLeft = ({ layout }) => {
   );
 };
 
-export const StatisticsRight = ({ layout }) => {
+export const StatisticsRight = ({ layout="column" }) => {
   const classes = useStyles();
 
   return (
