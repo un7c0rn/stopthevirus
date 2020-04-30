@@ -25,6 +25,10 @@ export default function StartGameInputs() {
       "& > div div fieldset": {
         borderRadius: "0px",
       },
+      "& > div label": {
+        textAlign: "center",
+        width: "calc(100% - 28px)",
+      },
     },
     title: {
       margin: "1em 0",
@@ -73,6 +77,30 @@ export default function StartGameInputs() {
     setCountry(countryObj);
   }
 
+  const inputLabelProps = {
+    style: {
+      textAlign: "left",
+    },
+  };
+
+  const inputClicked = (e) => {
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.textAlign = "left";
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.width = "auto";
+  };
+
+  const inputBlur = (e) => {
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.textAlign = "center";
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.width = "calc(100% - 28px)";
+  };
+
   return (
     <div className={classes.root}>
       <Paper square>
@@ -86,6 +114,9 @@ export default function StartGameInputs() {
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
             className={classes.input}
+            onClick={inputClicked}
+            onBlur={inputBlur}
+            InputLabelProps={{ id: "start-game-inputs-tiktok-label" }}
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
@@ -95,6 +126,8 @@ export default function StartGameInputs() {
             onChange={handleOnPhoneChange}
             value={phone}
             id="start-game-inputs-phone"
+            variant="outlined"
+            InputLabelProps={inputLabelProps}
           />
           <TextField
             id="start-game-inputs-game-name"
@@ -104,6 +137,9 @@ export default function StartGameInputs() {
             onChange={(event) => setGameName(event.target.value)}
             inputRef={gameNameRef}
             value={gameName}
+            onClick={inputClicked}
+            onBlur={inputBlur}
+            InputLabelProps={{ id: "start-game-inputs-game-name-label" }}
           />
         </form>
         <form className={classes.form} autoComplete="off">

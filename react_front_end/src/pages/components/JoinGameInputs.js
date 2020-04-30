@@ -3,16 +3,16 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import {isSm, isL} from "../../utilities/Utilities";
+import { isSm, isL } from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
-import {maxButtonWidth} from "../../utilities/Constants";
+import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function JoinGameInputs() {
   const sm = isSm();
   const isLarge = isL();
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles((theme) => ({
     root: {
-      backgroundColor:"black",
+      backgroundColor: "black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
@@ -22,6 +22,13 @@ export default function JoinGameInputs() {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+      },
+      "& > div div fieldset": {
+        borderRadius: "0px",
+      },
+      "& > div label": {
+        textAlign: "center",
+        width: "calc(100% - 28px)",
       },
     },
     title: {
@@ -40,10 +47,10 @@ export default function JoinGameInputs() {
 
   const tikTokRef = useRef();
 
- const [tikTok, setTikTok] = useState("");
- const [didSubmit, setDidSubmit] = useState(false);
- const [phone, setPhone] = useState("");
- const [country, setCountry] = useState({});
+  const [tikTok, setTikTok] = useState("");
+  const [didSubmit, setDidSubmit] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState({});
 
   const submit = (event) => {
     console.log("send to API endpoint");
@@ -59,6 +66,30 @@ export default function JoinGameInputs() {
     setCountry(countryObj);
   }
 
+  const inputLabelProps = {
+    style: {
+      textAlign: "left",
+    },
+  };
+
+  const inputClicked = (e) => {
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.textAlign = "left";
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.width = "auto";
+  };
+
+  const inputBlur = (e) => {
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.textAlign = "center";
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.width = "calc(100% - 28px)";
+  };
+
   return (
     <div className={classes.root}>
       <Paper square>
@@ -71,25 +102,36 @@ export default function JoinGameInputs() {
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
+            onClick={inputClicked}
+            onBlur={inputBlur}
+            InputLabelProps={{ id: "join-game-inputs-tiktok-label" }}
           />
-          <MuiPhoneNumber error={didSubmit && phone.length <= 6}
-          label="PHONE NUMBER" defaultCountry={'us'} disableAreaCodes={true}
-          onChange={handleOnPhoneChange}
-          value={phone}
-          id="join-game-inputs-phone"
+          <MuiPhoneNumber
+            error={didSubmit && phone.length <= 6}
+            label="PHONE NUMBER"
+            defaultCountry={"us"}
+            disableAreaCodes={true}
+            onChange={handleOnPhoneChange}
+            value={phone}
+            id="join-game-inputs-phone"
+            variant="outlined"
+            InputLabelProps={inputLabelProps}
           />
         </form>
         <form className={classes.form} autoComplete="off">
-          <Button variant="contained" onClick={submit}
-          style={{backgroundColor:'white',
-                width:'100vw',
-                maxWidth: maxButtonWidth,
-                fontWeight: 'bold',
-            }}>
+          <Button
+            variant="contained"
+            onClick={submit}
+            style={{
+              backgroundColor: "white",
+              width: "100vw",
+              maxWidth: maxButtonWidth,
+              fontWeight: "bold",
+            }}
+          >
             JOIN THIS GAME
-            </Button>
+          </Button>
         </form>
-
       </Paper>
     </div>
   );
