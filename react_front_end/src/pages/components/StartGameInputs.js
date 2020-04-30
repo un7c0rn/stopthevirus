@@ -35,6 +35,18 @@ export default function StartGameInputs() {
         margin: "1em 0",
       },
     },
+    input: {
+      borderRadius: "0 !important",
+      backgroundColor: "green",
+      border: "2px dotted white",
+      "&:hover":{
+        borderRadius: "0 !important",
+        backgroundColor: "pink",
+      },
+      "> fieldset": {
+        display:"none",
+      }
+    }
   }));
   const classes = useStyles();
 
@@ -83,6 +95,8 @@ export default function StartGameInputs() {
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
+            className={classes.input}
+
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
