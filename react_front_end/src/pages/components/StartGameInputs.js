@@ -6,22 +6,24 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import { isSm } from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 import { startGame } from "../../mediators/GameMediator";
-import {maxButtonWidth} from "../../utilities/Constants";
+import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function StartGameInputs() {
   const sm = isSm();
   const useStyles = makeStyles(() => ({
     root: {
-      backgroundColor:"black",
+      backgroundColor: "black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        //height: sm ? "55vh" : "45vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+      },
+      "& > div div fieldset": {
+        borderRadius: "0px",
       },
     },
     title: {
@@ -35,18 +37,6 @@ export default function StartGameInputs() {
         margin: "1em 0",
       },
     },
-    input: {
-      borderRadius: "0 !important",
-      backgroundColor: "green",
-      border: "2px dotted white",
-      "&:hover":{
-        borderRadius: "0 !important",
-        backgroundColor: "pink",
-      },
-      "> fieldset": {
-        display:"none",
-      }
-    }
   }));
   const classes = useStyles();
 
@@ -96,7 +86,6 @@ export default function StartGameInputs() {
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
             className={classes.input}
-
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
@@ -118,18 +107,20 @@ export default function StartGameInputs() {
           />
         </form>
         <form className={classes.form} autoComplete="off">
-          <Button variant="contained" onClick={submit}
-          style={{backgroundColor:'white',
-                width:'100vw',
-                maxWidth:maxButtonWidth,
-                fontWeight: 'bold',
-            }}>
+          <Button
+            variant="contained"
+            onClick={submit}
+            style={{
+              backgroundColor: "white",
+              width: "100vw",
+              maxWidth: maxButtonWidth,
+              fontWeight: "bold",
+            }}
+          >
             START A GAME
           </Button>
         </form>
-
       </Paper>
-
     </div>
   );
 }
