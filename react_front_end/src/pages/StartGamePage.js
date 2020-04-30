@@ -5,6 +5,8 @@ import Footer from "./components/Footer";
 import StartGamePrompt from "./components/StartGamePrompt";
 import StartGameInputs from "./components/StartGameInputs";
 import TriangleLogo from "./components/TriangleLogo";
+import LogoContainer from "./components/LogoContainer";
+import { StatisticsLeft, StatisticsRight } from "./components/GameStatistics";
 
 export default function StartGamePage() {
   const useStyles = makeStyles((theme) => ({
@@ -26,7 +28,11 @@ export default function StartGamePage() {
       <section className={classes.root}>
         <AppTitle />
         <StartGamePrompt />
-        <TriangleLogo />
+        <LogoContainer layout="center">
+          <StatisticsLeft />
+          <TriangleLogo />
+          <StatisticsRight />
+        </LogoContainer>
         <StartGameInputs />
         <Footer />
       </section>

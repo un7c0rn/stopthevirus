@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { withStyles } from "@material-ui/core";
 import { AppContext } from "../App";
-
 import Footer from "./components/Footer";
 import { makeStyles } from "@material-ui/core/styles";
 import LandingPageInformation from "./components/LandingPageInformation";
 import AppTitle from "./components/AppTitle";
-import TriangleLogo from "./components/TriangleLogo";
+import LogoContainer from "./components/LogoContainer";
+import { StatisticsLeft, StatisticsRight } from "./components/GameStatistics";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,7 +35,10 @@ const LandingPage = () => {
     <>
       <section className={classes.root}>
         <AppTitle />
-        <TriangleLogo hideTriangle={true} />
+        <LogoContainer layout="center">
+          <StatisticsLeft layout="row" />
+          <StatisticsRight layout="row" />
+        </LogoContainer>
         <LandingPageInformation />
         <Footer />
       </section>
