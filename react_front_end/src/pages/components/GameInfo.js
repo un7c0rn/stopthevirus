@@ -12,6 +12,8 @@ import { NumberOfPlayers } from "./NumberOfPlayers";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
     flexWrap: "wrap",
     width: "100vw",
     margin: "3em 0",
