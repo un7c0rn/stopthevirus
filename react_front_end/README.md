@@ -353,7 +353,7 @@ Current work around is run the function. And then to **open the lambda function*
 
 1. `yarn && netlify dev`
 2. `yarn test`
-3. `netlify functions:invoke add_player --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "tiktok":"@user1234", "email":"user@domain.com", "trib e_id":"77TMV9omdLeW7ORvuheX", "team_id":"Q09FeEtoIgjNI57Bnl1E", "active":"false"}' --no-identity`
+3. `netlify functions:invoke add_player --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "tiktok":"@user1234", "email":"user@domain.com", "trib e_id":"77TMV9omdLeW7ORvuheX", "team_id":"Q09FeEtoIgjNI57Bnl1E", "active":"false","phone":"+440987654321"}' --no-identity`
 
 ## Firebase API **add_vote**
 

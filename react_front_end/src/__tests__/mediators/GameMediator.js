@@ -7,7 +7,7 @@ describe("StartGame", () => {
   it("should not start a new game if data is missing", async () => {
     const obj = {
       handle: "who",
-      phone: "+1 (098) 765-4321",
+      phone: null,
       hashtag: null,
     };
 
@@ -19,7 +19,7 @@ describe("StartGame", () => {
   it("should start a new game", async () => {
     const obj = {
       handle: "who",
-      phone: "+1 (098) 765-4321",
+      phone: process.env.REACT_APP_phone_number,
       hashtag: "#who",
     };
 

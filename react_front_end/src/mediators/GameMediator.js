@@ -35,6 +35,7 @@ export const startGame = async ({
     team_id: 1,
     active: 1,
     testId,
+    phone,
   };
 
   const addedPlayer = await fetch(
@@ -47,5 +48,17 @@ export const startGame = async ({
 
   // TODO: Debug data not being in response
 
-  return addedPlayer.status === 200;
+  const verifyData = {
+    phone,
+  };
+
+  const sendCodeResponse = await fetch(
+    "http://localhost:8888/.netlify/functions/verify_player",
+    {
+      method: "POST",
+      body: JSON.stringify(verifyData),
+    }
+  );
+
+  return sendCodeResponse.status === 200;
 };

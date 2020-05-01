@@ -42,6 +42,7 @@ describe("Firestore service", () => {
   const _TEST_USER_IS_ACTIVE = "true";
   const _TEST_USER_FROM_ID = "a1b2c3CJaiSkxYgDocGDw4";
   const _TEST_USER_TO_ID = "a1b2c3CJaiSkxYgDocGDw4";
+  const _TEST_PHONE_ = "+4401234567890";
 
   const { firebase, firestore } = Firestore.initialise();
 
@@ -287,9 +288,10 @@ describe("Firestore service", () => {
       team_id: _TEST_TEAM_YELLOW_ID,
       active: _TEST_USER_IS_ACTIVE,
       testId: _TEST_ID,
+      phone: _TEST_PHONE_,
     };
     const response = await Firestore.add_player(obj);
-    expect(response.id).toBe(_TEST_ID);
+    expect(response.id).toBeDefined();
   });
 
   it("should return false if data is missing when adding a vote", async () => {

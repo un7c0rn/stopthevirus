@@ -9,7 +9,8 @@ exports.handler = async (event, context, callback) => {
       !body.email ||
       !body.tribe_id ||
       !body.team_id ||
-      !body.active
+      !body.active ||
+      !body.phone
     )
       throw new Error("problem with data in body");
 
@@ -20,6 +21,7 @@ exports.handler = async (event, context, callback) => {
       tribe_id: body.tribe_id,
       team_id: body.team_id,
       active: body.active,
+      phone: body.phone,
     });
 
     callback(null, { statusCode: 200, body: JSON.stringify(response) });
