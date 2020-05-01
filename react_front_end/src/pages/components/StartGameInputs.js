@@ -5,10 +5,11 @@ import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
 import { isSm } from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
+import { startGame } from "../../mediators/GameMediator";
 
 export default function StartGameInputs() {
   const sm = isSm();
-  const useStyles = makeStyles((theme) => ({
+  const useStyles = makeStyles(() => ({
     root: {
       display: "flex",
       flexWrap: "wrap",
@@ -44,7 +45,7 @@ export default function StartGameInputs() {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState({});
 
-  const submit = (event) => {
+  const submit = async () => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
     console.log(gameNameRef.current.value);
@@ -52,6 +53,15 @@ export default function StartGameInputs() {
     console.log(country);
 
     setDidSubmit(true);
+
+    const payload = {
+      handle: tikTokRef.current.value,
+      phone,
+      hashtag: gameNameRef.current.value,
+    };
+
+    const response = await startGame(payload);
+    if (response) console.log("show success snack bar ===", response);
   };
 
   function handleOnPhoneChange(value, countryObj) {

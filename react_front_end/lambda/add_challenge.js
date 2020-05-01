@@ -103,10 +103,13 @@ __webpack_require__.r(__webpack_exports__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
+
 dotenv__WEBPACK_IMPORTED_MODULE_0___default.a.config();
 class Firestore {}
 
 _defineProperty(Firestore, "firebase", void 0);
+
+_defineProperty(Firestore, "firestore", void 0);
 
 _defineProperty(Firestore, "getInstance", () => {
   if (firebase_admin__WEBPACK_IMPORTED_MODULE_1__["apps"].length < 1) {
@@ -122,8 +125,6 @@ _defineProperty(Firestore, "getInstance", () => {
   Firestore.firestore = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["app"]("VIR-US").firestore();
   return Firestore;
 });
-  
-_defineProperty(Firestore, "firestore", void 0);
 
 _defineProperty(Firestore, "initialise", () => {
   // Web app's Firebase configuration
@@ -138,7 +139,6 @@ _defineProperty(Firestore, "initialise", () => {
     token_uri: process.env.REACT_APP_token_uri,
     auth_provider_x509_cert_url: process.env.REACT_APP_auth_provider_x509_cert_url,
     client_x509_cert_url: process.env.REACT_APP_client_x509_cert_url
-
   };
   const app = firebase_admin__WEBPACK_IMPORTED_MODULE_1__["initializeApp"]({
     credential: firebase_admin__WEBPACK_IMPORTED_MODULE_1__["credential"].cert(credentials),
@@ -342,7 +342,7 @@ _defineProperty(Firestore, "add_game", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
-  return (await response.get()).data();
+  return response.id;
 });
 
 _defineProperty(Firestore, "add_challenge", async ({
@@ -419,7 +419,8 @@ _defineProperty(Firestore, "add_player", async ({
     ...(await response.get()).data()
   };
   await response.set(map);
-  return (await response.get()).data();
+  const data = (await response.get()).data();
+  return data;
 });
 
 _defineProperty(Firestore, "add_vote", async ({
@@ -444,6 +445,7 @@ _defineProperty(Firestore, "add_vote", async ({
   await response.set(map);
   return (await response.get()).data();
 });
+
 /***/ }),
 
 /***/ "./add_challenge.js":

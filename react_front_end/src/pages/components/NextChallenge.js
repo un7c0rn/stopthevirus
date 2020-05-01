@@ -1,7 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import React, { useContext } from "react";
-import { AppContext } from "../../App";
+import React from "react";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -18,8 +17,6 @@ const useStyles = makeStyles((theme) => ({
 
 export const NextChallenge = () => {
   const classes = useStyles();
-
-  const { gameInfo } = useContext(AppContext);
 
   return (
     <Typography

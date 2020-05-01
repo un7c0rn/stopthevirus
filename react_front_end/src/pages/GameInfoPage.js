@@ -1,5 +1,5 @@
-import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
 import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
@@ -23,7 +23,7 @@ const GameInfoPage = () => {
 
   return (
     <>
-      <section className={classes.root}>
+      <section className={classes.root} data-testid="Game Info Page">
         <ButtonAppBar />
         <AppTitle />
         <GameInfo />

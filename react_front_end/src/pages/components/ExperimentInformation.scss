@@ -1,0 +1,35 @@
+.experiment-information-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin-top: 2em;
+
+    border-radius: 5px;
+    background: linear-gradient(-70deg, #ffffff, #d7d7d7);
+    box-shadow: -3px -3px 6px #cbcbcb, 10px 10px 25px #ffffff;
+
+    font-size: 1em;
+    font-weight: 600;
+
+    color: black;
+
+    // default ui state
+    filter: blur(0.2rem);
+    opacity: 0;
+
+    // ui transition
+    animation-name: ui-component-blur-up;
+    animation-fill-mode: forwards;
+    animation-duration: 1s;
+    animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    animation-delay: 0.5s;
+  }
+}

@@ -1,9 +1,15 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+// eslint-disable-next-line
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from "@material-ui/core/styles";
 import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import useErrorBoundary from "use-error-boundary";
 import "./App.scss";
-import { makeStyles } from "@material-ui/core/styles";
+import Preloader from "./pages/components/Preloader";
+import { CustomUiError } from "./utilities/Utilities";
 
 const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -17,57 +23,64 @@ const theme = createMuiTheme({
 
 export const AppContext = createContext();
 
+// eslint-disable-next-line
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    flexWrap: "wrap",
-    "& > *": {
-      width: "100vw",
-      height: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "flex-end",
-    },
-  },
-  preloader: {
-    display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignSelf: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    width: "100vw",
+    height: "100vh",
   },
 }));
 
 function App() {
+  // eslint-disable-next-line
   const classes = useStyles();
+  const [gameInfo, setGameInfo] = useState(false);
+  const [blurUi, setBlurUi] = useState(false);
 
-  const [gameInfo, setGameInfo] = useState();
+  const {
+    ErrorBoundary, // class - The react component to wrap your children in. This WILL NOT CHANGE
+    // eslint-disable-next-line
+    didCatch, // boolean - Whether the ErrorBoundary catched something
+    // error, // null or the error
+    // errorInfo, // null or the error info as described in the react docs
+  } = useErrorBoundary();
 
   return (
-    <AppContext.Provider value={{ gameInfo, setGameInfo }}>
-      <Suspense
-        fallback={
-          <div className={classes.root}>
-            <CircularProgress className={classes.preloader} />
-          </div>
-        }
-      >
-        <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/start-game" element={<StartGamePage />} />
-              <Route path="/join-game" element={<JoinGamePage />} />
-              <Route path="/game-info/:gameId" element={<GameInfoPage />} />
-              <Route
-                path="/challenge-submission/:phone/:game"
-                element={<SubmitPage />}
-              />
-            </Routes>
-          </BrowserRouter>
-        </ThemeProvider>
-      </Suspense>
-    </AppContext.Provider>
+    <ErrorBoundary
+      render={() => (
+        <AppContext.Provider
+          value={{
+            gameInfo,
+            setGameInfo,
+            blurUi,
+            setBlurUi,
+          }}
+        >
+          <Suspense fallback={<Preloader />}>
+            <ThemeProvider theme={theme}>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/start-game" element={<StartGamePage />} />
+                  <Route path="/join-game" element={<JoinGamePage />} />
+                  <Route path="/game-info/:gameId" element={<GameInfoPage />} />
+                  <Route
+                    path="/challenge-submission/:phone/:game"
+                    element={<SubmitPage />}
+                  />
+                  <Route path="/*" element={<LandingPage />} />
+                </Routes>
+              </BrowserRouter>
+            </ThemeProvider>
+          </Suspense>
+        </AppContext.Provider>
+      )}
+      renderError={({ error }) => <CustomUiError error={error} type="app" />}
+    />
   );
 }
 export default App;
