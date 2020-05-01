@@ -47,7 +47,10 @@ export default class Firestore {
     const defaultFirebase = admin;
     const defaultFirestore = admin.firestore(app);
 
-    return { firebase: defaultFirebase, firestore: defaultFirestore };
+    return {
+      firebase: defaultFirebase,
+      firestore: defaultFirestore,
+    };
   };
 
   static tribe_from_id = async (game = null, id = null) => {
@@ -397,5 +400,27 @@ export default class Firestore {
     await response.set(map);
 
     return (await response.get()).data();
+  };
+
+  static verify_code = async ({ phone = null, code = null, game = null }) => {
+    if (!phone || !code) return false;
+
+    const player = this.firestore
+      .collection(`games/${game}/players`)
+      .where("phone", "==", phone, "code", "==", code);
+
+    const update = (await player.get()).data();
+
+    if (update.code === code && update.phone === phone) {
+      const map = {
+        ...(await player.get()).data(),
+        active: true,
+      };
+      await player.set(map);
+    }
+
+    const data = (await player.get()).data();
+
+    return data;
   };
 }

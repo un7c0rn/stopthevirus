@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { getProfile } from "../services/TikTok";
+import { v4 as uuidv4 } from "uuid";
 
 export const startGame = async ({
   handle = null,
@@ -27,6 +28,8 @@ export const startGame = async ({
 
   const gameId = await addedGameId.json();
 
+  const code = uuidv4();
+
   const playerData = {
     game: gameId,
     tiktok: handle,
@@ -36,6 +39,7 @@ export const startGame = async ({
     active: 1,
     testId,
     phone,
+    code,
   };
 
   const addedPlayer = await fetch(
@@ -50,6 +54,8 @@ export const startGame = async ({
 
   const verifyData = {
     phone,
+    code,
+    game: gameId,
   };
 
   const sendCodeResponse = await fetch(
