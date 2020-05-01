@@ -448,6 +448,26 @@ _defineProperty(Firestore, "add_vote", async ({
   return (await response.get()).data();
 });
 
+_defineProperty(Firestore, "verify_code", async ({
+  phone = null,
+  code = null,
+  game = null
+}) => {
+  if (!phone || !code) return false;
+  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone, "code", "==", code);
+  const update = (await player.get()).data();
+
+  if (update.code === code && update.phone === phone) {
+    const map = { ...(await player.get()).data(),
+      active: true
+    };
+    await player.set(map);
+  }
+
+  const data = (await player.get()).data();
+  return data;
+});
+
 /***/ }),
 
 /***/ "./add_player.js":
