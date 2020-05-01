@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
 import { isSm, isL } from "../../utilities/Utilities";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function JoinGameInputs() {
@@ -73,12 +73,12 @@ export default function JoinGameInputs() {
   };
 
   const inputClicked = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "left";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "auto";
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
+
+    style.setProperty("text-align", "left");
+    style.setProperty("width", "auto");
+    style.setProperty("color", "white");
   };
 
   const inputBlur = (e) => {
@@ -89,6 +89,15 @@ export default function JoinGameInputs() {
       `#${e.target.getAttribute("id")}-label`
     ).style.width = "calc(100% - 28px)";
   };
+
+  useEffect(() => {
+    document.querySelectorAll(`fieldset`).forEach((element) => {
+      element.style.borderColor = "white";
+    });
+    document.querySelectorAll(`label`).forEach((element) => {
+      element.style.color = "white";
+    });
+  }, []);
 
   return (
     <div className={classes.root}>

@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
 import { isSm } from "../../utilities/Utilities";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { startGame } from "../../mediators/GameMediator";
 import { maxButtonWidth } from "../../utilities/Constants";
 
@@ -24,6 +24,7 @@ export default function StartGameInputs() {
       },
       "& > div div fieldset": {
         borderRadius: "0px",
+        borderColor: "white",
       },
       "& > div label": {
         textAlign: "center",
@@ -84,12 +85,12 @@ export default function StartGameInputs() {
   };
 
   const inputClicked = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "left";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "auto";
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
+
+    style.setProperty("text-align", "left");
+    style.setProperty("width", "auto");
+    style.setProperty("color", "white");
   };
 
   const inputBlur = (e) => {
@@ -100,6 +101,15 @@ export default function StartGameInputs() {
       `#${e.target.getAttribute("id")}-label`
     ).style.width = "calc(100% - 28px)";
   };
+
+  useEffect(() => {
+    document.querySelectorAll(`fieldset`).forEach((element) => {
+      element.style.borderColor = "white";
+    });
+    document.querySelectorAll(`label`).forEach((element) => {
+      element.style.color = "white";
+    });
+  }, []);
 
   return (
     <div className={classes.root}>
