@@ -1,45 +1,49 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
 import logo from "../../assets/vir-us.logo.type.white.letters.svg";
 import bg from "../../assets/vir-us_world_map_transparent_canvas.svg";
-//aspect ratio 310/2744
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    flexDirection: "column",
     justifyContent: "center",
-
-    "& > *": {
-      width: "80vw",
-      maxWidth:"850px",
-      height: "11vh",
-      display: "flex",
-      alignItems: "center"
-    },
+    alignItems: "flex-start",
+    height: "auto",
+    maxHeight: "40vh",
   },
-  title: {
-    margin: 0,
-    fontSize: "4em"
-  }
+  background: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    position: "relative",
+    zIndex: "2",
+    alignSelf: "center",
+    height: "100%",
+    width: "100%",
+  },
+  logo: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignSelf: "center",
+    position: "relative",
+    zIndex: "2",
+    width: "50%",
+    height: "50%",
+    top: "calc(-15%)",
+    left: "calc(-75%)",
+  },
 }));
 
 export default function AppTitle() {
   const classes = useStyles();
-  const imgHeight = 30;
 
   return (
-    <div className={classes.root}
-    >
-      <img src ={bg} style={{
-        height:imgHeight+"vh",
-      }}/>
-      <img src={logo} style = {{
-        position:"absolute",
-        marginTop:imgHeight/4+"vh"
-      }}/>
+    <div className={classes.root}>
+      <img src={bg} className={classes.background} />
+      <img src={logo} className={classes.logo} />
     </div>
   );
 }
