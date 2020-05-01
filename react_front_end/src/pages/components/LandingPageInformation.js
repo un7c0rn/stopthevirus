@@ -1,12 +1,11 @@
 import React from "react";
 import { withStyles } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import ExperimentInformation from "./ExperimentInfomation";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import {maxButtonWidth} from "../../utilities/Constants";
+import { maxButtonWidth } from "../../utilities/Constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,8 +21,7 @@ const useStyles = makeStyles((theme) => ({
     margin: "1em",
     fontSize: "100%",
     textAlign: "center",
-  }
-
+  },
 }));
 
 const LandingPageInformation = () => {
@@ -32,11 +30,8 @@ const LandingPageInformation = () => {
   return (
     <>
       <section className={classes.root}>
-        <Paper square style={{maxWidth:maxButtonWidth}}>
-          <Typography
-            gutterBottom
-            className={classes.title}
-          >
+        <Paper square style={{ maxWidth: maxButtonWidth }}>
+          <Typography gutterBottom className={classes.title}>
             It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the
             Tokyo Olympics are cancelled this year. We’re at the height of human
             technology and innovation, but at the same time facing one of the
@@ -44,17 +39,13 @@ const LandingPageInformation = () => {
             suffering, countries around the world are facing mandatory lockdown
             orders and hospitals are overwhelmed.
           </Typography>
-          <Typography
-            gutterBottom
-            className={classes.title}
-          >
-            Despite this, many people are
-            still unaware of the seriousness of COVID-19 and actions they can
-            take to support our health care professionals such as social
-            distancing to flatten the health care demand curve. Reducing the
-            doubling rate of COVID-19 by even a few days can have massive
-            impact. Can we use a high stakes social game to help inspire the
-            youth to stop the virus?
+          <Typography gutterBottom className={classes.title}>
+            Despite this, many people are still unaware of the seriousness of
+            COVID-19 and actions they can take to support our health care
+            professionals such as social distancing to flatten the health care
+            demand curve. Reducing the doubling rate of COVID-19 by even a few
+            days can have massive impact. Can we use a high stakes social game
+            to help inspire the youth to stop the virus?
           </Typography>
         </Paper>
         <Typography
@@ -62,18 +53,21 @@ const LandingPageInformation = () => {
           component="h4"
           gutterBottom
           className={classes.title}
-
         >
-          <Link to='/start-game' style={{ textDecoration: "none" }} >
-            <Button style={{backgroundColor:'white',
-                  width:'100vw',fontWeight: "bold",
-                  maxWidth:maxButtonWidth,
-                color:"black"}} >
+          <Link to="/start-game" style={{ textDecoration: "none" }}>
+            <Button
+              style={{
+                backgroundColor: "white",
+                width: "100vw",
+                fontWeight: "bold",
+                maxWidth: maxButtonWidth,
+                color: "black",
+              }}
+            >
               GET STARTED
             </Button>
           </Link>
         </Typography>
-
       </section>
     </>
   );

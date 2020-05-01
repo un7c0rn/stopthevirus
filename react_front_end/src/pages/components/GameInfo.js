@@ -1,5 +1,4 @@
 import { CircularProgress } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import fetch from "node-fetch";
 import React, { useContext, useEffect } from "react";
@@ -14,9 +13,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
+    width: "100vw",
+    margin: "3em 0",
     "& > *": {
-      width: "100vw",
-      height: "40vh",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -72,19 +71,17 @@ export default function GameInfo() {
 
   return (
     <div className={classes.root}>
-      <Paper square>
-        {gameInfo === undefined ? problemWithUi() : null}
-        {gameInfo&&gameInfo.game ? (
-          <>
-            <GameName />
-            <NumberOfPlayers />
-            <NextChallenge />
-            <NextTribalCouncil />
-          </>
-        ) : (
-          <CircularProgress className={classes.preloader} />
-        )}
-      </Paper>
+      {gameInfo === undefined ? problemWithUi() : null}
+      {gameInfo && gameInfo?.game ? (
+        <>
+          <GameName />
+          <NumberOfPlayers />
+          <NextChallenge />
+          <NextTribalCouncil />
+        </>
+      ) : (
+        <CircularProgress className={classes.preloader} />
+      )}
     </div>
   );
 }

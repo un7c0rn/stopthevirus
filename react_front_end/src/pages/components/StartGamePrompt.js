@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     width: "40vw",
     [theme.breakpoints.down("md")]: {
+      width: "60vw",
+    },
+    [theme.breakpoints.down("sm")]: {
       width: "90vw",
     },
   },
