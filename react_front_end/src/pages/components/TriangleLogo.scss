@@ -1,0 +1,44 @@
+.triangle-logo {
+  min-height: 50vh;
+  animation-name: scale-triangle;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+
+  @keyframes scale-triangle {
+    0% {
+      transform: scale(0, 0);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+
+  @media screen and (min-width: 0px) {
+    width: 50vw;
+    @media screen and (orientation: landscape) {
+      max-width: 25vw;
+    }
+  }
+  @media screen and (min-width: 600px) {
+    max-width: 45vw;
+
+    @media screen and (orientation: landscape) {
+      max-width: 25vw;
+    }
+
+  }
+  @media screen and (min-width: 960px) {
+    max-width: 30vw;
+    @media screen and (orientation: landscape) {
+      max-width: 20vw;
+    }
+
+  }
+  @media screen and (min-width: 1280px) {
+    max-width: 25vw;
+  }
+  @media screen and (min-width: 1920px) {
+    max-width: 15vw;
+  }
+}

@@ -2,20 +2,20 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import NumberFormat from "react-number-format";
+import NumberFormat from 'react-number-format';
 import Button from "@material-ui/core/Button";
-import { Link } from "react-router-dom";
-import { isSm } from "../../utilities/Utilities";
+import {Link} from "react-router-dom";
+import {isSm} from "../../utilities/Utilities";
+
 
 export default function JoinGamePrompt() {
   const sm = isSm();
-  const useStyles = makeStyles(() => ({
+  const useStyles = makeStyles(theme => ({
     root: {
       display: "flex",
       flexWrap: "nowrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "36vh" : "30vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -43,8 +43,9 @@ export default function JoinGamePrompt() {
           component="h4"
           gutterBottom
           className={classes.title}
+
         >
-          You've been invited to &quot;{gameName}&quot;
+          You've been invited to "{gameName}"
         </Typography>
 
         <Typography
@@ -75,9 +76,12 @@ export default function JoinGamePrompt() {
           gutterBottom
           className={classes.title}
         >
-          <Link to="/game-info" style={{ textDecoration: "none" }}>
-            <Button>HOW THE GAME WORKS</Button>
+          <Link to='/game-info' style={{ textDecoration: "none" }} >
+            <Button style={{fontWeight: "bold"}} >
+              HOW THE GAME WORKS
+            </Button>
           </Link>
+
         </Typography>
       </Paper>
     </div>

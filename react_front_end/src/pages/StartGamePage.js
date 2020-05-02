@@ -1,10 +1,12 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import StartGamePrompt from "./components/StartGamePrompt";
 import StartGameInputs from "./components/StartGameInputs";
+import TriangleLogo from "./components/TriangleLogo";
+import LogoContainer from "./components/LogoContainer";
+import { StatisticsLeft, StatisticsRight } from "./components/GameStatistics";
 
 export default function StartGamePage() {
   const useStyles = makeStyles((theme) => ({
@@ -16,6 +18,7 @@ export default function StartGamePage() {
       display: "flex",
       flexDirection: "column",
       justifyContent: "flex-start",
+      marginTop: "4em",
     },
   }));
 
@@ -24,9 +27,13 @@ export default function StartGamePage() {
   return (
     <>
       <section className={classes.root}>
-        <ButtonAppBar />
         <AppTitle />
         <StartGamePrompt />
+        <LogoContainer>
+          <StatisticsLeft />
+          <TriangleLogo />
+          <StatisticsRight />
+        </LogoContainer>
         <StartGameInputs />
         <Footer />
       </section>

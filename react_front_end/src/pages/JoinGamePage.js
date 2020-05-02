@@ -1,6 +1,5 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import ButtonAppBar from "./components/AppBar";
 import AppTitle from "./components/AppTitle";
 import Footer from "./components/Footer";
 import JoinGamePrompt from "./components/JoinGamePrompt";
@@ -16,6 +15,7 @@ export default function JoinGamePage() {
       display: "flex",
       flexDirection: "column",
       justifyContent: "flex-start",
+      marginTop: "4em",
     },
   }));
 
@@ -24,7 +24,6 @@ export default function JoinGamePage() {
   return (
     <>
       <section className={classes.root}>
-        <ButtonAppBar />
         <AppTitle />
         <JoinGamePrompt />
         <JoinGameInputs />

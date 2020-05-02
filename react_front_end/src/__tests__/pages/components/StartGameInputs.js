@@ -5,19 +5,19 @@ import StartGameInputs from "../../../pages/components/StartGameInputs";
 import "@testing-library/jest-dom";
 
 function tikTokLocater() {
-  return screen.getByLabelText("Tik Tok");
+  return screen.getByLabelText("TIK TOK");
 }
 
 function phoneNumberLocator() {
-  return screen.getByLabelText("SMS Phone Number");
+  return screen.getByLabelText("PHONE NUMBER");
 }
 
 function startGameLocator() {
-  return screen.getByText("Start a game");
+  return screen.getByText("START A GAME");
 }
 
 function gameNameLocator() {
-  return screen.getByLabelText("Game Hashtag");
+  return screen.getByLabelText("GAME HASHTAG");
 }
 
 test("TikTok input", () => {
