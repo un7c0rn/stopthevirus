@@ -345,11 +345,14 @@ export default class Firestore {
     code = null,
   }) => {
     if (
-      (!game || !tiktok || !email || !tribe_id,
-      !team_id,
-      !active,
-      !phone,
-      !code)
+      !game ||
+      !tiktok ||
+      !email ||
+      !tribe_id ||
+      !team_id ||
+      !active ||
+      !phone ||
+      !code
     )
       return false;
 
@@ -369,10 +372,9 @@ export default class Firestore {
 
     const map = {
       id: testId ? testId : response.id,
-      ...(await response.get()).data(),
     };
 
-    await response.set(map);
+    await response.update(map);
 
     const data = (await response.get()).data();
 
@@ -411,24 +413,22 @@ export default class Firestore {
   };
 
   static verify_code = async ({ phone = null, code = null, game = null }) => {
-    if (!phone || !code) return false;
+    if (!phone || !code || !game) return false;
 
     const player = this.firestore
       .collection(`games/${game}/players`)
-      .where("phone", "==", phone, "code", "==", code);
+      .where("phone", "==", phone)
+      .where("code", "==", code)
+      .limit(1);
 
-    const update = (await player.get()).data();
+    const query = await player.get();
 
-    if (update.code === code && update.phone === phone) {
-      const map = {
-        ...(await player.get()).data(),
-        active: true,
-      };
-      await player.set(map);
-    }
+    if (!query.docs.length) throw new Error("player not found");
 
-    const data = (await player.get()).data();
+    const data = query.docs[0];
 
-    return data;
+    data.ref.update({ active: true });
+
+    return "verified";
   };
 }

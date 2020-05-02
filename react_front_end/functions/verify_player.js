@@ -10,11 +10,15 @@ exports.handler = async (event, context, callback) => {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = require("twilio")(accountSid, authToken);
 
+    const url = encodeURI(
+      `${process.env.WEBHOOK_CODE_VERIFY}/.netlify/functions/verify_code?phone=${body.phone}&code=${body.code}&game=${body.game}`
+    );
+
     const sms = await client.messages.create({
       body: `Hi there! Click the link to verify`,
-      mediaUrl: `${process.env.WEBHOOK_CODE_VERIFY}/.netlify/functions/verify_code?phone=${body.phone}&code=${body.code}&game=${body.game}`,
+      mediaUrl: url,
       from: "+12029527488",
-      to: body.phone,
+      to: `+${body.phone}`,
     });
 
     callback(null, { statusCode: 200, body: JSON.stringify(sms.sid) });

@@ -4,6 +4,9 @@
 
 import Firestore from "../../services/Firestore";
 import collections_dict from "../mock_data/firestore.json";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 describe("Firestore service", () => {
   const _TEST_FIRESTORE_INSTANCE_JSON_PATH =
@@ -39,10 +42,11 @@ describe("Firestore service", () => {
   const _TEST_GAME_CHALLENGE_SUBMISSION_VIDEO_VIEWS = 2000;
   const _TEST_GAME_TIKTOK_USER_HANDLE = "@user1234";
   const _TEST_GAME_USER_EMAIL = "user@domain.com";
-  const _TEST_USER_IS_ACTIVE = "true";
+  const _TEST_USER_IS_ACTIVE = 1;
   const _TEST_USER_FROM_ID = "a1b2c3CJaiSkxYgDocGDw4";
   const _TEST_USER_TO_ID = "a1b2c3CJaiSkxYgDocGDw4";
-  const _TEST_PHONE_ = "+4401234567890";
+  const _TEST_PHONE_ = "4401234567890";
+  const _TEST_CODE_ = "3f4f0e53-4f93-4fcb-aa8f-e0e00ae03e9c";
 
   const { firebase, firestore } = Firestore.initialise();
 
@@ -289,9 +293,10 @@ describe("Firestore service", () => {
       active: _TEST_USER_IS_ACTIVE,
       testId: _TEST_ID,
       phone: _TEST_PHONE_,
+      code: _TEST_CODE_,
     };
     const response = await Firestore.add_player(obj);
-    expect(response.id).toBeDefined();
+    expect(response.id).toBe(_TEST_ID);
   });
 
   it("should return false if data is missing when adding a vote", async () => {
@@ -311,5 +316,41 @@ describe("Firestore service", () => {
     };
     const response = await Firestore.add_vote(obj);
     expect(response.id).toBe(_TEST_ID);
+  });
+
+  it("should verify a code", async () => {
+    const game = {
+      game: _TEST_GAME_NAME,
+      hashtag: _TEST_GAME_HASHTAG,
+      testId: _TEST_ID,
+    };
+
+    const player = {
+      game: _TEST_ID,
+      tiktok: _TEST_GAME_TIKTOK_USER_HANDLE,
+      email: _TEST_GAME_USER_EMAIL,
+      tribe_id: _TEST_TRIBE_TIGRAWAY_ID,
+      team_id: _TEST_TEAM_YELLOW_ID,
+      active: _TEST_USER_IS_ACTIVE,
+      testId: _TEST_ID,
+      phone: _TEST_PHONE_,
+      code: _TEST_CODE_,
+    };
+
+    const code = {
+      game: _TEST_ID,
+      phone: _TEST_PHONE_,
+      code: _TEST_CODE_,
+    };
+
+    const gameResponse = await Firestore.add_game(game);
+    const playerResponse = await Firestore.add_player(player);
+    const codeResponse = await Firestore.getInstance().verify_code(code);
+
+    console.log(gameResponse);
+    console.log(playerResponse);
+    console.log(codeResponse);
+
+    expect(codeResponse).toBe("verified");
   });
 });

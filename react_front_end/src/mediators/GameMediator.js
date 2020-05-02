@@ -38,7 +38,7 @@ export const startGame = async ({
     team_id: 1,
     active: 1,
     testId,
-    phone,
+    phone: phone.replace("+", "").replace(/ /g, ""),
     code,
   };
 

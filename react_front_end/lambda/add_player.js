@@ -408,7 +408,7 @@ _defineProperty(Firestore, "add_player", async ({
   phone = null,
   code = null
 }) => {
-  if (!game || !tiktok || !email || !tribe_id, !team_id, !active, !phone, !code) return false;
+  if (!game || !tiktok || !email || !tribe_id || !team_id || !active || !phone || !code) return false;
   const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`players`).add({
     tiktok,
     email,
@@ -419,10 +419,9 @@ _defineProperty(Firestore, "add_player", async ({
     code
   });
   const map = {
-    id: testId ? testId : response.id,
-    ...(await response.get()).data()
+    id: testId ? testId : response.id
   };
-  await response.set(map);
+  await response.update(map);
   const data = (await response.get()).data();
   return data;
 });
@@ -455,19 +454,15 @@ _defineProperty(Firestore, "verify_code", async ({
   code = null,
   game = null
 }) => {
-  if (!phone || !code) return false;
-  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone, "code", "==", code);
-  const update = (await player.get()).data();
-
-  if (update.code === code && update.phone === phone) {
-    const map = { ...(await player.get()).data(),
-      active: true
-    };
-    await player.set(map);
-  }
-
-  const data = (await player.get()).data();
-  return data;
+  if (!phone || !code || !game) return false;
+  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone).where("code", "==", code).limit(1);
+  const query = await player.get();
+  if (!query.docs.length) throw new Error("player not found");
+  const data = query.docs[0];
+  data.ref.update({
+    active: true
+  });
+  return "verified";
 });
 
 /***/ }),
@@ -487,15 +482,16 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.tiktok || !body.email || !body.tribe_id || !body.team_id || !body.active || !body.phone) throw new Error("problem with data in body");
-    const response = _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().add_player({
+    if (!body.game || !body.tiktok || !body.email || !body.tribe_id || !body.team_id || !body.active || !body.phone || !body.code) throw new Error("problem with data in body");
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().add_player({
       game: body.game,
       tiktok: body.tiktok,
       email: body.email,
       tribe_id: body.tribe_id,
       team_id: body.team_id,
       active: body.active,
-      phone: body.phone
+      phone: body.phone,
+      code: body.code
     });
     callback(null, {
       statusCode: 200,

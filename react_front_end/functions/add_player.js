@@ -10,11 +10,12 @@ exports.handler = async (event, context, callback) => {
       !body.tribe_id ||
       !body.team_id ||
       !body.active ||
-      !body.phone
+      !body.phone ||
+      !body.code
     )
       throw new Error("problem with data in body");
 
-    const response = Firestore.getInstance().add_player({
+    const response = await Firestore.getInstance().add_player({
       game: body.game,
       tiktok: body.tiktok,
       email: body.email,
@@ -22,6 +23,7 @@ exports.handler = async (event, context, callback) => {
       team_id: body.team_id,
       active: body.active,
       phone: body.phone,
+      code: body.code,
     });
 
     callback(null, { statusCode: 200, body: JSON.stringify(response) });

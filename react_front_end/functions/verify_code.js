@@ -2,7 +2,7 @@ import Firestore from "../src/services/Firestore";
 // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
 exports.handler = async (event, context, callback) => {
   try {
-    const game = event.queryStringParameters.gamse || null;
+    const game = event.queryStringParameters.game || null;
     if (!game) throw new Error("problem with game");
     const phone = event.queryStringParameters.phone || null;
     if (!phone) throw new Error("problem with phone");
