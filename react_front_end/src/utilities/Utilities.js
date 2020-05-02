@@ -12,6 +12,7 @@ export const toCurrency = (number) => {
   return formatter.format(v);
 };
 
+
 export const isSm = () => {
   //check to see if user resolution is considered "small"
   return useMediaQuery.bind(null, "(max-height:650px)")(); //for iphone 5SE
@@ -24,6 +25,11 @@ export const CustomUiError = ({ error, type }) => {
     default:
       return null;
   }
+};
+
+export const isL = () => {
+  //check to see if user resolution is considered "large" (Desktop)
+  return useMediaQuery.bind(null, "(min-width:1024px)")();
 };
 
 // the next help function
