@@ -342,8 +342,15 @@ export default class Firestore {
     active = null,
     testId = null,
     phone = null,
+    code = null,
   }) => {
-    if ((!game || !tiktok || !email || !tribe_id, !team_id, !active, !phone))
+    if (
+      (!game || !tiktok || !email || !tribe_id,
+      !team_id,
+      !active,
+      !phone,
+      !code)
+    )
       return false;
 
     const response = await this.firestore
@@ -357,6 +364,7 @@ export default class Firestore {
         team_id,
         active,
         phone,
+        code,
       });
 
     const map = {

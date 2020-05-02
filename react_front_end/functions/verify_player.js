@@ -11,9 +11,8 @@ exports.handler = async (event, context, callback) => {
     const client = require("twilio")(accountSid, authToken);
 
     const sms = await client.messages.create({
-      body: `Hi there!
-      
-      Click this link to verify: ${process.env.WEBHOOK_URL}/.netlify/functions/verify_code?phone=${body.phone}&code=${body.code}&game=${body.game}`,
+      body: `Hi there! Click the link to verify`,
+      mediaUrl: `${process.env.WEBHOOK_CODE_VERIFY}/.netlify/functions/verify_code?phone=${body.phone}&code=${body.code}&game=${body.game}`,
       from: "+12029527488",
       to: body.phone,
     });

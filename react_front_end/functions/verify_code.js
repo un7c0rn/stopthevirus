@@ -2,17 +2,17 @@ import Firestore from "../src/services/Firestore";
 // Docs on event and context https://www.netlify.com/docs/functions/#the-handler-method
 exports.handler = async (event, context, callback) => {
   try {
-    const body = JSON.parse(event.body) || null;
-    if (!body.phone) throw new Error("problem with data in body");
+    const game = event.queryStringParameters.gamse || null;
+    if (!game) throw new Error("problem with game");
+    const phone = event.queryStringParameters.phone || null;
+    if (!phone) throw new Error("problem with phone");
+    const code = event.queryStringParameters.code || null;
+    if (!code) throw new Error("problem with code");
 
-    const response = Firestore.getInstance().verify_code({
-      game: body.game,
-      tiktok: body.tiktok,
-      email: body.email,
-      tribe_id: body.tribe_id,
-      team_id: body.team_id,
-      active: body.active,
-      phone: body.phone,
+    const response = await Firestore.getInstance().verify_code({
+      game,
+      phone,
+      code,
     });
 
     callback(null, { statusCode: 200, body: JSON.stringify(response) });

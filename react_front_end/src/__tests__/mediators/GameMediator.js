@@ -17,6 +17,7 @@ describe("StartGame", () => {
   });
 
   it("should start a new game", async () => {
+    jest.setTimeout(30000);
     const obj = {
       handle: "who",
       phone: process.env.REACT_APP_phone_number,
@@ -24,6 +25,8 @@ describe("StartGame", () => {
     };
 
     const response = await startGame(obj);
+
+    console.dir(response);
 
     expect(response).toBe(true);
   });
