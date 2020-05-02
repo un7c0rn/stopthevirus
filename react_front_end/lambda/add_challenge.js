@@ -405,16 +405,18 @@ _defineProperty(Firestore, "add_player", async ({
   team_id = null,
   active = null,
   testId = null,
-  phone = null
+  phone = null,
+  code = null
 }) => {
-  if (!game || !tiktok || !email || !tribe_id, !team_id, !active, !phone) return false;
+  if (!game || !tiktok || !email || !tribe_id, !team_id, !active, !phone, !code) return false;
   const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`players`).add({
     tiktok,
     email,
     tribe_id,
     team_id,
     active,
-    phone
+    phone,
+    code
   });
   const map = {
     id: testId ? testId : response.id,
