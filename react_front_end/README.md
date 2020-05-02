@@ -73,7 +73,7 @@ Before you begin. You'll need to install [**ngrok**](https://ngrok.com/download)
 
 1. Install ngrok
 2. Fire it up in your terminal using the following command `ngrok http 8888`. Navigate to the **https** URL. You should see an error stating `the client failed to establish a connection to the local address localhost:8888`. That is good.
-3. Update your .env file and set the value of WEBHOOK_CODE_VERIFY to the **ngrok** URL **without** the trailing slash.
+3. Update your .env file and set the value of WEBHOOK_CODE_VERIFY to the **ngrok** URL **without** the trailing slash. The **ngrok tunnel** expires after a period of time so be mindful.
 
 Follow the steps below to set up the development server and refresh the window with the **ngrok** URL.
 
