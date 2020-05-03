@@ -29,6 +29,7 @@ export const startGame = async ({
   const gameId = await addedGameId.json();
 
   const code = uuidv4();
+  const number = phone.replace("+", "").replace(/ /g, "");
 
   const playerData = {
     game: gameId,
@@ -38,22 +39,19 @@ export const startGame = async ({
     team_id: 1,
     active: 1,
     testId,
-    phone: phone.replace("+", "").replace(/ /g, ""),
+    phone: number,
     code,
   };
 
-  const addedPlayer = await fetch(
-    "http://localhost:8888/.netlify/functions/add_player",
-    {
-      method: "POST",
-      body: JSON.stringify(playerData),
-    }
-  );
+  await fetch("http://localhost:8888/.netlify/functions/add_player", {
+    method: "POST",
+    body: JSON.stringify(playerData),
+  });
 
   // TODO: Debug data not being in response
 
   const verifyData = {
-    phone,
+    phone: number,
     code,
     game: gameId,
   };
