@@ -10,7 +10,7 @@ _TEST_TRIBE_SIDAMA_ID = 'cbTgYdPh97K6rRTDdEPL'
 _TEST_GAME_ID = '7rPwCJaiSkxYgDocGDw1'
 _TEST_TEAM_BLUE_ID = 'GQnxhYXnV86oJXLklbGB'
 _TEST_TEAM_YELLOW_ID = 'Q09FeEtoIgjNI57Bnl1E'
-_TEST_CHALLENGE_KARAOKE_ID = '2JQ5ZvttkFafjxvrN07Q'
+_TEST_CHALLENGE_KARAOKE_ID = 'PTifdegtPAtUAgxtNoBK'
 _TEST_CHALLENGE_KARAOKE_URL = 'https://www.youtube.com/watch?v=irVIUvDTTB0'
 _TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID = '2ZPmDfX9q82KY5PVf1LH'
 _TEST_BOSTON_ROB_PLAYER_ID = '2ZPmDfX9q82KY5PVf1LH'
@@ -116,6 +116,27 @@ _TEST_DATA_JSON = """
          "to_id":"2ZPmDfX9q82KY5PVf1LH",
          "from_id":"LXHpnrUA65FS25wGfJ00",
          "is_for_win":false
+      }
+   },
+   "games/7rPwCJaiSkxYgDocGDw1/challenges":{
+      "PTifdegtPAtUAgxtNoBK":{
+         "name" : "KARAOKE",
+         "complete" : false
+      },
+      "caqZjCq6rREzqImUBFmV":{
+         "name" : "MOST CREATIVE HOME CLEAN",
+         "complete" : false
+      }
+   },
+   "games/7rPwCJaiSkxYgDocGDw1/entries":{
+      "Eajg3iXhalMbb42BktcG":{
+         "likes" : 10,
+         "views" : 10,
+         "player_id" : "2ZPmDfX9q82KY5PVf1LH",
+         "tribe_id" : "77TMV9omdLeW7ORvuheX",
+         "challenge_id" : "PTifdegtPAtUAgxtNoBK",
+         "team_id" : "GQnxhYXnV86oJXLklbGB",
+         "url" : "https://www.youtube.com/watch?v=irVIUvDTTB0"
       }
    }
 }
