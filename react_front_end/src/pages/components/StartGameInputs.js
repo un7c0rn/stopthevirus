@@ -3,13 +3,11 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { isSm } from "../../utilities/Utilities";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { startGame } from "../../mediators/GameMediator";
 import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function StartGameInputs() {
-  const sm = isSm();
   const useStyles = makeStyles(() => ({
     root: {
       backgroundColor: "black",
@@ -47,7 +45,6 @@ export default function StartGameInputs() {
 
   const tikTokRef = useRef();
   const gameNameRef = useRef();
-  const phoneRef = useRef();
 
   const [tikTok, setTikTok] = useState("");
   const [didSubmit, setDidSubmit] = useState(false);
@@ -68,7 +65,7 @@ export default function StartGameInputs() {
 
     const payload = {
       handle: tikTokRef.current.value,
-      phone,
+      phone: phone.replace(/\+/, "").replace(/ /g, ""),
       hashtag: gameNameRef.current.value,
     };
 

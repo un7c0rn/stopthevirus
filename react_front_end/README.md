@@ -69,15 +69,33 @@ After cloning the repo, in the base directory run `cd react_front_end/` to move 
 
 ## Available Scripts
 
+Before you begin. You'll need to install [**ngrok**](https://ngrok.com/download). This working in conjunction with `netlify dev` which should be run on port **8888**.
+
+1. Install ngrok
+2. Fire it up in your terminal using the following command `ngrok http 8888`. Navigate to the **https** URL. You should see an error stating `the client failed to establish a connection to the local address localhost:8888`. That is good.
+3. Update your .env file and set the value of WEBHOOK_CODE_VERIFY to the **ngrok** URL **without** the trailing slash. The **ngrok tunnel** expires after a period of time so be mindful.
+
+Follow the steps below to set up the development server and refresh the window with the **ngrok** URL.
+
+---
+
 In the project directory **react_front_end** , you can run:
 
 ### `yarn`
 
 Installs all the packages for the project.
 
+### `netlify dev`
+
+Runs the app in the development mode **with** Netlify environment variables and lambda functions.<br />
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.<br />
+You will also see any lint errors in the console.
+
 ### `yarn start`
 
-Runs the app in the development mode.<br />
+Runs the app in the development mode **with out** Netlify environment variables or lambda functions.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br />
@@ -353,7 +371,7 @@ Current work around is run the function. And then to **open the lambda function*
 
 1. `yarn && netlify dev`
 2. `yarn test`
-3. `netlify functions:invoke add_player --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "tiktok":"@user1234", "email":"user@domain.com", "trib e_id":"77TMV9omdLeW7ORvuheX", "team_id":"Q09FeEtoIgjNI57Bnl1E", "active":"false"}' --no-identity`
+3. `netlify functions:invoke add_player --payload '{"game":"a1b2c3d4e5f6g7h8i9j10", "tiktok":"@user1234", "email":"user@domain.com", "trib e_id":"77TMV9omdLeW7ORvuheX", "team_id":"Q09FeEtoIgjNI57Bnl1E", "active":"false","phone":"+440987654321"}' --no-identity`
 
 ## Firebase API **add_vote**
 

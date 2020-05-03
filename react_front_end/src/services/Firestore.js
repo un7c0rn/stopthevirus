@@ -47,7 +47,10 @@ export default class Firestore {
     const defaultFirebase = admin;
     const defaultFirestore = admin.firestore(app);
 
-    return { firebase: defaultFirebase, firestore: defaultFirestore };
+    return {
+      firebase: defaultFirebase,
+      firestore: defaultFirestore,
+    };
   };
 
   static tribe_from_id = async (game = null, id = null) => {
@@ -338,8 +341,19 @@ export default class Firestore {
     team_id = null,
     active = null,
     testId = null,
+    phone = null,
+    code = null,
   }) => {
-    if ((!game || !tiktok || !email || !tribe_id, !team_id, !active))
+    if (
+      !game ||
+      !tiktok ||
+      !email ||
+      !tribe_id ||
+      !team_id ||
+      !active ||
+      !phone ||
+      !code
+    )
       return false;
 
     const response = await this.firestore
@@ -352,14 +366,15 @@ export default class Firestore {
         tribe_id,
         team_id,
         active,
+        phone,
+        code,
       });
 
     const map = {
       id: testId ? testId : response.id,
-      ...(await response.get()).data(),
     };
 
-    await response.set(map);
+    await response.update(map);
 
     const data = (await response.get()).data();
 
@@ -395,5 +410,25 @@ export default class Firestore {
     await response.set(map);
 
     return (await response.get()).data();
+  };
+
+  static verify_code = async ({ phone = null, code = null, game = null }) => {
+    if (!phone || !code || !game) return false;
+
+    const player = this.firestore
+      .collection(`games/${game}/players`)
+      .where("phone", "==", phone)
+      .where("code", "==", code)
+      .limit(1);
+
+    const query = await player.get();
+
+    if (!query.docs.length) throw new Error("player not found");
+
+    const data = query.docs[0];
+
+    data.ref.update({ active: true });
+
+    return "verified";
   };
 }
