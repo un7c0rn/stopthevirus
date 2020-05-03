@@ -3,13 +3,11 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { isSm } from "../../utilities/Utilities";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { startGame } from "../../mediators/GameMediator";
 import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function StartGameInputs() {
-  const sm = isSm();
   const useStyles = makeStyles(() => ({
     root: {
       backgroundColor: "black",
@@ -54,6 +52,8 @@ export default function StartGameInputs() {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState({});
 
+  const MINIMUM_PHONE_NUMBER_LENGTH = 6;
+
   const submit = async () => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
@@ -65,7 +65,7 @@ export default function StartGameInputs() {
 
     const payload = {
       handle: tikTokRef.current.value,
-      phone,
+      phone: phone.replace(/\+/, "").replace(/ /g, ""),
       hashtag: gameNameRef.current.value,
     };
 
@@ -90,26 +90,28 @@ export default function StartGameInputs() {
 
     style.setProperty("text-align", "left");
     style.setProperty("width", "auto");
-    style.setProperty("color", "white");
   };
 
   const inputBlur = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "center";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "calc(100% - 28px)";
-  };
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
 
-  useEffect(() => {
-    document.querySelectorAll(`fieldset`).forEach((element) => {
-      element.style.borderColor = "white";
-    });
-    document.querySelectorAll(`label`).forEach((element) => {
-      element.style.color = "white";
-    });
-  }, []);
+    style.setProperty("width", "calc(100% - 28px)");
+    style.removeProperty("transform");
+
+    if (e.target === tikTokRef?.current && tikTokRef.current.value.length) {
+      style.setProperty("text-align", "left");
+    } else if (phone.length >= MINIMUM_PHONE_NUMBER_LENGTH) {
+      style.setProperty("text-align", "left");
+    } else if (
+      e.target === gameNameRef?.current &&
+      gameNameRef.current.value.length
+    ) {
+      style.setProperty("text-align", "left");
+    } else {
+      style.setProperty("text-align", "center");
+    }
+  };
 
   return (
     <div className={classes.root}>
@@ -120,19 +122,21 @@ export default function StartGameInputs() {
             label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
-            error={didSubmit && tikTok === ""}
+            error={didSubmit && !tikTok.length}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
             className={classes.input}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "start-game-inputs-tiktok-label" }}
           />
           <MuiPhoneNumber
-            error={didSubmit && phone.length <= 6}
+            error={didSubmit && phone.length <= MINIMUM_PHONE_NUMBER_LENGTH}
             label="PHONE NUMBER"
             defaultCountry={"us"}
             disableAreaCodes={true}
+            onFocus={inputClicked}
             onChange={handleOnPhoneChange}
             value={phone}
             id="start-game-inputs-phone"
@@ -147,12 +151,11 @@ export default function StartGameInputs() {
             onChange={(event) => setGameName(event.target.value)}
             inputRef={gameNameRef}
             value={gameName}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "start-game-inputs-game-name-label" }}
           />
-        </form>
-        <form className={classes.form} autoComplete="off">
           <Button
             variant="contained"
             onClick={submit}

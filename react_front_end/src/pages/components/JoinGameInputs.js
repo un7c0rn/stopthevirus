@@ -3,12 +3,11 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { isSm, isL } from "../../utilities/Utilities";
-import React, { useRef, useState, useEffect } from "react";
+import { isL } from "../../utilities/Utilities";
+import React, { useRef, useState } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function JoinGameInputs() {
-  const sm = isSm();
   const isLarge = isL();
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,6 +24,7 @@ export default function JoinGameInputs() {
       },
       "& > div div fieldset": {
         borderRadius: "0px",
+        borderColor: "white",
       },
       "& > div label": {
         textAlign: "center",
@@ -52,6 +52,8 @@ export default function JoinGameInputs() {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState({});
 
+  const MINIMUM_PHONE_NUMBER_LENGTH = 6;
+
   const submit = (event) => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
@@ -78,26 +80,23 @@ export default function JoinGameInputs() {
 
     style.setProperty("text-align", "left");
     style.setProperty("width", "auto");
-    style.setProperty("color", "white");
   };
 
   const inputBlur = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "center";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "calc(100% - 28px)";
-  };
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
 
-  useEffect(() => {
-    document.querySelectorAll(`fieldset`).forEach((element) => {
-      element.style.borderColor = "white";
-    });
-    document.querySelectorAll(`label`).forEach((element) => {
-      element.style.color = "white";
-    });
-  }, []);
+    style.setProperty("width", "calc(100% - 28px)");
+    style.removeProperty("transform");
+
+    if (e.target === tikTokRef?.current && tikTokRef.current.value.length) {
+      style.setProperty("text-align", "left");
+    } else if (phone.length >= MINIMUM_PHONE_NUMBER_LENGTH) {
+      style.setProperty("text-align", "left");
+    } else {
+      style.setProperty("text-align", "center");
+    }
+  };
 
   return (
     <div className={classes.root}>
@@ -111,23 +110,23 @@ export default function JoinGameInputs() {
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "join-game-inputs-tiktok-label" }}
           />
           <MuiPhoneNumber
-            error={didSubmit && phone.length <= 6}
+            error={didSubmit && phone.length <= MINIMUM_PHONE_NUMBER_LENGTH}
             label="PHONE NUMBER"
             defaultCountry={"us"}
             disableAreaCodes={true}
+            onFocus={inputClicked}
             onChange={handleOnPhoneChange}
             value={phone}
             id="join-game-inputs-phone"
             variant="outlined"
             InputLabelProps={inputLabelProps}
           />
-        </form>
-        <form className={classes.form} autoComplete="off">
           <Button
             variant="contained"
             onClick={submit}

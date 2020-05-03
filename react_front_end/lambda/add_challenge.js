@@ -404,21 +404,24 @@ _defineProperty(Firestore, "add_player", async ({
   tribe_id = null,
   team_id = null,
   active = null,
-  testId = null
+  testId = null,
+  phone = null,
+  code = null
 }) => {
-  if (!game || !tiktok || !email || !tribe_id, !team_id, !active) return false;
+  if (!game || !tiktok || !email || !tribe_id || !team_id || !active || !phone || !code) return false;
   const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`players`).add({
     tiktok,
     email,
     tribe_id,
     team_id,
-    active
+    active,
+    phone,
+    code
   });
   const map = {
-    id: testId ? testId : response.id,
-    ...(await response.get()).data()
+    id: testId ? testId : response.id
   };
-  await response.set(map);
+  await response.update(map);
   const data = (await response.get()).data();
   return data;
 });
@@ -444,6 +447,22 @@ _defineProperty(Firestore, "add_vote", async ({
   };
   await response.set(map);
   return (await response.get()).data();
+});
+
+_defineProperty(Firestore, "verify_code", async ({
+  phone = null,
+  code = null,
+  game = null
+}) => {
+  if (!phone || !code || !game) return false;
+  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone).where("code", "==", code).limit(1);
+  const query = await player.get();
+  if (!query.docs.length) throw new Error("player not found");
+  const data = query.docs[0];
+  data.ref.update({
+    active: true
+  });
+  return "verified";
 });
 
 /***/ }),
