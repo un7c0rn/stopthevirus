@@ -47,12 +47,15 @@ export default function StartGameInputs() {
 
   const tikTokRef = useRef();
   const gameNameRef = useRef();
+  const phoneRef = useRef();
 
   const [tikTok, setTikTok] = useState("");
   const [didSubmit, setDidSubmit] = useState(false);
   const [gameName, setGameName] = useState("");
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState({});
+
+  const MINIMUM_PHONE_NUMBER_LENGTH = 6;
 
   const submit = async () => {
     console.log("send to API endpoint");
@@ -90,26 +93,28 @@ export default function StartGameInputs() {
 
     style.setProperty("text-align", "left");
     style.setProperty("width", "auto");
-    style.setProperty("color", "white");
   };
 
   const inputBlur = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "center";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "calc(100% - 28px)";
-  };
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
 
-  useEffect(() => {
-    document.querySelectorAll(`fieldset`).forEach((element) => {
-      element.style.borderColor = "white";
-    });
-    document.querySelectorAll(`label`).forEach((element) => {
-      element.style.color = "white";
-    });
-  }, []);
+    style.setProperty("width", "calc(100% - 28px)");
+    style.removeProperty("transform");
+
+    if (e.target === tikTokRef?.current && tikTokRef.current.value.length) {
+      style.setProperty("text-align", "left");
+    } else if (phone.length >= MINIMUM_PHONE_NUMBER_LENGTH) {
+      style.setProperty("text-align", "left");
+    } else if (
+      e.target === gameNameRef?.current &&
+      gameNameRef.current.value.length
+    ) {
+      style.setProperty("text-align", "left");
+    } else {
+      style.setProperty("text-align", "center");
+    }
+  };
 
   return (
     <div className={classes.root}>
@@ -120,19 +125,21 @@ export default function StartGameInputs() {
             label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
-            error={didSubmit && tikTok === ""}
+            error={didSubmit && !tikTok.length}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
             className={classes.input}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "start-game-inputs-tiktok-label" }}
           />
           <MuiPhoneNumber
-            error={didSubmit && phone.length <= 6}
+            error={didSubmit && phone.length <= MINIMUM_PHONE_NUMBER_LENGTH}
             label="PHONE NUMBER"
             defaultCountry={"us"}
             disableAreaCodes={true}
+            onFocus={inputClicked}
             onChange={handleOnPhoneChange}
             value={phone}
             id="start-game-inputs-phone"
@@ -147,12 +154,11 @@ export default function StartGameInputs() {
             onChange={(event) => setGameName(event.target.value)}
             inputRef={gameNameRef}
             value={gameName}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "start-game-inputs-game-name-label" }}
           />
-        </form>
-        <form className={classes.form} autoComplete="off">
           <Button
             variant="contained"
             onClick={submit}
