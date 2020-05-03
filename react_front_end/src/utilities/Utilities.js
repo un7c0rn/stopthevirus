@@ -1,6 +1,6 @@
 import React from "react";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { UiForAppError } from "./ui/UiForAppError";
+import UiForAppError from "./ui/UiForAppError";
 
 export const toCurrency = (number) => {
   // change to the locale en-US, de-DE
@@ -11,7 +11,6 @@ export const toCurrency = (number) => {
   const v = Number(number).toFixed(2);
   return formatter.format(v);
 };
-
 
 export const isSm = () => {
   //check to see if user resolution is considered "small"

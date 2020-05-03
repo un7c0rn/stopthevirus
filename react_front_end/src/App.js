@@ -20,14 +20,12 @@ const GameInfoPage = lazy(() => import("./pages/GameInfoPage"));
 const theme = createMuiTheme({
   background: "black",
   palette: {
-    type: 'dark',
-    background:"black"
+    type: "dark",
+    background: "black",
   },
   typography: {
-    fontFamily: [
-      'Helvetica Neue',
-    ].join(','),
-  }
+    fontFamily: ["Helvetica Neue"].join(","),
+  },
 });
 
 export const AppContext = createContext();
