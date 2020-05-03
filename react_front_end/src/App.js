@@ -18,7 +18,16 @@ const StartGamePage = lazy(() => import("./pages/StartGamePage"));
 const GameInfoPage = lazy(() => import("./pages/GameInfoPage"));
 
 const theme = createMuiTheme({
-  background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+  background: "black",
+  palette: {
+    type: 'dark',
+    background:"black"
+  },
+  typography: {
+    fontFamily: [
+      'Helvetica Neue',
+    ].join(','),
+  }
 });
 
 export const AppContext = createContext();
@@ -33,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: "wrap",
     width: "100vw",
     height: "100vh",
+    backgroundColor: "black",
   },
 }));
 

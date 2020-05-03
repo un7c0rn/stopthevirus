@@ -1,21 +1,23 @@
-import { withStyles } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import React, { useContext, useEffect, useState } from "react";
+import { withStyles } from "@material-ui/core";
 import { AppContext } from "../App";
 import Footer from "./components/Footer";
-import LandingPageHeaderLogoSvg from "./components/LandingPageHeaderLogoSvg";
+import { makeStyles } from "@material-ui/core/styles";
 import LandingPageInformation from "./components/LandingPageInformation";
-import "./LandingPage.scss";
+import AppTitle from "./components/AppTitle";
+import LogoContainer from "./components/LogoContainer";
+import { StatisticsLeft, StatisticsRight } from "./components/GameStatistics";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    // background: theme.background,
+    background: theme.background,
     color: "white",
     height: "100vh",
     width: "100vw",
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
+    marginTop: "4em",
   },
 }));
 
@@ -33,11 +35,13 @@ const LandingPage = () => {
   return (
     <>
       <section className={classes.root}>
-        <div className={blur ? "landing-page blur" : "landing-page"}>
-          <LandingPageHeaderLogoSvg />
-          <LandingPageInformation />
-          <Footer />
-        </div>
+        <AppTitle />
+        <LogoContainer>
+          <StatisticsLeft layout="row" />
+          <StatisticsRight layout="row" />
+        </LogoContainer>
+        <LandingPageInformation />
+        <Footer />
       </section>
     </>
   );

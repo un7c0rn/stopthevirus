@@ -3,22 +3,32 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { isSm } from "../../utilities/Utilities";
-import React, { useRef, useState } from "react";
+import { isSm, isL } from "../../utilities/Utilities";
+import React, { useRef, useState, useEffect } from "react";
+import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function JoinGameInputs() {
   const sm = isSm();
-  const useStyles = makeStyles(() => ({
+  const isLarge = isL();
+  const useStyles = makeStyles((theme) => ({
     root: {
+      backgroundColor: "black",
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
         width: "100vw",
-        height: sm ? "40vh" : "35vh",
+        height: isLarge ? "50vh" : "",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+      },
+      "& > div div fieldset": {
+        borderRadius: "0px",
+      },
+      "& > div label": {
+        textAlign: "center",
+        width: "calc(100% - 28px)",
       },
     },
     title: {
@@ -56,30 +66,79 @@ export default function JoinGameInputs() {
     setCountry(countryObj);
   }
 
+  const inputLabelProps = {
+    style: {
+      textAlign: "left",
+    },
+  };
+
+  const inputClicked = (e) => {
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
+
+    style.setProperty("text-align", "left");
+    style.setProperty("width", "auto");
+    style.setProperty("color", "white");
+  };
+
+  const inputBlur = (e) => {
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.textAlign = "center";
+    document.querySelector(
+      `#${e.target.getAttribute("id")}-label`
+    ).style.width = "calc(100% - 28px)";
+  };
+
+  useEffect(() => {
+    document.querySelectorAll(`fieldset`).forEach((element) => {
+      element.style.borderColor = "white";
+    });
+    document.querySelectorAll(`label`).forEach((element) => {
+      element.style.color = "white";
+    });
+  }, []);
+
   return (
     <div className={classes.root}>
       <Paper square>
         <form className={classes.form} autoComplete="off">
           <TextField
             id="join-game-inputs-tiktok"
-            label="Tik Tok"
+            label="TIK TOK"
             variant="outlined"
             inputRef={tikTokRef}
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
+            onClick={inputClicked}
+            onBlur={inputBlur}
+            InputLabelProps={{ id: "join-game-inputs-tiktok-label" }}
           />
           <MuiPhoneNumber
             error={didSubmit && phone.length <= 6}
-            label="SMS Phone Number"
+            label="PHONE NUMBER"
             defaultCountry={"us"}
             disableAreaCodes={true}
             onChange={handleOnPhoneChange}
             value={phone}
             id="join-game-inputs-phone"
+            variant="outlined"
+            InputLabelProps={inputLabelProps}
           />
-          <Button variant="contained" onClick={submit}>
-            Join This Game
+        </form>
+        <form className={classes.form} autoComplete="off">
+          <Button
+            variant="contained"
+            onClick={submit}
+            style={{
+              backgroundColor: "white",
+              width: "100vw",
+              maxWidth: maxButtonWidth,
+              fontWeight: "bold",
+            }}
+          >
+            JOIN THIS GAME
           </Button>
         </form>
       </Paper>

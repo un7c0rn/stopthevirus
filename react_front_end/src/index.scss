@@ -3,7 +3,7 @@
 
 /* rest of app styles */
 html {
-  background: #d7d7d7;
+  background: #000000;
 }
 
 body {
@@ -28,4 +28,8 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  button {
+    max-width: 300px !important;
+  }  
 }
