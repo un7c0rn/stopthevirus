@@ -65,7 +65,7 @@ export default function StartGameInputs() {
 
     const payload = {
       handle: tikTokRef.current.value,
-      phone,
+      phone: phone.replace(/\+/, "").replace(/ /g, ""),
       hashtag: gameNameRef.current.value,
     };
 
@@ -94,12 +94,14 @@ export default function StartGameInputs() {
   };
 
   const inputBlur = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "center";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "calc(100% - 28px)";
+    const node = document.querySelector(`#${e.target.getAttribute("id")}`);
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
+
+    if (!node.value.length) {
+      style.setProperty("text-align", "center");
+      style.setProperty("width", "calc(100% - 28px)");
+    }
   };
 
   useEffect(() => {
@@ -124,6 +126,7 @@ export default function StartGameInputs() {
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
             className={classes.input}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "start-game-inputs-tiktok-label" }}
@@ -147,6 +150,7 @@ export default function StartGameInputs() {
             onChange={(event) => setGameName(event.target.value)}
             inputRef={gameNameRef}
             value={gameName}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "start-game-inputs-game-name-label" }}

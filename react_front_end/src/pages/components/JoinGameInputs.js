@@ -82,12 +82,14 @@ export default function JoinGameInputs() {
   };
 
   const inputBlur = (e) => {
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.textAlign = "center";
-    document.querySelector(
-      `#${e.target.getAttribute("id")}-label`
-    ).style.width = "calc(100% - 28px)";
+    const node = document.querySelector(`#${e.target.getAttribute("id")}`);
+    let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
+      .style;
+
+    if (!node.value.length) {
+      style.setProperty("text-align", "center");
+      style.setProperty("width", "calc(100% - 28px)");
+    }
   };
 
   useEffect(() => {
@@ -111,6 +113,7 @@ export default function JoinGameInputs() {
             error={didSubmit && tikTok === ""}
             onChange={(event) => setTikTok(event.target.value)}
             value={tikTok}
+            onFocus={inputClicked}
             onClick={inputClicked}
             onBlur={inputBlur}
             InputLabelProps={{ id: "join-game-inputs-tiktok-label" }}

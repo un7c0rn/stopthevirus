@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { getProfile } from "../services/TikTok";
+import { v4 as uuidv4 } from "uuid";
 
 export const startGame = async ({
   handle = null,
@@ -27,6 +28,8 @@ export const startGame = async ({
 
   const gameId = await addedGameId.json();
 
+  const code = uuidv4();
+
   const playerData = {
     game: gameId,
     tiktok: handle,
@@ -35,6 +38,8 @@ export const startGame = async ({
     team_id: 1,
     active: 1,
     testId,
+    phone: phone.replace("+", "").replace(/ /g, ""),
+    code,
   };
 
   const addedPlayer = await fetch(
@@ -47,5 +52,19 @@ export const startGame = async ({
 
   // TODO: Debug data not being in response
 
-  return addedPlayer.status === 200;
+  const verifyData = {
+    phone,
+    code,
+    game: gameId,
+  };
+
+  const sendCodeResponse = await fetch(
+    "http://localhost:8888/.netlify/functions/verify_player",
+    {
+      method: "POST",
+      body: JSON.stringify(verifyData),
+    }
+  );
+
+  return sendCodeResponse.status === 200;
 };
