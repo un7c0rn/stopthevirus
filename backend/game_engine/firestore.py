@@ -151,6 +151,48 @@ class FirestoreDB(Database):
     def _create_game_id(self) -> Text:
         return ""
 
+    @classmethod
+    def add_game(cls, json_config_path: Text, hashtag: Text) -> Text:
+        cred = credentials.Certificate(json_config_path)
+        if not firebase_admin._apps:
+            firebase_admin.initialize_app(cred)
+        client = firestore.client()
+
+        game_ref = client.collection('games').document()
+        game_ref.set({
+            'count_players': 0,
+            'count_teams': 0,
+            'count_tribes': 0,
+            'game':  hashtag,
+            'hashtag': hashtag
+        })
+        return str(game_ref.id)
+
+    def add_challenge_entry(self, entry: Entry) -> None:
+        entry_ref = self._client.collection('games/{}/entries').document()
+        entry_ref.set({
+            'likes': entry.likes,
+            'views': entry.views,
+            'player_id': entry.player_id,
+            'tribe_id': entry.tribe_id,
+            'challenge_id': entry.challenge_id,
+            'team_id': entry.team_id,
+            'url': entry.url
+        })
+        return str(entry_ref.id)
+
+    def add_challenge(self, challenge: Challenge) -> None:
+        challenge_ref = self._client.collection(
+            'games/{}/challenges').document()
+        challenge_ref.set({
+            'name: challenge.name',
+            'message: challenge.message',
+            'start_timestamp': challenge.start_timestamp,
+            'end_timestamp': challenge.end_timestamp,
+            'complete': challenge.complete
+        })
+        return str(challenge_ref.id)
+
     def _tribe_update_fn(self, stream: Iterable, updates_dict: Dict, batch_size=500):
         batch = self._client.batch()
         document_iter = iter(stream)
@@ -385,13 +427,15 @@ class FirestoreDB(Database):
         })
         return FirestoreData(tribe_ref.get())
 
-    def player(self, name: Text) -> Player:
+    def player(self, name: Text, tiktok: Text = None, phone_number: Text = None) -> Player:
         batch = self._client.batch()
         player_ref = self._client.collection(
             "games/{}/players".format(self._game_id)).document()
         batch.set(player_ref, {
             'name': name,
-            'active': True
+            'active': True,
+            'tiktok': tiktok,
+            'phone_number': phone_number
         })
 
         game_ref = self._client.document("games/{}".format(self._game_id))
