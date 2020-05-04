@@ -16,7 +16,7 @@ exports.handler = async (event, context, callback) => {
     });
 
     callback(null, {
-      statusCode: 200,
+      statusCode: 301,
       headers: {
         "Content-Type": "text/richtext",
         Location: `${process.env.WEBHOOK_REDIRECT_URL}`,
