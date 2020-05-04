@@ -18,13 +18,10 @@ export const startGame = async ({
     testId,
   };
 
-  const addedGameId = await fetch(
-    "http://localhost:8888/.netlify/functions/add_game",
-    {
-      method: "POST",
-      body: JSON.stringify(gameData),
-    }
-  );
+  const addedGameId = await fetch(`/.netlify/functions/add_game`, {
+    method: "POST",
+    body: JSON.stringify(gameData),
+  });
 
   const gameId = await addedGameId.json();
 
@@ -43,7 +40,7 @@ export const startGame = async ({
     code,
   };
 
-  await fetch("http://localhost:8888/.netlify/functions/add_player", {
+  await fetch(`/.netlify/functions/add_player`, {
     method: "POST",
     body: JSON.stringify(playerData),
   });
@@ -56,13 +53,10 @@ export const startGame = async ({
     game: gameId,
   };
 
-  const sendCodeResponse = await fetch(
-    "http://localhost:8888/.netlify/functions/verify_player",
-    {
-      method: "POST",
-      body: JSON.stringify(verifyData),
-    }
-  );
+  const sendCodeResponse = await fetch(`/.netlify/functions/verify_player`, {
+    method: "POST",
+    body: JSON.stringify(verifyData),
+  });
 
   return sendCodeResponse.status === 200;
 };
