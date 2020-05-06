@@ -349,14 +349,17 @@ _defineProperty(Firestore, "add_challenge", async ({
   game = null,
   name = null,
   message = null,
+  phone = null,
   testId = null
 }) => {
   if (!game) return false;
   if (!name) return false;
   if (!message) return false;
+  if (!phone) return false;
   const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`challenges`).add({
     name,
     message,
+    phone,
     start_timestamp: Date.now(),
     end_timestamp: Date.now() + 10080000
   });
@@ -482,12 +485,12 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.name || !body.message) throw new Error("problem with data in body");
-    _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_challenge({
+    if (!body.game || !body.name || !body.message || !body.phone) throw new Error("problem with data in body");
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().add_challenge({
       game: body.game,
       name: body.name,
-      message: body.message
+      message: body.message,
+      phone: body.phone
     });
     callback(null, {
       statusCode: 200,

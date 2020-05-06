@@ -184,7 +184,7 @@ This is the page for route **http://localhost:8888/game-info/0JnfIU9ke5gWO3TxXTt
 
 # Create challenge page
 
-This is the page for route **http://localhost:8888/create-challenge/09876543210987/b1b1b1b1b1b1b1** displays information about creating a challenge.
+This is the page for route **http://localhost:8888/create-challenge/[your phone number]/0H3RzPqfq4dnf47BSgve** displays information about creating a challenge.
 
 ---
 
@@ -274,7 +274,7 @@ Current work around is run the function. And then to **open the lambda function*
 
 1. `yarn && netlify dev`
 2. `yarn test`
-3. `netlify functions:invoke add_challenge --payload '{"game":"A NEW CHALLENGE", "name":"CHALLENGE NAME", "message":"A CHALLENGE MESSAGE"} ' --no-identity`
+3. `netlify functions:invoke add_challenge --payload '{"game":"a game identifier", "name":"CHALLENGE NAME", "message":"A CHALLENGE MESSAGE", "phone":"your phone number"} ' --no-identity`
 
 ## Firebase API **add_challenge**
 
