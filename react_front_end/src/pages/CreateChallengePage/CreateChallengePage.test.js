@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import CreateChallengePage from "../../pages/CreateChallengePage";
+import CreateChallengePage from "./CreateChallengePage";
 import { AppContext } from "../../App";
 import useErrorBoundary from "use-error-boundary";
 import { renderHook } from "@testing-library/react-hooks";

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import GameInfoPage from "../../pages/GameInfoPage";
+import GameInfoPage from "./GameInfoPage";
 import { AppContext } from "../../App";
 
 // Needs to be split into smaller test units

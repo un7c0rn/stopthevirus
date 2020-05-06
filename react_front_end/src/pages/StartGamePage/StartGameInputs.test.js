@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import React from "react";
 import { render, fireEvent, screen } from "@testing-library/react";
-import StartGameInputs from "../../../pages/components/StartGameInputs";
+import StartGameInputs from "./StartGameInputs";
 import "@testing-library/jest-dom";
 
 function tikTokLocater() {

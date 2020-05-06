@@ -2,8 +2,8 @@
  * @jest-environment node
  */
 
-import Firestore from "../../services/Firestore";
-import collections_dict from "../mock_data/firestore.json";
+import Firestore from "./Firestore";
+import collections_dict from "./mock_data/firestore.json";
 import dotenv from "dotenv";
 
 dotenv.config();

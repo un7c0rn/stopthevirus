@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { metricParser, getProfile } from "../../services/TikTok";
+import { metricParser, getProfile } from "./TikTok";
 
 describe("TikTok service", () => {
   it("should return video metadata", async () => {
