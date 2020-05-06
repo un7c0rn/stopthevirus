@@ -1,20 +1,13 @@
 import "@testing-library/jest-dom";
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import GameInfoPage from "./GameInfoPage";
+import { AppContext } from "../../App";
 import useErrorBoundary from "use-error-boundary";
 import { renderHook } from "@testing-library/react-hooks";
 import { CustomUiError } from "../../utilities/Utilities";
-import { Router } from "react-router-dom";
-import { createMemoryHistory } from "history";
 
-const WillThrowError = () => {
-  const throwError = () => {
-    throw new Error("Error thrown");
-  };
-  return <>{throwError()}</>;
-};
-
-describe("CustomUiError", () => {
+describe("GameInfoPage", () => {
   /**
    * Store a reference to the console.
    * When a test completes, restore the console.
@@ -29,24 +22,30 @@ describe("CustomUiError", () => {
     // We don't want to see the error
     console.error = () => {};
 
-    const { result, rerender } = renderHook(() => useErrorBoundary());
+    const { result } = renderHook(() => useErrorBoundary());
 
     const { ErrorBoundary } = result.current;
 
-    const history = createMemoryHistory();
-
     const { debug } = render(
-      <Router history={history}>
-        <ErrorBoundary
-          render={() => <WillThrowError />}
-          renderError={({ error }) => (
-            <CustomUiError error={error} type="app" />
-          )}
-        />
-      </Router>
+      <ErrorBoundary
+        render={() => <GameInfoPage />}
+        renderError={({ error }) => <CustomUiError error={error} type="app" />}
+      />
     );
 
     expect(screen.getByTestId("Game App Error Page")).toBeDefined();
-    expect(screen.getByText(/error thrown/i)).toBeDefined();
+  });
+
+  it("should render the page", async () => {
+    const gameInfo = {};
+    const setGameInfo = () => {};
+
+    render(
+      <AppContext.Provider value={{ gameInfo, setGameInfo }}>
+        <GameInfoPage />
+      </AppContext.Provider>
+    );
+
+    expect(screen.getByTestId("Game Info Page")).toBeDefined();
   });
 });

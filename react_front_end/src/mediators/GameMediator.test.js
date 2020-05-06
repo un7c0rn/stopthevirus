@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { startGame } from "../../mediators/GameMediator";
+import { startGame } from "./GameMediator";
 
 describe("StartGame", () => {
   it("should not start a new game if data is missing", async () => {
