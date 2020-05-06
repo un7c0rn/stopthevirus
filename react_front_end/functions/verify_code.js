@@ -14,7 +14,6 @@ exports.handler = async (event, context, callback) => {
       phone,
       code,
     });
-
     callback(null, {
       statusCode: 301,
       headers: {
