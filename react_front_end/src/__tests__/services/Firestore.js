@@ -81,7 +81,7 @@ describe("Firestore service", () => {
   });
 
   it("should return a tribe ID", async () => {
-    const response = await Firestore.tribe_from_id(
+    const response = await Firestore.getInstance().tribe_from_id(
       _TEST_GAME_ID,
       _TEST_TRIBE_SIDAMA_ID
     );
@@ -89,14 +89,14 @@ describe("Firestore service", () => {
   });
 
   it("should count the players in a game", async () => {
-    const response = await Firestore.count_players({
+    const response = await Firestore.getInstance().count_players({
       game: _TEST_GAME_ID,
     });
     expect(response).toBe(2);
   });
 
   it("should count the players in a tribe", async () => {
-    const response = await Firestore.count_players({
+    const response = await Firestore.getInstance().count_players({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_SIDAMA_ID,
     });
@@ -104,7 +104,7 @@ describe("Firestore service", () => {
   });
 
   it("should count the players in a different tribe", async () => {
-    const response = await Firestore.count_players({
+    const response = await Firestore.getInstance().count_players({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
     });
@@ -112,7 +112,7 @@ describe("Firestore service", () => {
   });
 
   it("should count the players in a team", async () => {
-    const response = await Firestore.count_players({
+    const response = await Firestore.getInstance().count_players({
       game: _TEST_GAME_ID,
       from_team: _TEST_TEAM_BLUE_ID,
     });
@@ -120,14 +120,14 @@ describe("Firestore service", () => {
   });
 
   it("should count the teams in a game", async () => {
-    const response = await Firestore.count_teams({
+    const response = await Firestore.getInstance().count_teams({
       game: _TEST_GAME_ID,
     });
     expect(response).toBe(6);
   });
 
   it("should count the teams in a tribe", async () => {
-    const response = await Firestore.count_teams({
+    const response = await Firestore.getInstance().count_teams({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_SIDAMA_ID,
     });
@@ -135,7 +135,7 @@ describe("Firestore service", () => {
   });
 
   it("should count the teams in a different tribe", async () => {
-    const response = await Firestore.count_teams({
+    const response = await Firestore.getInstance().count_teams({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
     });
@@ -143,7 +143,7 @@ describe("Firestore service", () => {
   });
 
   it("should perform a batch update from one tribe to another", async () => {
-    const response = await Firestore.batch_update_tribe({
+    const response = await Firestore.getInstance().batch_update_tribe({
       game: _TEST_GAME_ID,
       from_tribe: _TEST_TRIBE_TIGRAWAY_ID,
       to_tribe: _TEST_TRIBE_SIDAMA_ID,
@@ -152,7 +152,7 @@ describe("Firestore service", () => {
   });
 
   it("should get a player from an ID", async () => {
-    const response = await Firestore.player_from_id({
+    const response = await Firestore.getInstance().player_from_id({
       game: _TEST_GAME_ID,
       id: _TEST_BOSTON_ROB_PLAYER_ID,
     });
@@ -160,7 +160,7 @@ describe("Firestore service", () => {
   });
 
   it("should get a player from an ID", async () => {
-    const response = await Firestore.team_from_id({
+    const response = await Firestore.getInstance().team_from_id({
       game: _TEST_GAME_ID,
       id: _TEST_TEAM_BLUE_ID,
     });
@@ -171,7 +171,7 @@ describe("Firestore service", () => {
     const obj = {};
     obj[_TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID] = 5;
 
-    const response = await Firestore.count_votes({
+    const response = await Firestore.getInstance().count_votes({
       game: _TEST_GAME_ID,
       from_team: _TEST_TEAM_YELLOW_ID,
       is_for_win: false,
@@ -183,7 +183,7 @@ describe("Firestore service", () => {
     const obj = {};
     obj[_TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID] = 5;
 
-    const response = await Firestore.count_votes({
+    const response = await Firestore.getInstance().count_votes({
       game: _TEST_GAME_ID,
       from_team: _TEST_TEAM_YELLOW_ID,
       is_for_win: false,
@@ -195,7 +195,7 @@ describe("Firestore service", () => {
     const obj = {};
     obj[_TEST_YELLOW_TEAM_ACTIVE_PLAYER_ID] = 5;
 
-    const response = await Firestore.count_votes({
+    const response = await Firestore.getInstance().count_votes({
       game: _TEST_GAME_ID,
       is_for_win: false,
     });
@@ -204,19 +204,19 @@ describe("Firestore service", () => {
 
   it("should return false if no ID parameter is provided when requesting game information", async () => {
     const obj = {};
-    const response = await Firestore.get_game_info({});
+    const response = await Firestore.getInstance().get_game_info({});
     expect(response).toBe(false);
   });
 
   it("should return undefined if the ID for a game is not found when requesting game information", async () => {
     const obj = { game: ";lhsdfk3lrhkl3" };
-    const response = await Firestore.get_game_info(obj);
+    const response = await Firestore.getInstance().get_game_info(obj);
     expect(response).toBe(undefined);
   });
 
   it("should return game information for a given game ID", async () => {
     const obj = { id: _TEST_GAME_ID };
-    const response = await Firestore.get_game_info({
+    const response = await Firestore.getInstance().get_game_info({
       game: _TEST_GAME_ID,
     });
     expect(response.id).toBe(obj.id);
@@ -224,7 +224,7 @@ describe("Firestore service", () => {
 
   it("should return false if no name or hashtag is provided", async () => {
     const obj = {};
-    const response = await Firestore.add_game(obj);
+    const response = await Firestore.getInstance().add_game(obj);
     expect(response).toBe(false);
   });
 
@@ -234,13 +234,13 @@ describe("Firestore service", () => {
       hashtag: _TEST_GAME_HASHTAG,
       testId: _TEST_ADD_GAME__GAME_ID,
     };
-    const response = await Firestore.add_game(obj);
+    const response = await Firestore.getInstance().add_game(obj);
     expect(response).toBeDefined();
   });
 
   it("should return false if data is missing from the challenge", async () => {
     const obj = {};
-    const response = await Firestore.add_challenge(obj);
+    const response = await Firestore.getInstance().add_challenge(obj);
     expect(response).toBe(false);
   });
 
@@ -249,15 +249,16 @@ describe("Firestore service", () => {
       game: _TEST_ID,
       name: _TEST_GAME_CHALLENGE_NAME,
       message: _TEST_GAME_MESSAGE,
+      phone: process.env.REACT_APP_phone_number,
       testId: _TEST_ID,
     };
-    const response = await Firestore.add_challenge(obj);
+    const response = await Firestore.getInstance().add_challenge(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 
   it("should return false if data is missing from the entry (submission)", async () => {
     const obj = {};
-    const response = await Firestore.add_submission_entry(obj);
+    const response = await Firestore.getInstance().add_submission_entry(obj);
     expect(response).toBe(false);
   });
 
@@ -273,13 +274,13 @@ describe("Firestore service", () => {
       url: _TEST_TIKTOK_VIDEO_ID,
       testId: _TEST_ID,
     };
-    const response = await Firestore.add_submission_entry(obj);
+    const response = await Firestore.getInstance().add_submission_entry(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 
   it("should return false if data is missing when adding a player", async () => {
     const obj = {};
-    const response = await Firestore.add_player(obj);
+    const response = await Firestore.getInstance().add_player(obj);
     expect(response).toBe(false);
   });
 
@@ -295,13 +296,13 @@ describe("Firestore service", () => {
       phone: _TEST_PHONE_,
       code: _TEST_CODE_,
     };
-    const response = await Firestore.add_player(obj);
+    const response = await Firestore.getInstance().add_player(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 
   it("should return false if data is missing when adding a vote", async () => {
     const obj = {};
-    const response = await Firestore.add_vote(obj);
+    const response = await Firestore.getInstance().add_vote(obj);
     expect(response).toBe(false);
   });
 
@@ -314,7 +315,7 @@ describe("Firestore service", () => {
       is_for_win: _TEST_USER_IS_ACTIVE,
       testId: _TEST_ID,
     };
-    const response = await Firestore.add_vote(obj);
+    const response = await Firestore.getInstance().add_vote(obj);
     expect(response.id).toBe(_TEST_ID);
   });
 
@@ -343,9 +344,11 @@ describe("Firestore service", () => {
       code: _TEST_CODE_,
     };
 
-    const gameResponse = await Firestore.add_game(game);
-    const playerResponse = await Firestore.add_player(player);
-    const codeResponse = await Firestore.getInstance().verify_code(code);
+    const gameResponse = await Firestore.getInstance().add_game(game);
+    const playerResponse = await Firestore.getInstance().add_player(player);
+    const codeResponse = await Firestore.getInstance()
+      .getInstance()
+      .verify_code(code);
 
     console.log(gameResponse);
     console.log(playerResponse);

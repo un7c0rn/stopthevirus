@@ -482,12 +482,12 @@ __webpack_require__.r(__webpack_exports__);
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.name || !body.message) throw new Error("problem with data in body");
-    _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_challenge({
+    if (!body.game || !body.name || !body.message || !body.phone) throw new Error("problem with data in body");
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().add_challenge({
       game: body.game,
       name: body.name,
-      message: body.message
+      message: body.message,
+      phone: body.phone
     });
     callback(null, {
       statusCode: 200,

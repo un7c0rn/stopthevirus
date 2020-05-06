@@ -12,6 +12,7 @@ export const startGame = async ({
 
   await getProfile(handle);
 
+  // TODO where is the game name coming from
   const gameData = {
     game: "PREDEFINED GAME NAME",
     hashtag,
@@ -74,4 +75,34 @@ export const startGame = async ({
   );
 
   return sendCodeResponse.status === 200;
+};
+
+export const createChallenge = async ({
+  game = null,
+  name = null,
+  message = null,
+  phone = null,
+  testId = "a1b2c3d4e5f6g7h8i9j",
+}) => {
+  if (!phone || !game || !name) return false;
+
+  const challengePayload = {
+    game,
+    name,
+    message,
+    phone,
+    testId: "a1b2c3d4e5f6g7h8i9j",
+  };
+
+  const createChallengeResponse = await fetch(
+    process.env?.REACT_DEVELOPMENT_ENV === "development"
+      ? "http://localhost:8888" + `/.netlify/functions/add_challenge`
+      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_challenge`,
+    {
+      method: "POST",
+      body: JSON.stringify(challengePayload),
+    }
+  );
+
+  return createChallengeResponse.status === 200;
 };
