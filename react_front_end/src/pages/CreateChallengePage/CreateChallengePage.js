@@ -1,12 +1,12 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import AppTitle from "./components/AppTitle";
-import Footer from "./components/Footer";
-import CreateChallengePrompt from "./components/CreateChallengePrompt";
-import CreateChallengeInputs from "./components/CreateChallengeInputs";
-import TriangleLogo from "./components/TriangleLogo";
-import LogoContainer from "./components/LogoContainer";
-import { StatisticsLeft, StatisticsRight } from "./components/GameStatistics";
+import AppTitle from "../common/AppTitle";
+import Footer from "../common/Footer";
+import CreateChallengePrompt from "./CreateChallengePrompt";
+import CreateChallengeInputs from "./CreateChallengeInputs";
+import TriangleLogo from "../common/TriangleLogo";
+import LogoContainer from "../common/LogoContainer";
+import { StatisticsLeft, StatisticsRight } from "../common/GameStatistics";
 
 export default function CreateChallengePage() {
   const useStyles = makeStyles((theme) => ({

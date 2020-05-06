@@ -1,9 +1,9 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import AppTitle from "./components/AppTitle";
-import Footer from "./components/Footer";
-import JoinGamePrompt from "./components/JoinGamePrompt";
-import JoinGameInputs from "./components/JoinGameInputs";
+import AppTitle from "../common/AppTitle";
+import Footer from "../common/Footer";
+import JoinGamePrompt from "./JoinGamePrompt";
+import JoinGameInputs from "./JoinGameInputs";
 
 export default function JoinGamePage() {
   const useStyles = makeStyles((theme) => ({

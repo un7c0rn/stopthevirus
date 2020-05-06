@@ -1,9 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import AppTitle from "./components/AppTitle";
-import Footer from "./components/Footer";
-import ChallengeInfo from "./components/ChallengeInfo";
-import ChallengeSubmit from "./components/ChallengeSubmit";
+import AppTitle from "../common/AppTitle";
+import Footer from "../common/Footer";
+import ChallengeInfo from "./ChallengeInfo";
+import ChallengeSubmit from "./ChallengeSubmit";
 
 const SubmitPage = () => {
   const useStyles = makeStyles((theme) => ({

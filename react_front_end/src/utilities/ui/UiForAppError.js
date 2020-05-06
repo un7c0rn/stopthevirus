@@ -1,14 +1,14 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import AppTitle from "../../pages/components/AppTitle";
-import Footer from "../../pages/components/Footer";
-import StartGamePrompt from "../../pages/components/StartGamePrompt";
-import TriangleLogo from "../../pages/components/TriangleLogo";
-import LogoContainer from "../../pages/components/LogoContainer";
+import AppTitle from "../../pages/common/AppTitle";
+import Footer from "../../pages/common/Footer";
+import StartGamePrompt from "../../pages/StartGamePage/StartGamePrompt";
+import TriangleLogo from "../../pages/common/TriangleLogo";
+import LogoContainer from "../../pages/common/LogoContainer";
 import {
   StatisticsLeft,
   StatisticsRight,
-} from "../../pages/components/GameStatistics";
+} from "../../pages/common/GameStatistics";
 
 export default function UiForAppError({ error }) {
   const useStyles = makeStyles((theme) => ({

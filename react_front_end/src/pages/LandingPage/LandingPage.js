@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { withStyles } from "@material-ui/core";
-import { AppContext } from "../App";
-import Footer from "./components/Footer";
+import { AppContext } from "../../App";
+import Footer from "../common/Footer";
 import { makeStyles } from "@material-ui/core/styles";
-import LandingPageInformation from "./components/LandingPageInformation";
-import AppTitle from "./components/AppTitle";
-import LogoContainer from "./components/LogoContainer";
-import { StatisticsLeft, StatisticsRight } from "./components/GameStatistics";
+import LandingPageInformation from "./LandingPageInformation";
+import AppTitle from "../common/AppTitle";
+import LogoContainer from "../common/LogoContainer";
+import { StatisticsLeft, StatisticsRight } from "../common/GameStatistics";
 
 const useStyles = makeStyles((theme) => ({
   root: {

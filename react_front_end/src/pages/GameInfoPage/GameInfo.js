@@ -5,7 +5,7 @@ import fetch from "node-fetch";
 import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../App";
-import { GameName } from "./GameName";
+import { GameName } from "../common/GameName";
 import { NextChallenge } from "./NextChallenge";
 import { NextTribalCouncil } from "./NextTribalCouncil";
 import { NumberOfPlayers } from "./NumberOfPlayers";

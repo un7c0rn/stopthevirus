@@ -1,9 +1,9 @@
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import AppTitle from "./components/AppTitle";
-import Footer from "./components/Footer";
-import GameInfo from "./components/GameInfo";
-import GameInfoButtonOptions from "./components/GameInfoButtonOptions";
+import AppTitle from "../common/AppTitle";
+import Footer from "../common/Footer";
+import GameInfo from "./GameInfo";
+import GameInfoButtonOptions from "./GameInfoButtonOptions";
 
 const GameInfoPage = () => {
   const useStyles = makeStyles((theme) => ({

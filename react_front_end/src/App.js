@@ -8,15 +8,15 @@ import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
 import "./App.scss";
-import Preloader from "./pages/components/Preloader";
+import Preloader from "./pages/common/Preloader";
 import { CustomUiError } from "./utilities/Utilities";
 
-const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const SubmitPage = lazy(() => import("./pages/SubmitPage"));
-const StartGamePage = lazy(() => import("./pages/StartGamePage"));
-const GameInfoPage = lazy(() => import("./pages/GameInfoPage"));
-const CreateChallengePage = lazy(() => import("./pages/CreateChallengePage"));
+const JoinGamePage = lazy(() => import("./pages/JoinGamePage/JoinGamePage"));
+const LandingPage = lazy(() => import("./pages/LandingPage/LandingPage"));
+const SubmitPage = lazy(() => import("./pages/SubmitPage/SubmitPage"));
+const StartGamePage = lazy(() => import("./pages/StartGamePage/StartGamePage"));
+const GameInfoPage = lazy(() => import("./pages/GameInfoPage/GameInfoPage"));
+const CreateChallengePage = lazy(() => import("./pages/CreateChallengePage/CreateChallengePage"));
 
 const theme = createMuiTheme({
   background: "black",
