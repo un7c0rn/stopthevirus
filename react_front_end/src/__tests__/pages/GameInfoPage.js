@@ -22,7 +22,7 @@ describe("GameInfoPage", () => {
     // We don't want to see the error
     console.error = () => {};
 
-    const { result, rerender } = renderHook(() => useErrorBoundary());
+    const { result } = renderHook(() => useErrorBoundary());
 
     const { ErrorBoundary } = result.current;
 
