@@ -182,6 +182,10 @@ After running `netlify dev` in the **react_front_end** directory. This url will 
 
 This is the page for route **http://localhost:8888/game-info/0JnfIU9ke5gWO3TxXTt5** displays information about a game.
 
+# Create challenge page
+
+This is the page for route **http://localhost:8888/create-challenge/09876543210987/b1b1b1b1b1b1b1** displays information about creating a challenge.
+
 ---
 
 ## TicTok metric parser

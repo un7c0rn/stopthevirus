@@ -16,6 +16,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const SubmitPage = lazy(() => import("./pages/SubmitPage"));
 const StartGamePage = lazy(() => import("./pages/StartGamePage"));
 const GameInfoPage = lazy(() => import("./pages/GameInfoPage"));
+const CreateChallengePage = lazy(() => import("./pages/CreateChallengePage"));
 
 const theme = createMuiTheme({
   background: "black",
@@ -79,6 +80,10 @@ function App() {
                   <Route
                     path="/challenge-submission/:phone/:game"
                     element={<SubmitPage />}
+                  />
+                  <Route
+                    path="/create-challenge/:phone/:game"
+                    element={<CreateChallengePage />}
                   />
                   <Route path="/*" element={<LandingPage />} />
                 </Routes>
