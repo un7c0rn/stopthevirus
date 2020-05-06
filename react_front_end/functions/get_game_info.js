@@ -9,10 +9,17 @@ exports.handler = async (event, context, callback) => {
       game: body.game,
     });
 
-    callback(null, {
-      statusCode: 200,
-      body: JSON.stringify(response),
-    });
+    if (response) {
+      callback(null, {
+        statusCode: 200,
+        body: JSON.stringify(response),
+      });
+    } else {
+      callback(null, {
+        statusCode: 200,
+        body: JSON.stringify({ error: true }),
+      });
+    }
   } catch (err) {
     callback(null, { statusCode: 500, body: err.toString() });
   }

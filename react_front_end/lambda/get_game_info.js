@@ -486,10 +486,20 @@ exports.handler = async (event, context, callback) => {
     const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().get_game_info({
       game: body.game
     });
-    callback(null, {
-      statusCode: 200,
-      body: JSON.stringify(response)
-    });
+
+    if (response) {
+      callback(null, {
+        statusCode: 200,
+        body: JSON.stringify(response)
+      });
+    } else {
+      callback(null, {
+        statusCode: 200,
+        body: JSON.stringify({
+          error: true
+        })
+      });
+    }
   } catch (err) {
     callback(null, {
       statusCode: 500,
