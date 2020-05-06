@@ -18,10 +18,15 @@ export const startGame = async ({
     testId,
   };
 
-  const addedGameId = await fetch(`/.netlify/functions/add_game`, {
-    method: "POST",
-    body: JSON.stringify(gameData),
-  });
+  const addedGameId = await fetch(
+    process.env?.REACT_DEVELOPMENT_ENV === "development"
+      ? "http://localhost:8888" + `/.netlify/functions/add_game`
+      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_game`,
+    {
+      method: "POST",
+      body: JSON.stringify(gameData),
+    }
+  );
 
   const gameId = await addedGameId.json();
 
@@ -40,10 +45,15 @@ export const startGame = async ({
     code,
   };
 
-  await fetch(`/.netlify/functions/add_player`, {
-    method: "POST",
-    body: JSON.stringify(playerData),
-  });
+  await fetch(
+    process.env?.REACT_DEVELOPMENT_ENV === "development"
+      ? "http://localhost:8888" + `/.netlify/functions/add_player`
+      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_player`,
+    {
+      method: "POST",
+      body: JSON.stringify(playerData),
+    }
+  );
 
   // TODO: Debug data not being in response
 
@@ -53,10 +63,15 @@ export const startGame = async ({
     game: gameId,
   };
 
-  const sendCodeResponse = await fetch(`/.netlify/functions/verify_player`, {
-    method: "POST",
-    body: JSON.stringify(verifyData),
-  });
+  const sendCodeResponse = await fetch(
+    process.env?.REACT_DEVELOPMENT_ENV === "development"
+      ? "http://localhost:8888" + `/.netlify/functions/verify_player`
+      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/verify_player`,
+    {
+      method: "POST",
+      body: JSON.stringify(verifyData),
+    }
+  );
 
   return sendCodeResponse.status === 200;
 };
