@@ -19,6 +19,9 @@ const GameInfoPage = lazy(() => import("./pages/GameInfoPage/GameInfoPage"));
 const CreateChallengePage = lazy(() =>
   import("./pages/CreateChallengePage/CreateChallengePage")
 );
+const VerifiedPlayerPage = lazy(() =>
+  import("./pages/VerifiedPlayerPage/VerifiedPlayerPage")
+);
 
 const theme = createMuiTheme({
   background: "black",
@@ -87,6 +90,7 @@ function App() {
                     path="/create-challenge/:phone/:game"
                     element={<CreateChallengePage />}
                   />
+                  <Route path="/verified" element={<VerifiedPlayerPage />} />
                   <Route path="/*" element={<LandingPage />} />
                 </Routes>
               </BrowserRouter>
