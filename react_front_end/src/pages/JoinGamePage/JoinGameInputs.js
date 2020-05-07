@@ -6,6 +6,8 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import { isL } from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
+import { joinGame } from "../../mediators/GameMediator";
+import { useParams } from "react-router-dom";
 
 export default function JoinGameInputs() {
   const isLarge = isL();
@@ -54,13 +56,24 @@ export default function JoinGameInputs() {
 
   const MINIMUM_PHONE_NUMBER_LENGTH = 6;
 
-  const submit = (event) => {
+  const { gameId } = useParams();
+
+  const submit = async (event) => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
     console.log(phone);
     console.log(country);
 
     setDidSubmit(true);
+
+    const payload = {
+      tiktok: tikTokRef.current.value,
+      phone: phone.replace(/\+/, "").replace(/ /g, ""),
+      game: gameId,
+    };
+
+    const response = await joinGame(payload);
+    if (response) console.log("show success snack bar ===", response);
   };
 
   function handleOnPhoneChange(value, countryObj) {

@@ -23,7 +23,7 @@ export default function JoinGamePage() {
 
   return (
     <>
-      <section className={classes.root}>
+      <section className={classes.root} data-testid="Join Game Page">
         <AppTitle />
         <JoinGamePrompt />
         <JoinGameInputs />
