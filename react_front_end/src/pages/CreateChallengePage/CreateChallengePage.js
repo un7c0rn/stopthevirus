@@ -7,6 +7,7 @@ import CreateChallengeInputs from "./CreateChallengeInputs";
 import TriangleLogo from "../common/TriangleLogo";
 import LogoContainer from "../common/LogoContainer";
 import { StatisticsLeft, StatisticsRight } from "../common/GameStatistics";
+import "./CreateChallengePage.scss";
 
 export default function CreateChallengePage() {
   const useStyles = makeStyles((theme) => ({
