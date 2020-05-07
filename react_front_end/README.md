@@ -171,7 +171,7 @@ a new game.
 
 # Join game page
 
-This is the page for route **http://localhost:8888/join-game** used for joining
+This is the page for route **http://localhost:8888/join-game/[the game id]** used for joining
 an existing game.
 
 ## Challenge submission page
