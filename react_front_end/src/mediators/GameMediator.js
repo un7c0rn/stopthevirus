@@ -106,3 +106,54 @@ export const createChallenge = async ({
 
   return createChallengeResponse.status === 200;
 };
+
+export const joinGame = async ({
+  game = null,
+  tiktok = null,
+  phone = null,
+  testId = "a1b2c3d4e5f6g7h8i9j",
+}) => {
+  if (!game || !tiktok || !phone) return false;
+
+  const code = uuidv4();
+
+  const playerData = {
+    game,
+    tiktok,
+    email: 1,
+    tribe_id: 1,
+    team_id: 1,
+    active: 1,
+    testId,
+    phone,
+    code,
+  };
+
+  const addPlayerResponse = await fetch(
+    process.env?.REACT_DEVELOPMENT_ENV === "development"
+      ? "http://localhost:8888" + `/.netlify/functions/add_player`
+      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_player`,
+    {
+      method: "POST",
+      body: JSON.stringify(playerData),
+    }
+  );
+
+  const verifyData = {
+    phone,
+    code,
+    game,
+  };
+
+  const sendCodeResponse = await fetch(
+    process.env?.REACT_DEVELOPMENT_ENV === "development"
+      ? "http://localhost:8888" + `/.netlify/functions/verify_player`
+      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/verify_player`,
+    {
+      method: "POST",
+      body: JSON.stringify(verifyData),
+    }
+  );
+
+  return addPlayerResponse.status === 200 && sendCodeResponse.status === 200;
+};
