@@ -1,0 +1,13 @@
+@media screen and (max-width: 600px) {
+  .triangle-logo {
+    order: 1;
+  }
+  .statistics {
+    &.left {
+      order: 2;
+    }
+    &.right {
+      order: 2;
+    }
+  }
+}
