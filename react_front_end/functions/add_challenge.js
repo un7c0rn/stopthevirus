@@ -3,15 +3,14 @@ import Firestore from "../src/services/Firestore";
 exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
-    if (!body.game || !body.name || !body.message)
+    if (!body.game || !body.name || !body.message || !body.phone)
       throw new Error("problem with data in body");
 
-    Firestore.initialise();
-
-    const response = await Firestore.add_challenge({
+    const response = await Firestore.getInstance().add_challenge({
       game: body.game,
       name: body.name,
       message: body.message,
+      phone: body.phone,
     });
 
     callback(null, { statusCode: 200, body: JSON.stringify(response) });
