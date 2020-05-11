@@ -185,8 +185,8 @@ class FirestoreDB(Database):
         challenge_ref = self._client.collection(
             'games/{}/challenges').document()
         challenge_ref.set({
-            'name: challenge.name',
-            'message: challenge.message',
+            'name': challenge.name,
+            'message': challenge.message,
             'start_timestamp': challenge.start_timestamp,
             'end_timestamp': challenge.end_timestamp,
             'complete': challenge.complete
