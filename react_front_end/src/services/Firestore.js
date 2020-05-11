@@ -264,11 +264,13 @@ export default class Firestore {
     game = null,
     name = null,
     message = null,
+    phone = null,
     testId = null,
   }) => {
     if (!game) return false;
     if (!name) return false;
     if (!message) return false;
+    if (!phone) return false;
 
     const response = await this.firestore
       .collection(`games`)
@@ -277,6 +279,7 @@ export default class Firestore {
       .add({
         name,
         message,
+        phone,
         start_timestamp: Date.now(),
         end_timestamp: Date.now() + 10080000,
       });

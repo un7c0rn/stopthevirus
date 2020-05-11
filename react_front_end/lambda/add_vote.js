@@ -349,14 +349,17 @@ _defineProperty(Firestore, "add_challenge", async ({
   game = null,
   name = null,
   message = null,
+  phone = null,
   testId = null
 }) => {
   if (!game) return false;
   if (!name) return false;
   if (!message) return false;
+  if (!phone) return false;
   const response = await Firestore.firestore.collection(`games`).doc(`${game}`).collection(`challenges`).add({
     name,
     message,
+    phone,
     start_timestamp: Date.now(),
     end_timestamp: Date.now() + 10080000
   });

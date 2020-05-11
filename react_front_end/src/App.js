@@ -8,26 +8,30 @@ import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
 import "./App.scss";
-import Preloader from "./pages/components/Preloader";
+import Preloader from "./pages/common/Preloader";
 import { CustomUiError } from "./utilities/Utilities";
 
-const JoinGamePage = lazy(() => import("./pages/JoinGamePage"));
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const SubmitPage = lazy(() => import("./pages/SubmitPage"));
-const StartGamePage = lazy(() => import("./pages/StartGamePage"));
-const GameInfoPage = lazy(() => import("./pages/GameInfoPage"));
+const JoinGamePage = lazy(() => import("./pages/JoinGamePage/JoinGamePage"));
+const LandingPage = lazy(() => import("./pages/LandingPage/LandingPage"));
+const SubmitPage = lazy(() => import("./pages/SubmitPage/SubmitPage"));
+const StartGamePage = lazy(() => import("./pages/StartGamePage/StartGamePage"));
+const GameInfoPage = lazy(() => import("./pages/GameInfoPage/GameInfoPage"));
+const CreateChallengePage = lazy(() =>
+  import("./pages/CreateChallengePage/CreateChallengePage")
+);
+const VerifiedPlayerPage = lazy(() =>
+  import("./pages/VerifiedPlayerPage/VerifiedPlayerPage")
+);
 
 const theme = createMuiTheme({
   background: "black",
   palette: {
-    type: 'dark',
-    background:"black"
+    type: "dark",
+    background: "black",
   },
   typography: {
-    fontFamily: [
-      'Helvetica Neue',
-    ].join(','),
-  }
+    fontFamily: ["Helvetica Neue"].join(","),
+  },
 });
 
 export const AppContext = createContext();
@@ -76,12 +80,17 @@ function App() {
               <BrowserRouter>
                 <Routes>
                   <Route path="/start-game" element={<StartGamePage />} />
-                  <Route path="/join-game" element={<JoinGamePage />} />
+                  <Route path="/join-game/:gameId" element={<JoinGamePage />} />
                   <Route path="/game-info/:gameId" element={<GameInfoPage />} />
                   <Route
                     path="/challenge-submission/:phone/:game"
                     element={<SubmitPage />}
                   />
+                  <Route
+                    path="/create-challenge/:phone/:game"
+                    element={<CreateChallengePage />}
+                  />
+                  <Route path="/verified" element={<VerifiedPlayerPage />} />
                   <Route path="/*" element={<LandingPage />} />
                 </Routes>
               </BrowserRouter>
