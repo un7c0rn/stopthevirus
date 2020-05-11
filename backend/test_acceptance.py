@@ -3,8 +3,10 @@ from game_engine import database
 from game_engine.common import Serializable, GameError, GameOptions
 from game_engine.events import *
 from game_engine.firestore import FirestoreDB
+from game import Game
 import enum
 import attr
+from abc import ABC, abstractmethod
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 
@@ -13,7 +15,7 @@ class TestError(Exception):
     pass
 
 
-class InputType(enum.Enum):
+class FrameType(enum.Enum):
     PLAYER_START_GAME = 0
     PLAYER_JOIN_GAME = 1
     PLAYER_VOTE = 2
@@ -28,17 +30,37 @@ class InputType(enum.Enum):
 
 
 @attr.s
-class GameInput(Serializable):
-    type: InputType = attr.ib()
+class Frame(Serializable):
+    type: FrameType = attr.ib()
     timestamp: int = attr.ib()
 
 
 @attr.s
 class GameRecording(object):
-    inputs: List[GameInput] = attr.ib()
+    frames: List[Frame] = attr.ib()
 
 
-class NetlifyMock(object):
+class Frontend(ABC):
+
+    @abstractmethod
+    def start_game(self, tiktok: Text, phone_number: Text, game_hashtag: Text):
+        pass
+
+    @abstractmethod
+    def join_game(self, tiktok: Text, phone_number: Text, game_id: Text) -> None:
+        pass
+
+    @abstractmethod
+    def submit_entry(self, likes: int, views: int, player_id: Text, tribe_id: Text,
+                     challenge_id: Text, team_id: Text, url: Text) -> None:
+        pass
+
+    @abstractmethod
+    def submit_challenge(self):
+        pass
+
+
+class MockFrontend(Frontend):
     def __init__(self):
         self._gamedb = None
 
@@ -66,7 +88,7 @@ class NetlifyMock(object):
         self._verify_game_started()
         self._gamedb.add_challenge_entry(
             database.Entry(likes=likes, views=views, player_id=player_id, tribe_id=tribe_id,
-                        challenge_id=challenge_id, team_id=team_id, url=url)
+                           challenge_id=challenge_id, team_id=team_id, url=url)
         )
 
     def submit_challenge(self):
@@ -74,56 +96,73 @@ class NetlifyMock(object):
 
 
 class GameAcceptanceTest(object):
+    def __init__(self):
+        options = GameOptions()
+        self._game = Game(game_id=str(uuid.uuid4), options=options)
+        self._frontend = MockFrontend()
+
     def playback(self, recording: GameRecording) -> None:
-        for input in recording.inputs:
-            print("Simulating game input {}".format(input.to_json()))
+        # As this test runs, text messages will be sent to users. By injecting a known
+        # test phone number into a given user profile, testers can validate the user experience
+        # for a given player against a known historical sequence of game actions.
 
-            if input.type == InputType.PLAYER_START_GAME:
-                # netlify DB write
-                # direct DB write, adds new game and new player to DB
-                # player is owner
-                pass
+        for frame in recording.frames:
+            print("Simulating game frame {}".format(frame.to_json()))
 
-            elif input.type == InputType.PLAYER_JOIN_GAME:
-                # netlify DB write
-                # direct DB write, adds new player and associates with game ID
-                pass
+            if frame.type == FrameType.PLAYER_START_GAME:
+                # TODO(brandon): populate from frame
+                self._frontend.start_game(
+                    tiktok='',
+                    phone_number='',
+                    game_hashtag=''
+                )
 
-            elif input.type == InputType.PLAYER_VOTE:
+            elif frame.type == FrameType.PLAYER_JOIN_GAME:
+                self._frontend.join_game(
+                    tiktok='',
+                    phone_number='',
+                    game_id=''
+                )
+
+            elif frame.type == FrameType.PLAYER_VOTE:
                 # send SMS to endpoint with voting info
                 pass
 
-            elif input.type == InputType.PLAYER_SUBMIT_ENTRY:
-                # netlify DB write
+            elif frame.type == FrameType.PLAYER_SUBMIT_ENTRY:
                 # NOTE(brandon): behavior needs to change here. challenges
-                # should be processed on the backend by a continuous job.
-                pass
+                # should be processed on the backend by a continuous job to improve
+                # user experience (post-MVP).
 
-            elif input.type == InputType.PLAYER_SUBMIT_NEW_CHALLENGE:
-                # netlify DB write
-                pass
+                # TODO(brandon): populate from frame info.
+                self._frontend.submit_entry(
+                    likes=0,
+                    views=0,
+                    player_id='',
+                    tribe_id='',
+                    challenge_id='',
+                    team_id='',
+                    url=''
+                )
 
-            elif input.type == InputType.PLAYER_QUIT:
+            elif frame.type == FrameType.PLAYER_SUBMIT_NEW_CHALLENGE:
+                # TODO(brandon): populate from frame info.
+                self._frontend.submit_challenge()
+
+            elif frame.type == FrameType.PLAYER_QUIT:
                 # sends quit message to the SMS endpoint
                 pass
 
-            elif input.type == InputType.GAME_START_TIME:
-                # match maker generates teams using algo
-                # game object is instantiated with tribes and game starts
-                pass
+            elif frame.type == FrameType.GAME_START_TIME:
+                self._game.set_game_start_event()
 
-            elif input.type == InputType.DAILY_CHALLENGE_START_TIME:
-                # TODO(brandon) override game tribal council wait by setting process event
-                pass
+            elif frame.type == FrameType.DAILY_CHALLENGE_START_TIME:
+                self._game.set_challenge_start_event()
 
-            elif input.type == InputType.DAILY_CHALLENGE_END_TIME:
-                # TODO(brandon) override
-                pass
+            elif frame.type == FrameType.DAILY_CHALLENGE_END_TIME:
+                self._game.set_challenge_end_event()
 
-            elif input.type == InputType.TRIBAL_COUNCIL_START_TIME:
-                # TODO(brandon) override
-                pass
+            elif frame.type == FrameType.TRIBAL_COUNCIL_START_TIME:
+                self._game.set_tribal_council_start_event()
 
-            elif input.type == InputType.TRIBAL_COUNCIL_END_TIME:
-                # TODO(brandon) override
-                pass
+            elif frame.type == FrameType.TRIBAL_COUNCIL_END_TIME:
+                self._game.set_tribal_council_end_event()
