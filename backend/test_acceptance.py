@@ -62,7 +62,7 @@ class NetlifyMock(object):
                             phone_number=phone_number)
 
     def submit_entry(self, likes: int, views: int, player_id: Text, tribe_id: Text,
-                     challenge_id: Text, team_id: Text, url: Text) -> None
+                     challenge_id: Text, team_id: Text, url: Text) -> None:
         self._verify_game_started()
         self._gamedb.add_challenge_entry(
             database.Entry(likes=likes, views=views, player_id=player_id, tribe_id=tribe_id,
