@@ -6,8 +6,9 @@ Information about where files are and what does what and goes where is listed be
 
 **Files are in**
 
-1. Pages are in ./src/pages
-2. Page components are in ./src/pages/components
+1. Pages are in ./src/pages/PAGE (e.g. src/pages/CreateChallengePage)
+2. Page components are in ./src/pages/PAGE (e.g. src/pages/CreateChallengePage)
+3. Common page components in ./src/pages/common
 3. Utilities are in ./src/utilities
 4. Service are in ./src/services
 
