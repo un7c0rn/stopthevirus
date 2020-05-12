@@ -10,6 +10,12 @@ from datetime import date
 import enum
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+import sentry_sdk
+sentry_sdk.init(dsn='https://c6e27a09424a4e4e8ac19e7c82fc9941@o391367.ingest.sentry.io/5237391',
+                attach_stacktrace=True)
+from sentry_sdk import capture_message
+
+
 
 
 class GameError(Exception):
@@ -212,4 +218,5 @@ class Serializable(object):
 
 
 def log_message(message):
+    capture_message('Something went wrong')
     logging.info(message)

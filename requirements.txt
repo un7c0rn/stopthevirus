@@ -7,5 +7,4 @@ boto3
 twilio==6.5.0
 phonenumbers
 names
-
-
+sentry-sdk==0.14.3
