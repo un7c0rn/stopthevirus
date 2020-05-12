@@ -14,6 +14,8 @@ import sentry_sdk
 sentry_sdk.init(dsn='https://c6e27a09424a4e4e8ac19e7c82fc9941@o391367.ingest.sentry.io/5237391',
                 attach_stacktrace=True)
 from sentry_sdk import capture_message
+from sentry_sdk import configure_scope
+
 
 
 
@@ -217,6 +219,9 @@ class Serializable(object):
         return json.dumps(self.to_dict())
 
 
-def log_message(message):
+def log_message(message, game_id="9999999999"):
+    with configure_scope() as scope:
+        scope.set_tag("game_id", game_id)
+
     capture_message('Something went wrong')
     logging.info(message)
