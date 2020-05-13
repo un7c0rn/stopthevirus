@@ -32,7 +32,7 @@ class Engine(object):
         self._output_events.put(event, blocking=False)
 
     def stop(self):
-        log_message('Shutting down all engine workers.')
+        log_message('Shutting down all engine workers.')#no state info
         self._stop.set()
 
     def _do_work_fn(self) -> None:
@@ -44,7 +44,7 @@ class Engine(object):
                 log_message('Getting event from queue...')
                 event = queue.get()
                 log_message(
-                    'Engine worker processing event {}'.format(event.to_json()))
+                    'Engine worker processing event {}'.format(event.to_json()), game_id=event.game_id)#TODO test this
                 notifier.send(sms_event_messages=event.messages)
             except Exception as e:
                 log_message(
