@@ -112,13 +112,13 @@ class AmazonSQS(EventQueue):
             ],
             MaxNumberOfMessages=1,
             WaitTimeSeconds=20)
-        log_message(str(response))
+        log_message(str(response), self)
 
         if 'Messages' in response:
             message = response['Messages'][0]
             message_body = message['Body']
             log_message(
-                'Received event with message body {}'.format(message_body))
+                'Received event with message body {}'.format(message_body), self)
             self._delete_message(message['ReceiptHandle'])
             return SMSEvent.from_json(json_text=message_body, game_options=self._game_options)
         else:
@@ -126,15 +126,16 @@ class AmazonSQS(EventQueue):
 
     def put_fn(self, event: SMSEvent) -> None:
         # TODO(brandon) add retry logic and error handling.
+        print(dir(event))
         log_message("Putting {} on queue {}.".format(
-            event.to_json(), self._url))
+            event.to_json(), self._url), event)
         response = self._client.send_message(
             QueueUrl=self._url,
             MessageBody=event.to_json(),
             MessageGroupId=event.game_id,
             MessageDeduplicationId=str(uuid.uuid4())
         )
-        log_message(response)
+        log_message(response, event)
 
     def put(self, event: SMSEvent, blocking: bool = False) -> None:
         if blocking:

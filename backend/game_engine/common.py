@@ -200,23 +200,7 @@ class Serializable(object):
         tiktok=""
         team_id=""
         tribe_id=""
-        print("PRINTING DIRR")
-        print(dir(self))
-        if hasattr(self, 'recipient_phone_numbers'):
-            nums=self.recipient_phone_numbers
-        elif hasattr(self, 'phone_number'):
-            nums=self.phone_number
-        if hasattr(self, 'tiktok'):
-            tiktok=self.tiktok
-        if hasattr(self, 'team_id'):
-            team_id=self.team_id
-        if hasattr(self, 'tribe_id'):
-            tribe_id=self.tribe_id
-        log_message('to_dict called for {}'.format(self.__class__),
-                    phone_numbers=nums,
-                    tiktok=tiktok,
-                    team_id=team_id,
-                    tribe_id=tribe_id)
+        log_message('to_dict called for {}'.format(self.__class__), self)
         d = {'class': self.__class__.__name__}
         for k, v in vars(self).items():
             d[k] = self._to_dict_item(v)
@@ -240,32 +224,52 @@ class Serializable(object):
         return json.dumps(self.to_dict())
 
 
-def log_message(message="Something went wrong", game_id="", player_id="",
-                phone_numbers=[], tiktok="", tribe_id="", team_id=""):
+def log_message(message, game_attributes):
+    #game_attributes is usually self
     print("LOG_MESSAGE CALLED --------------------")
+    phone_numbers=[]
+    tiktok=""
+    team_id=""
+    tribe_id=""
+    game_id=""
+    player_id=""
+    if game_attributes:
+        if hasattr(game_attributes, 'recipient_phone_numbers'):
+            phone_numbers=game_attributes.recipient_phone_numbers
+        elif hasattr(game_attributes, 'phone_number'):
+            phone_numbers=game_attributes.phone_number
+        if hasattr(game_attributes, 'tiktok'):
+            tiktok=game_attributes.tiktok
+        if hasattr(game_attributes, 'team_id'):
+            team_id=game_attributes.team_id
+        if hasattr(game_attributes, 'tribe_id'):
+            tribe_id=game_attributes.tribe_id
+
     with push_scope() as scope:
         if phone_numbers:
             #sometimes phone_numbers is not a list
             if (isinstance(phone_numbers, list)):
                 for index, num in enumerate(phone_numbers):
                     scope.set_tag("phone_number"+str(index), num)
+                    print("phone_number"+str(index) +" " + num)
             else:
                 scope.set_tag("phone_number", phone_numbers)
+                print("phone_number " + phone_numbers)
 
         if game_id:
-            print("gameid"+game_id)
+            print("game_id "+game_id)
             scope.set_tag("game_id", game_id)
 
         if player_id:
-            print("player_id"+player_id)
+            print("player_id "+player_id)
             scope.set_tag("player_id", player_id)
 
         if tiktok:
-            print("tiktok"+tiktok)
+            print("tiktok "+tiktok)
             scope.set_tag("tiktok_hash", tiktok)
 
         if team_id:
-            print("team_id"+team_id)
+            print("team_id "+team_id)
             scope.set_tag("team_id", team_id)
 
         # capture_message(message)
