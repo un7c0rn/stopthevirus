@@ -238,12 +238,22 @@ def log_message(message, game_attributes):
             phone_numbers=game_attributes.recipient_phone_numbers
         elif hasattr(game_attributes, 'phone_number'):
             phone_numbers=game_attributes.phone_number
+        if hasattr(game_attributes, 'game_id'):
+            game_id=game_attributes.game_id
+        elif hasattr(game_attributes, '_game_id'):
+            game_id=game_attributes._game_id
         if hasattr(game_attributes, 'tiktok'):
             tiktok=game_attributes.tiktok
+        elif hasattr(game_attributes, '_tiktok'):
+            tiktok=game_attributes._tiktok
         if hasattr(game_attributes, 'team_id'):
             team_id=game_attributes.team_id
+        if hasattr(game_attributes, '_team_id'):
+            team_id=game_attributes._team_id
         if hasattr(game_attributes, 'tribe_id'):
             tribe_id=game_attributes.tribe_id
+        if hasattr(game_attributes, '_tribe_id'):
+            tribe_id=game_attributes._tribe_id
 
     with push_scope() as scope:
         if phone_numbers:
@@ -272,7 +282,5 @@ def log_message(message, game_attributes):
             print("team_id "+team_id)
             scope.set_tag("team_id", team_id)
 
-        # capture_message(message)
+        #capture_message(message)
         logging.info(message)
-        logging.info(game_id)
-        logging.info(phone_numbers)
