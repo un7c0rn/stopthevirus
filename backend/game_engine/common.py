@@ -11,7 +11,7 @@ import enum
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 import sentry_sdk
-sentry_sdk.init(dsn='https://c6e27a09424a4e4e8ac19e7c82fc9941@o391367.ingest.sentry.io/5237391',
+sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
                 attach_stacktrace=True)
 from sentry_sdk import capture_message
 from sentry_sdk import configure_scope
