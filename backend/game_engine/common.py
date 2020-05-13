@@ -282,5 +282,6 @@ def log_message(message, game_attributes):
             print("team_id "+team_id)
             scope.set_tag("team_id", team_id)
 
+        #UNCOMMENT THE BELOW LINE TO ENABLE SENTRY CALLS
         #capture_message(message)
         logging.info(message)
