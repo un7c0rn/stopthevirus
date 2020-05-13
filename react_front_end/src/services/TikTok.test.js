@@ -25,6 +25,7 @@ describe("TikTok service", () => {
   });
 
   it("should return information about a person when url is provided", async () => {
+    jest.setTimeout(10000);
     const handle = "who";
     const { user } = await getProfile(handle);
     console.log("..", user);
