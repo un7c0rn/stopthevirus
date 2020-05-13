@@ -15,6 +15,7 @@ sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sen
                 attach_stacktrace=True)
 from sentry_sdk import capture_message
 from sentry_sdk import configure_scope
+from sentry_sdk import push_scope
 
 
 
@@ -195,7 +196,7 @@ class Serializable(object):
                 'Serializable object contains unsupported attribute {}'.format(v))
 
     def to_dict(self):
-        log_message('to_dict called for {}'.format(self.__class__))
+        log_message('to_dict called for {}'.format(self.__class__), phone_numbers=self.recipient_phone_numbers)
         d = {'class': self.__class__.__name__}
         for k, v in vars(self).items():
             d[k] = self._to_dict_item(v)
@@ -219,9 +220,26 @@ class Serializable(object):
         return json.dumps(self.to_dict())
 
 
-def log_message(message, game_id="9999999999"):
-    with configure_scope() as scope:
-        scope.set_tag("game_id", game_id)
+def log_message( message="Something went wrong", game_id="", player_id="", phone_numbers=[]):
+    with push_scope() as scope:
+        if phone_numbers:
+            #sometimes phone_numbers is not a list. why?
+            if (isinstance(phone_numbers, list)):
+                for index, num in enumerate(phone_numbers):
+                    scope.set_tag("phone_number"+str(index), num)
+            else:
+                scope.set_tag("phone_number", phone_numbers)
 
-    capture_message('Something went wrong')
-    logging.info(message)
+
+        if game_id:
+            print("gameid"+game_id)
+            scope.set_tag("game_id", game_id)
+
+        if player_id:
+            print("player_id"+player_id)
+            scope.set_tag("player_id", player_id)
+
+        capture_message(message)
+        logging.info(message)
+        logging.info(game_id)
+        logging.info(phone_numbers)
