@@ -11,8 +11,6 @@ import enum
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 import sentry_sdk
-sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
-                attach_stacktrace=True)
 from sentry_sdk import capture_message
 from sentry_sdk import configure_scope
 from sentry_sdk import push_scope
@@ -230,10 +228,13 @@ class Serializable(object):
     def to_json(self):
         return json.dumps(self.to_dict())
 
+def init_sentry():
+    sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
+                    attach_stacktrace=True)
 
 def log_message(message: Text, game_id: Text = None, additional_tags: Dict = None, push_to_sentry=False):
-    print("LOG_MESSAGE CALLED --------------------")
-
+    if push_to_sentry:
+        init_sentry()#sentry automatically pushes exceptions. to avoid this in local env, only init sentry when needed
     with push_scope() as scope:
         if additional_tags:
             for tag, value in additional_tags.items():
@@ -246,5 +247,6 @@ def log_message(message: Text, game_id: Text = None, additional_tags: Dict = Non
 
         if push_to_sentry:
             logging.info("pushing to sentry")
-            #capture_message(message)
+            capture_message(message)
+
         logging.info(message)

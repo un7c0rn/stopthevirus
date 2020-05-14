@@ -47,7 +47,7 @@ class Engine(object):
                 if hasattr(event, "game_id"):
                     game_id = event.game_id
                 log_message(
-                    'Engine worker processing event {}'.format(event.to_json()), game_id)#TODO test this
+                    'Engine worker processing event {}'.format(event.to_json()), game_id)
                 notifier.send(sms_event_messages=event.messages)
             except Exception as e:
                 log_message(
