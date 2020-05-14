@@ -20,9 +20,9 @@ export const startGame = async ({
   };
 
   const addedGameId = await fetch(
-    process.env?.REACT_DEVELOPMENT_ENV === "development"
-      ? "http://localhost:8888" + `/.netlify/functions/add_game`
-      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_game`,
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/add_game`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/add_game`,
     {
       method: "POST",
       body: JSON.stringify(gameData),
@@ -47,9 +47,9 @@ export const startGame = async ({
   };
 
   await fetch(
-    process.env?.REACT_DEVELOPMENT_ENV === "development"
-      ? "http://localhost:8888" + `/.netlify/functions/add_player`
-      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_player`,
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/add_player`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/add_player`,
     {
       method: "POST",
       body: JSON.stringify(playerData),
@@ -65,9 +65,9 @@ export const startGame = async ({
   };
 
   const sendCodeResponse = await fetch(
-    process.env?.REACT_DEVELOPMENT_ENV === "development"
-      ? "http://localhost:8888" + `/.netlify/functions/verify_player`
-      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/verify_player`,
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/verify_player`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/verify_player`,
     {
       method: "POST",
       body: JSON.stringify(verifyData),
@@ -95,9 +95,9 @@ export const createChallenge = async ({
   };
 
   const createChallengeResponse = await fetch(
-    process.env?.REACT_DEVELOPMENT_ENV === "development"
-      ? "http://localhost:8888" + `/.netlify/functions/add_challenge`
-      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_challenge`,
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/add_challenge`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/add_challenge`,
     {
       method: "POST",
       body: JSON.stringify(challengePayload),
@@ -130,9 +130,9 @@ export const joinGame = async ({
   };
 
   const addPlayerResponse = await fetch(
-    process.env?.REACT_DEVELOPMENT_ENV === "development"
-      ? "http://localhost:8888" + `/.netlify/functions/add_player`
-      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/add_player`,
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/add_player`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/add_player`,
     {
       method: "POST",
       body: JSON.stringify(playerData),
@@ -146,9 +146,9 @@ export const joinGame = async ({
   };
 
   const sendCodeResponse = await fetch(
-    process.env?.REACT_DEVELOPMENT_ENV === "development"
-      ? "http://localhost:8888" + `/.netlify/functions/verify_player`
-      : process.env?.WEBHOOK_REDIRECT_URL + `/.netlify/functions/verify_player`,
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/verify_player`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/verify_player`,
     {
       method: "POST",
       body: JSON.stringify(verifyData),
