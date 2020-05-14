@@ -196,11 +196,18 @@ class Serializable(object):
                 'Serializable object contains unsupported attribute {}'.format(v))
 
     def to_dict(self):
-        nums=[]
-        tiktok=""
-        team_id=""
-        tribe_id=""
-        log_message('to_dict called for {}'.format(self.__class__), self)
+        def massage_for_logging(attrs_dict):
+            if hasattr(self, 'recipient_phone_numbers'):
+                #sometimes phone_numbers is not a list
+                if (isinstance(self.recipient_phone_numbers, list)):
+                    for index, num in enumerate(self.recipient_phone_numbers):
+                        attrs_dict["phone_number" + str(index)] = num
+                else:
+                    attrs_dict["phone_number0"] = self.recipient_phone_numbers
+            return attrs_dict
+        attrs_dict = massage_for_logging({})
+        log_message('to_dict called for {}'.format(self.__class__),
+                    additional_tags=attrs_dict)
         d = {'class': self.__class__.__name__}
         for k, v in vars(self).items():
             d[k] = self._to_dict_item(v)
@@ -224,64 +231,20 @@ class Serializable(object):
         return json.dumps(self.to_dict())
 
 
-def log_message(message, game_attributes):
-    #game_attributes is usually self
+def log_message(message: Text, game_id: Text = None, additional_tags: Dict = None, push_to_sentry=False):
     print("LOG_MESSAGE CALLED --------------------")
-    phone_numbers=[]
-    tiktok=""
-    team_id=""
-    tribe_id=""
-    game_id=""
-    player_id=""
-    if game_attributes:
-        if hasattr(game_attributes, 'recipient_phone_numbers'):
-            phone_numbers=game_attributes.recipient_phone_numbers
-        elif hasattr(game_attributes, 'phone_number'):
-            phone_numbers=game_attributes.phone_number
-        if hasattr(game_attributes, 'game_id'):
-            game_id=game_attributes.game_id
-        elif hasattr(game_attributes, '_game_id'):
-            game_id=game_attributes._game_id
-        if hasattr(game_attributes, 'tiktok'):
-            tiktok=game_attributes.tiktok
-        elif hasattr(game_attributes, '_tiktok'):
-            tiktok=game_attributes._tiktok
-        if hasattr(game_attributes, 'team_id'):
-            team_id=game_attributes.team_id
-        if hasattr(game_attributes, '_team_id'):
-            team_id=game_attributes._team_id
-        if hasattr(game_attributes, 'tribe_id'):
-            tribe_id=game_attributes.tribe_id
-        if hasattr(game_attributes, '_tribe_id'):
-            tribe_id=game_attributes._tribe_id
 
     with push_scope() as scope:
-        if phone_numbers:
-            #sometimes phone_numbers is not a list
-            if (isinstance(phone_numbers, list)):
-                for index, num in enumerate(phone_numbers):
-                    scope.set_tag("phone_number"+str(index), num)
-                    print("phone_number"+str(index) +" " + num)
-            else:
-                scope.set_tag("phone_number", phone_numbers)
-                print("phone_number " + phone_numbers)
+        if additional_tags:
+            for tag, value in additional_tags.items():
+                logging.info(tag +  '->' + value)
+                scope.set_tag(tag, value)
 
         if game_id:
-            print("game_id "+game_id)
+            logging.info("game_id " + game_id)
             scope.set_tag("game_id", game_id)
 
-        if player_id:
-            print("player_id "+player_id)
-            scope.set_tag("player_id", player_id)
-
-        if tiktok:
-            print("tiktok "+tiktok)
-            scope.set_tag("tiktok_hash", tiktok)
-
-        if team_id:
-            print("team_id "+team_id)
-            scope.set_tag("team_id", team_id)
-
-        #UNCOMMENT THE BELOW LINE TO ENABLE SENTRY CALLS
-        #capture_message(message)
+        if push_to_sentry:
+            logging.info("pushing to sentry")
+            #capture_message(message)
         logging.info(message)

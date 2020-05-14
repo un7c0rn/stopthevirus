@@ -32,7 +32,7 @@ class Engine(object):
         self._output_events.put(event, blocking=False)
 
     def stop(self):
-        log_message('Shutting down all engine workers.', self)
+        log_message('Shutting down all engine workers.')
         self._stop.set()
 
     def _do_work_fn(self) -> None:
@@ -41,15 +41,16 @@ class Engine(object):
         notifier = TwilioSMSNotifier(json_config_path=self._twilio_config_path)
         while not self._stop.is_set():
             try:
-                log_message('Getting event from queue...', self)
+                log_message('Getting event from queue...')
                 event = queue.get()
+                game_id = ""
+                if hasattr(event, "game_id"):
+                    game_id = event.game_id
                 log_message(
-                    'Engine worker processing event {}'.format(event.to_json()), event)#TODO test this
+                    'Engine worker processing event {}'.format(event.to_json()), game_id)#TODO test this
                 notifier.send(sms_event_messages=event.messages)
             except Exception as e:
                 log_message(
-                    'Engine worker failed with exception {}.'.format(e),
-                    self)
+                    'Engine worker failed with exception {}.'.format(e))
         log_message('Shutting down workder thread {}.'.format(
-            threading.current_thread().ident),
-                    self)
+            threading.current_thread().ident))

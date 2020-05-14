@@ -61,7 +61,7 @@ class TwilioSMSNotifier(SMSNotifier):
             to_binding=[
                 json.dumps({'binding_type': 'sms', 'address': self._normalize_sms_address(address)}) for address in recipient_addresses],
             body=self._normalize_sms_message(message))
-        log_message(str(notification.sid), self)#TODO test this
+        log_message(str(notification.sid))
 
     def send_sms(self, message: Text, recipient_address: Text) -> None:
         message = self._client.messages \
