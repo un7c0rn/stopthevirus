@@ -25,12 +25,13 @@ class SMSNotifier(ABC):
 
 class TwilioSMSNotifier(SMSNotifier):
 
-    def __init__(self, json_config_path: Text):
+    def __init__(self, json_config_path: Text, game_id: Text):
         with open(json_config_path, 'r') as f:
             config = json.loads(f.read())
             self._client = Client(config['account_sid'], config['auth_token'])
             self._notify_service_sid = config['notify_service_sid']
             self._phone_number = config['phone_number']
+            self._game_id = game_id
 
     def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
         for m in sms_event_messages:
@@ -61,7 +62,7 @@ class TwilioSMSNotifier(SMSNotifier):
             to_binding=[
                 json.dumps({'binding_type': 'sms', 'address': self._normalize_sms_address(address)}) for address in recipient_addresses],
             body=self._normalize_sms_message(message))
-        log_message(str(notification.sid))
+        log_message(message=str(notification.sid), game_id=self._game_id, additional_tags={"phone_number":self._phone_number})
 
     def send_sms(self, message: Text, recipient_address: Text) -> None:
         message = self._client.messages \

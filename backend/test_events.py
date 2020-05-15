@@ -73,7 +73,7 @@ _TEST_TRIBE2 = Tribe(
 
 @contextmanager
 def aws_test_queue() -> AmazonSQS:
-    sqs = AmazonSQS(json_config_path=_TEST_AMAZON_SQS_CONFIG_PATH)
+    sqs = AmazonSQS(json_config_path=_TEST_AMAZON_SQS_CONFIG_PATH, game_id=_TEST_GAME_ID)
     try:
         queue = sqs._client.create_queue(
             QueueName="{}.fifo".format(str(uuid.uuid4())),

@@ -159,6 +159,7 @@ class EngineTest(unittest.TestCase):
     def test_event_processing(self, send_fn):
         engine = Engine(
             options=self._game_options,
+            game_id=_TEST_GAME_ID,
             sqs_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
             twilio_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
             gamedb=_gamedb

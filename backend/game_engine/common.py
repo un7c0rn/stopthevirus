@@ -194,18 +194,6 @@ class Serializable(object):
                 'Serializable object contains unsupported attribute {}'.format(v))
 
     def to_dict(self):
-        def massage_for_logging(attrs_dict):
-            if hasattr(self, 'recipient_phone_numbers'):
-                #sometimes phone_numbers is not a list
-                if (isinstance(self.recipient_phone_numbers, list)):
-                    for index, num in enumerate(self.recipient_phone_numbers):
-                        attrs_dict["phone_number" + str(index)] = num
-                else:
-                    attrs_dict["phone_number0"] = self.recipient_phone_numbers
-            return attrs_dict
-        attrs_dict = massage_for_logging({})
-        log_message('to_dict called for {}'.format(self.__class__),
-                    additional_tags=attrs_dict)
         d = {'class': self.__class__.__name__}
         for k, v in vars(self).items():
             d[k] = self._to_dict_item(v)
@@ -232,9 +220,10 @@ def init_sentry():
     sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
                     attach_stacktrace=True)
 
-def log_message(message: Text, game_id: Text = None, additional_tags: Dict = None, push_to_sentry=False):
+def log_message(message: Text, game_id: Text = None, additional_tags: Dict = None, push_to_sentry = False):
     if push_to_sentry:
-        init_sentry()#sentry automatically pushes exceptions. to avoid this in local env, only init sentry when needed
+        # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
+        init_sentry()
     with push_scope() as scope:
         if additional_tags:
             for tag, value in additional_tags.items():

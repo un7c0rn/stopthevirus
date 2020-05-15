@@ -14,10 +14,12 @@ from game_engine.common import GameOptions
 
 class Engine(object):
 
-    def __init__(self, options: GameOptions, sqs_config_path: Text = '', twilio_config_path: Text = '', gamedb: Database = None):
+    def __init__(self, options: GameOptions, game_id: Text, sqs_config_path: Text = '', twilio_config_path: Text = '', gamedb: Database = None):
         self._options = options
+        self.game_id = game_id
         self._output_events = AmazonSQS(
-            json_config_path=sqs_config_path)
+            json_config_path=sqs_config_path,
+            game_id=game_id)
         self._sqs_config_path = sqs_config_path
         self._twilio_config_path = twilio_config_path
         self._stop = threading.Event()
@@ -32,25 +34,28 @@ class Engine(object):
         self._output_events.put(event, blocking=False)
 
     def stop(self):
-        log_message('Shutting down all engine workers.')
+        log_message(message='Shutting down all engine workers.', game_id=self.game_id)
         self._stop.set()
 
     def _do_work_fn(self) -> None:
         event = None
-        queue = AmazonSQS(json_config_path=self._sqs_config_path)
-        notifier = TwilioSMSNotifier(json_config_path=self._twilio_config_path)
+        queue = AmazonSQS(json_config_path=self._sqs_config_path, game_id=self.game_id)
+        notifier = TwilioSMSNotifier(json_config_path=self._twilio_config_path, game_id=self.game_id)
         while not self._stop.is_set():
             try:
-                log_message('Getting event from queue...')
+                log_message(message='Getting event from queue...', game_id=self.game_id)
                 event = queue.get()
                 game_id = ""
                 if hasattr(event, "game_id"):
                     game_id = event.game_id
                 log_message(
-                    'Engine worker processing event {}'.format(event.to_json()), game_id)
+                    message='Engine worker processing event {}'.format(event.to_json()),
+                    game_id=self.game_id)
                 notifier.send(sms_event_messages=event.messages)
             except Exception as e:
                 log_message(
-                    'Engine worker failed with exception {}.'.format(e))
-        log_message('Shutting down workder thread {}.'.format(
-            threading.current_thread().ident))
+                    message='Engine worker failed with exception {}.'.format(e),
+                    game_id=self.game_id)
+        log_message(message='Shutting down workder thread {}.'.format(
+            threading.current_thread().ident),
+                    game_id=self.game_id)
