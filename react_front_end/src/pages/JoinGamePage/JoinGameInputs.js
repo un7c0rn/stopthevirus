@@ -8,6 +8,7 @@ import React, { useRef, useState } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
 import { joinGame } from "../../mediators/GameMediator";
 import { useParams } from "react-router-dom";
+import Notification from "../common/Notification";
 
 export default function JoinGameInputs() {
   const isLarge = isL();
@@ -58,6 +59,8 @@ export default function JoinGameInputs() {
 
   const { gameId } = useParams();
 
+  const [responseCode, setResponse] = useState();
+
   const submit = async (event) => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
@@ -74,6 +77,8 @@ export default function JoinGameInputs() {
 
     const response = await joinGame(payload);
     if (response) console.log("show success snack bar ===", response);
+
+    response && setResponse(200);
   };
 
   function handleOnPhoneChange(value, countryObj) {
@@ -112,48 +117,51 @@ export default function JoinGameInputs() {
   };
 
   return (
-    <div className={classes.root}>
-      <Paper square>
-        <form className={classes.form} autoComplete="off">
-          <TextField
-            id="join-game-inputs-tiktok"
-            label="TIK TOK"
-            variant="outlined"
-            inputRef={tikTokRef}
-            error={didSubmit && tikTok === ""}
-            onChange={(event) => setTikTok(event.target.value)}
-            value={tikTok}
-            onFocus={inputClicked}
-            onClick={inputClicked}
-            onBlur={inputBlur}
-            InputLabelProps={{ id: "join-game-inputs-tiktok-label" }}
-          />
-          <MuiPhoneNumber
-            error={didSubmit && phone.length <= MINIMUM_PHONE_NUMBER_LENGTH}
-            label="PHONE NUMBER"
-            defaultCountry={"us"}
-            disableAreaCodes={true}
-            onFocus={inputClicked}
-            onChange={handleOnPhoneChange}
-            value={phone}
-            id="join-game-inputs-phone"
-            variant="outlined"
-            InputLabelProps={inputLabelProps}
-          />
-          <Button
-            variant="contained"
-            onClick={submit}
-            style={{
-              backgroundColor: "white",
-              width: "100vw",
-              maxWidth: maxButtonWidth,
-              fontWeight: "bold",
-            }}
-          >
-            JOIN THIS GAME
-          </Button>
-        </form>
-      </Paper>
-    </div>
+    <>
+      <Notification status={responseCode} />
+      <div className={classes.root}>
+        <Paper square>
+          <form className={classes.form} autoComplete="off">
+            <TextField
+              id="join-game-inputs-tiktok"
+              label="TIK TOK"
+              variant="outlined"
+              inputRef={tikTokRef}
+              error={didSubmit && tikTok === ""}
+              onChange={(event) => setTikTok(event.target.value)}
+              value={tikTok}
+              onFocus={inputClicked}
+              onClick={inputClicked}
+              onBlur={inputBlur}
+              InputLabelProps={{ id: "join-game-inputs-tiktok-label" }}
+            />
+            <MuiPhoneNumber
+              error={didSubmit && phone.length <= MINIMUM_PHONE_NUMBER_LENGTH}
+              label="PHONE NUMBER"
+              defaultCountry={"us"}
+              disableAreaCodes={true}
+              onFocus={inputClicked}
+              onChange={handleOnPhoneChange}
+              value={phone}
+              id="join-game-inputs-phone"
+              variant="outlined"
+              InputLabelProps={inputLabelProps}
+            />
+            <Button
+              variant="contained"
+              onClick={submit}
+              style={{
+                backgroundColor: "white",
+                width: "100vw",
+                maxWidth: maxButtonWidth,
+                fontWeight: "bold",
+              }}
+            >
+              JOIN THIS GAME
+            </Button>
+          </form>
+        </Paper>
+      </div>
+    </>
   );
 }
