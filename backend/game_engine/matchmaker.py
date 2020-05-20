@@ -135,8 +135,7 @@ class MatchMakerInterface(ABC):
     @classmethod
     @abstractmethod
     def generate_teams(cls, game_id: Text, players: list) -> dict:
-        """Take in game_id and list of Players and return a list of Teams
-        """
+        # Take in game_id and list of Players and return a list of Teams
         return
 
 class MatchMakerRoundRobin(MatchMakerInterface):
