@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LandingPage = () => {
+const VerifiedPlayerPage = () => {
   const classes = useStyles();
 
   return (
@@ -40,4 +40,4 @@ const LandingPage = () => {
   );
 };
 
-export default withStyles(useStyles)(LandingPage);
+export default withStyles(useStyles)(VerifiedPlayerPage);

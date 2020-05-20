@@ -132,6 +132,7 @@ export default function CreateChallengeInputs() {
               width: "100vw",
               maxWidth: maxButtonWidth,
               fontWeight: "bold",
+              borderRadius: "0",
             }}
           >
             CREATE CHALLENGE

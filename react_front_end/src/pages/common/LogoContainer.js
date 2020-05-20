@@ -7,8 +7,8 @@ const LogoContainer = ({ children }) => {
     <div
       className={
         location.pathname.indexOf("start-game") !== -1
-          ? "root row"
-          : "root column"
+          ? "root-container row"
+          : "root-container column"
       }
     >
       {children}

@@ -40,25 +40,9 @@ const theme = createMuiTheme({
 
 export const AppContext = createContext();
 
-// eslint-disable-next-line
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    flexWrap: "wrap",
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "black",
-  },
-}));
-
 function App() {
   // eslint-disable-next-line
-  const classes = useStyles();
   const [gameInfo, setGameInfo] = useState(false);
-  const [blurUi, setBlurUi] = useState(false);
 
   const {
     ErrorBoundary, // class - The react component to wrap your children in. This WILL NOT CHANGE
@@ -75,8 +59,6 @@ function App() {
           value={{
             gameInfo,
             setGameInfo,
-            blurUi,
-            setBlurUi,
           }}
         >
           <Suspense fallback={<Preloader />}>
