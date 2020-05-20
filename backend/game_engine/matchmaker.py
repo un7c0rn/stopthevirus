@@ -1,11 +1,14 @@
 from typing import Text
 from game_engine import database
+from game_engine.database import Player, Team
 import uuid
 import names
 import random
 import math
 from queue import Queue
 import json
+from abc import ABC, abstractmethod
+
 
 _VIR_US_FE_HOSTNAME = 'https://localhost:3000'
 _VIR_US_BE_CALLBACK_HOSTNAME = 'https://localhost:3001'
@@ -126,3 +129,33 @@ class MatchMaker(object):
 
     def generate_game_info_link(self, game_id: Text) -> Text:
         return "{}/game-info/{}".format(_VIR_US_FE_HOSTNAME, game_id)
+
+class MatchMakerInterface(ABC):
+
+    @abstractmethod
+    def generate_teams(self, game_id: Text, players: list) -> dict:
+        """Take in game_id and list of Players and return a list of Teams
+        """
+        return
+
+class MatchMakerRoundRobin(MatchMakerInterface):
+    def generate_teams(self, game_id: Text, players: list) -> dict:
+        teams = []
+        count_teams = len(teams)
+        team_size = 4
+        for n in range(0, math.floor(count_players / team_size)):
+            team = database.Team(
+                id=str(uuid.uuid4()),
+                name="team/{}".format(n),
+            )
+            teams.append(team)
+
+        for n, player in enumerate(players):
+            team = teams[n % count_teams]
+            player.team_id = team.id
+            team.size += 1
+
+        teams_dict = {}
+        for team in teams:
+            teams_dict[team.id] = team.to_dict()
+            del teams_dict[team.id]['id']
