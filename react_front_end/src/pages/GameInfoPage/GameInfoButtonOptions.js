@@ -48,6 +48,7 @@ export default function GameInfoButtonOptions() {
             width: "100vw",
             maxWidth: maxButtonWidth,
             fontWeight: "bold",
+            borderRadius: "0",
           }}
         >
           watch active #vir-us videos
@@ -60,6 +61,7 @@ export default function GameInfoButtonOptions() {
             width: "100vw",
             maxWidth: maxButtonWidth,
             fontWeight: "bold",
+            borderRadius: "0",
           }}
         >
           copy game invitation link
