@@ -131,15 +131,17 @@ class MatchMaker(object):
         return "{}/game-info/{}".format(_VIR_US_FE_HOSTNAME, game_id)
 
 class MatchMakerInterface(ABC):
-
+    
+    @classmethod
     @abstractmethod
-    def generate_teams(self, game_id: Text, players: list) -> dict:
+    def generate_teams(cls, game_id: Text, players: list) -> dict:
         """Take in game_id and list of Players and return a list of Teams
         """
         return
 
 class MatchMakerRoundRobin(MatchMakerInterface):
-    def generate_teams(self, game_id: Text, players: list) -> dict:
+    @classmethod
+    def generate_teams(cls, game_id: Text, players: list) -> dict:
         teams = []
         count_players = len(players)
         team_size = 10

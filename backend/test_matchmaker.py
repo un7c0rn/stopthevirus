@@ -19,7 +19,8 @@ _TEST_PLAYER1 = Player(
 
 class MatchMakerRoundRobinTest(unittest.TestCase):
 
-    def generate_players(self):
+    @staticmethod
+    def generate_players():
         players=[_TEST_PLAYER1]
         for x in range(2,21):
             player = copy.deepcopy(_TEST_PLAYER1)
@@ -27,11 +28,9 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
             players.append(player)
         return players
 
-    
-
     def test_matchmaker(self):
         players = self.generate_players()
-        teams=MatchMakerRoundRobin.generate_teams(self, game_id=_TEST_GAME_ID, players=players)
+        teams=MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players)
         self.assertEqual(len(teams),2)
 
 if __name__ == '__main__':
