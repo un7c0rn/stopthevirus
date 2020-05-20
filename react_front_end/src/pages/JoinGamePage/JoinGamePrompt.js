@@ -1,16 +1,18 @@
+/* eslint-disable no-restricted-globals */
 import { CircularProgress } from "@material-ui/core";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import React, { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { isSm } from "../../utilities/Utilities";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../App";
 import { JoinGameName } from "../common/JoinGameName";
 import { JoinGameNameNumberOfPlayers } from "../common/JoinGameNameNumberOfPlayers";
 import { JoinGameNameStartDateAndTime } from "../common/JoinGameNameStartDateAndTime";
+import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function JoinGamePrompt() {
   const sm = isSm();
@@ -22,13 +24,6 @@ export default function JoinGamePrompt() {
       justifyContent: "center",
       width: "100vw",
       margin: "3em 0",
-      "& > *": {
-        width: "100vw",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "space-around",
-      },
     },
     title: {
       margin: "1em",
@@ -91,6 +86,10 @@ export default function JoinGamePrompt() {
     }
   }, [gameInfo]);
 
+  const navigateToGameInfo = (e) => {
+    location.href = `/game-info/${gameId}`;
+  };
+
   return (
     <div className={classes.root}>
       {gameInfo === undefined ? problemWithUi() : null}
@@ -99,19 +98,20 @@ export default function JoinGamePrompt() {
           <JoinGameName />
           <JoinGameNameNumberOfPlayers />
           <JoinGameNameStartDateAndTime />
-          <Typography
-            variant="h3"
-            component="h4"
-            gutterBottom
-            className={classes.title}
+
+          <Button
+            style={{
+              backgroundColor: "white",
+              width: "100%",
+              color: "black",
+              alignSelf: "center",
+              borderRadius: "0",
+              fontWeight: "bold",
+            }}
+            onClick={navigateToGameInfo}
           >
-            <Link
-              to={`/game-info/${gameId}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Button style={{ fontWeight: "bold" }}>HOW THE GAME WORKS</Button>
-            </Link>
-          </Typography>
+            HOW THE GAME WORKS
+          </Button>
         </>
       ) : gameInfo?.error === undefined ? (
         <CircularProgress className={classes.preloader} />
