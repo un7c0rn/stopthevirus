@@ -16,6 +16,7 @@ _TEST_PLAYER1 = Player(
     phone_number='sms/bar',
     active=True
 )
+_TEAM_SIZE = 10
 
 class MatchMakerRoundRobinTest(unittest.TestCase):
 
@@ -30,8 +31,17 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
 
     def test_matchmaker(self):
         players = self.generate_players()
-        teams=MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players)
+        teams=MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players, 
+        team_size=_TEAM_SIZE)
         self.assertEqual(len(teams),2)
+
+    def test_matchmaker_insufficient_players(self):
+        players = [_TEST_PLAYER1]
+        with self.assertRaises(Exception) as context:
+            MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players, 
+            team_size=_TEAM_SIZE)
+        self.assertTrue(context.exception)
+    
 
 if __name__ == '__main__':
     unittest.main()

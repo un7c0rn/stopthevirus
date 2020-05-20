@@ -131,7 +131,7 @@ class MatchMaker(object):
         return "{}/game-info/{}".format(_VIR_US_FE_HOSTNAME, game_id)
 
 class MatchMakerInterface(ABC):
-    
+
     @classmethod
     @abstractmethod
     def generate_teams(cls, game_id: Text, players: list) -> dict:
@@ -141,10 +141,11 @@ class MatchMakerInterface(ABC):
 
 class MatchMakerRoundRobin(MatchMakerInterface):
     @classmethod
-    def generate_teams(cls, game_id: Text, players: list) -> dict:
+    def generate_teams(cls, game_id: Text, players: list, team_size: int) -> dict:
         teams = []
         count_players = len(players)
-        team_size = 10
+        if count_players<team_size:
+            raise Exception("Insufficient players for given team size")
         for n in range(0, math.floor(count_players / team_size)):
             team = database.Team(
                 id=str(uuid.uuid4()),
