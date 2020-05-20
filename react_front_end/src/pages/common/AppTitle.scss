@@ -1,0 +1,17 @@
+.logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  position: relative;
+  z-index: 2;
+  width: 50%;
+  height: 50%;
+  top: calc(-15%);
+  left: calc(-75%);
+}
+
+.logo-animation {
+  animation: effect-scale 1s ease 1, effect-fade-in 1s ease 1;
+  animation-fill-mode: forwards;
+}

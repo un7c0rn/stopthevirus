@@ -2,6 +2,8 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../../assets/vir-us.logo.type.white.letters.svg";
 import bg from "../../assets/vir-us_world_map_transparent_canvas.svg";
+import "./AppTitle.scss";
+import "./Effects.scss";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,18 +25,6 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "100%",
   },
-  logo: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignSelf: "center",
-    position: "relative",
-    zIndex: "2",
-    width: "50%",
-    height: "50%",
-    top: "calc(-15%)",
-    left: "calc(-75%)",
-  },
 }));
 
 export default function AppTitle() {
@@ -43,7 +33,7 @@ export default function AppTitle() {
   return (
     <div className={classes.root}>
       <img src={bg} className={classes.background} />
-      <img src={logo} className={classes.logo} />
+      <img src={logo} className="logo logo-animation" />
     </div>
   );
 }
