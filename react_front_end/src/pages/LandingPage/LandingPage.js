@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
 import { withStyles } from "@material-ui/core";
-import { AppContext } from "../../App";
-import Footer from "../common/Footer";
 import { makeStyles } from "@material-ui/core/styles";
-import LandingPageInformation from "./LandingPageInformation";
+import React from "react";
+import ReactPlayer from "react-player";
 import AppTitle from "../common/AppTitle";
-import LogoContainer from "../common/LogoContainer";
+import Footer from "../common/Footer";
 import { StatisticsLeft, StatisticsRight } from "../common/GameStatistics";
+import LogoContainer from "../common/LogoContainer";
+import LandingPageInformation from "./LandingPageInformation";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,18 +24,25 @@ const useStyles = makeStyles((theme) => ({
 const LandingPage = () => {
   const classes = useStyles();
 
-  const { blurUi } = useContext(AppContext);
-
-  const [blur, setBlur] = useState(false);
-
-  useEffect(() => {
-    setBlur(blurUi);
-  }, [blurUi]);
-
   return (
     <>
       <section className={classes.root}>
         <AppTitle />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ReactPlayer
+            url="/video/stopthevirus.mp4"
+            playing
+            light
+            width="100%"
+          />
+        </div>
         <LogoContainer>
           <StatisticsLeft layout="row" />
           <StatisticsRight layout="row" />
