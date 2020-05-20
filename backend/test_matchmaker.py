@@ -25,7 +25,7 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
         players=[_TEST_PLAYER1]
         for x in range(2,21):
             player = copy.deepcopy(_TEST_PLAYER1)
-            player.id='id/foo'+str(x)
+            player.id='id/foo' + str(x)
             players.append(player)
         return players
 
