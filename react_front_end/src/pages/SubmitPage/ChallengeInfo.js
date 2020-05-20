@@ -12,19 +12,34 @@ import { GameName } from "../common/GameName";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
     flexWrap: "wrap",
+    width: "100vw",
+    margin: "3em 0",
     "& > *": {
-      width: "100vw",
-      height: "40vh",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
+      width: "100%",
     },
   },
   title: {
     margin: "1em 0",
     fontSize: "1em",
+  },
+  preloader: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  error: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignSelf: "center",
   },
 }));
 
@@ -76,27 +91,29 @@ export default function ChallengeInfo() {
       {gameInfo === undefined ? problemWithUi() : null}
       {gameInfo && gameInfo?.game ? (
         <>
-          <Paper square>
-            <GameName />
-            <Typography
-              variant="h3"
-              component="h4"
-              gutterBottom
-              className={classes.title}
-            >
-              <span style={{ fontWeight: "bold" }}>Challenge</span>: Most
+          <GameName />
+          <Typography
+            variant="h3"
+            component="h4"
+            gutterBottom
+            className={classes.title}
+          >
+            <p data-testid="Game Name">
+              <span style={{ fontWeight: "bold" }}>Challenge: </span>Most
               Creative Homemade Mask
-            </Typography>
-            <Typography
-              variant="h3"
-              component="h4"
-              gutterBottom
-              className={classes.title}
-            >
-              <span style={{ fontWeight: "bold" }}>Time to submit</span>: 1 hour
+            </p>
+          </Typography>
+          <Typography
+            variant="h3"
+            component="h4"
+            gutterBottom
+            className={classes.title}
+          >
+            <p data-testid="Game Name">
+              <span style={{ fontWeight: "bold" }}>Time to submit: </span>1 hour
               27 min
-            </Typography>
-          </Paper>
+            </p>
+          </Typography>
         </>
       ) : gameInfo?.error === undefined ? (
         <CircularProgress className={classes.preloader} />
