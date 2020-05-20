@@ -141,7 +141,7 @@ class MatchMakerInterface(ABC):
 class MatchMakerRoundRobin(MatchMakerInterface):
     def generate_teams(self, game_id: Text, players: list) -> dict:
         teams = []
-        count_teams = len(teams)
+        count_players = len(players)
         team_size = 4
         for n in range(0, math.floor(count_players / team_size)):
             team = database.Team(
@@ -150,6 +150,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             )
             teams.append(team)
 
+        count_teams = len(teams)
         for n, player in enumerate(players):
             team = teams[n % count_teams]
             player.team_id = team.id
