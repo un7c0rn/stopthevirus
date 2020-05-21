@@ -468,6 +468,16 @@ _defineProperty(Firestore, "verify_code", async ({
   return "verified";
 });
 
+_defineProperty(Firestore, "player_from_phone_number", async ({
+  game = null,
+  phone = null
+}) => {
+  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone).limit(1);
+  const query = await player.get();
+  if (!query.docs.length) throw new Error("player not found");
+  return query.docs[0].data();
+});
+
 /***/ }),
 
 /***/ "./add_submission_entry.js":
@@ -486,8 +496,7 @@ exports.handler = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body) || null;
     if (!body.game || !body.likes || !body.views || !body.player_id || !body.team_id || !body.tribe_id || !body.challenge_id || !body.url) throw new Error("problem with data in body");
-    _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].initialise();
-    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].add_submission_entry({
+    const response = await _src_services_Firestore__WEBPACK_IMPORTED_MODULE_0__["default"].getInstance().add_submission_entry({
       game: body.game,
       likes: body.likes,
       views: body.views,
