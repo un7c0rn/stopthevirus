@@ -6,6 +6,7 @@ import React, { useRef, useState } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
 import { useParams } from "react-router-dom";
 import { createChallenge } from "../../mediators/GameMediator";
+import Notification from "../common/Notification";
 
 export default function CreateChallengeInputs() {
   const useStyles = makeStyles(() => ({
@@ -52,6 +53,8 @@ export default function CreateChallengeInputs() {
 
   const { phone, game } = useParams();
 
+  const [responseCode, setResponse] = useState();
+
   const submit = async () => {
     console.log("send to API endpoint");
     console.log(challengeRef.current.value);
@@ -69,6 +72,8 @@ export default function CreateChallengeInputs() {
 
     // TODO send payload to mediator
     if (response) console.log("show success snack bar ===", response);
+
+    response && setResponse(200);
   };
 
   const inputClicked = (e) => {
@@ -102,55 +107,58 @@ export default function CreateChallengeInputs() {
   };
 
   return (
-    <div className={classes.root}>
-      <Paper square>
-        <form className={classes.form} autoComplete="off">
-          <TextField
-            id="challenge-name"
-            label="YOUR CHALLENGE NAME"
-            variant="outlined"
-            inputRef={challengeRef}
-            error={didSubmit && !challengeName.length}
-            onChange={(event) => setChallengeName(event.target.value)}
-            value={challengeName}
-            className={classes.input}
-            onFocus={inputClicked}
-            onClick={inputClicked}
-            onBlur={inputBlur}
-            InputLabelProps={{
-              id: "challenge-name-label",
-            }}
-          />
-          <TextField
-            id="challenge-instructions"
-            label="YOUR CHALLENGE INSTRUCTIONS"
-            variant="outlined"
-            error={didSubmit && challengeInstructions === ""}
-            onChange={(event) => setChallengeInstructions(event.target.value)}
-            inputRef={challengeInstructionsRef}
-            value={challengeInstructions}
-            onFocus={inputClicked}
-            onClick={inputClicked}
-            onBlur={inputBlur}
-            InputLabelProps={{
-              id: "challenge-instructions-label",
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={submit}
-            style={{
-              backgroundColor: "white",
-              width: "100vw",
-              maxWidth: maxButtonWidth,
-              fontWeight: "bold",
-              borderRadius: "0",
-            }}
-          >
-            CREATE CHALLENGE
-          </Button>
-        </form>
-      </Paper>
-    </div>
+    <>
+      <Notification status={responseCode} />
+      <div className={classes.root}>
+        <Paper square>
+          <form className={classes.form} autoComplete="off">
+            <TextField
+              id="challenge-name"
+              label="YOUR CHALLENGE NAME"
+              variant="outlined"
+              inputRef={challengeRef}
+              error={didSubmit && !challengeName.length}
+              onChange={(event) => setChallengeName(event.target.value)}
+              value={challengeName}
+              className={classes.input}
+              onFocus={inputClicked}
+              onClick={inputClicked}
+              onBlur={inputBlur}
+              InputLabelProps={{
+                id: "challenge-name-label",
+              }}
+            />
+            <TextField
+              id="challenge-instructions"
+              label="YOUR CHALLENGE INSTRUCTIONS"
+              variant="outlined"
+              error={didSubmit && challengeInstructions === ""}
+              onChange={(event) => setChallengeInstructions(event.target.value)}
+              inputRef={challengeInstructionsRef}
+              value={challengeInstructions}
+              onFocus={inputClicked}
+              onClick={inputClicked}
+              onBlur={inputBlur}
+              InputLabelProps={{
+                id: "challenge-instructions-label",
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={submit}
+              style={{
+                backgroundColor: "white",
+                width: "100vw",
+                maxWidth: maxButtonWidth,
+                fontWeight: "bold",
+                borderRadius: "0",
+              }}
+            >
+              CREATE CHALLENGE
+            </Button>
+          </form>
+        </Paper>
+      </div>
+    </>
   );
 }
