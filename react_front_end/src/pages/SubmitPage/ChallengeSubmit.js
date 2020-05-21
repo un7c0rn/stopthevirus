@@ -5,6 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import React, { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { maxButtonWidth } from "../../utilities/Constants";
+import { submitChallenge } from "../../mediators/GameMediator";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,9 +46,7 @@ export default function ChallengeSubmit() {
 
   const tikTokRef = useRef();
 
-  const { phone } = useParams();
-
-  const { game } = useParams();
+  const { phone, game, challenge } = useParams();
 
   const [tikTok, setTikTok] = useState("");
   const [didSubmit, setDidSubmit] = useState(false);
@@ -77,17 +76,19 @@ export default function ChallengeSubmit() {
   const submit = async () => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
+    console.log(game);
 
     setDidSubmit(true);
 
-    // const payload = {
-    //   handle: tikTokRef.current.value,
-    //   phone: phone.replace(/\+/, "").replace(/ /g, ""),
-    //   hashtag: gameNameRef.current.value,
-    // };
+    const payload = {
+      phone,
+      game,
+      url: tikTokRef.current.value,
+      challenge,
+    };
 
-    // const response = await startGame(payload);
-    // if (response) console.log("show success snack bar ===", response);
+    const response = await submitChallenge(payload);
+    if (response) console.log("show success snack bar ===", response);
   };
 
   return (

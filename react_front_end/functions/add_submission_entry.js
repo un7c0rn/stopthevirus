@@ -15,9 +15,7 @@ exports.handler = async (event, context, callback) => {
     )
       throw new Error("problem with data in body");
 
-    Firestore.initialise();
-
-    const response = await Firestore.add_submission_entry({
+    const response = await Firestore.getInstance().add_submission_entry({
       game: body.game,
       likes: body.likes,
       views: body.views,

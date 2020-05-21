@@ -9,8 +9,8 @@ Information about where files are and what does what and goes where is listed be
 1. Pages are in ./src/pages/PAGE (e.g. src/pages/CreateChallengePage)
 2. Page components are in ./src/pages/PAGE (e.g. src/pages/CreateChallengePage)
 3. Common page components in ./src/pages/common
-3. Utilities are in ./src/utilities
-4. Service are in ./src/services
+4. Utilities are in ./src/utilities
+5. Service are in ./src/services
 
 **Routes + Suspense + lazy loading (go here)**
 
@@ -175,13 +175,13 @@ a new game.
 This is the page for route **http://localhost:8888/join-game/0H3RzPqfq4dnf47BSgve** used for joining
 an existing game.
 
-## Challenge submission page
+# Challenge submission page
 
-After running `netlify dev` in the **react_front_end** directory. This url will load the page **http://localhost:8888/challenge-submission/0044703947287/789632**. Please pay attention to the phone number and game ID in the URL. They are extracted on that page. If they are not present. Then do something? TBD.
+After running `netlify dev` in the **react_front_end** directory. This url will load the page **http://localhost:8888/challenge-submission/[your phone number]/0H3RzPqfq4dnf47BSgve/2IADVgFgQ0lryWtxiMEr**. Please pay attention to the phone number, game ID and challenge ID in the URL. They are extracted on that page.
 
 # Game info page
 
-This is the page for route **http://localhost:8888/game-info/0JnfIU9ke5gWO3TxXTt5** displays information about a game.
+This is the page for route **http://localhost:8888/game-info/0H3RzPqfq4dnf47BSgve** displays information about a game.
 
 # Create challenge page
 

@@ -28,7 +28,6 @@ describe("TikTok service", () => {
     jest.setTimeout(10000);
     const handle = "who";
     const { user } = await getProfile(handle);
-    console.log("..", user);
     expect(user.uniqueId).toBe(handle);
   });
 });

@@ -13,7 +13,7 @@ exports.handler = (event, context, callback) => {
           body: JSON.stringify({ video: videoMeta }),
         });
       } catch (error) {
-        callback(null, { statusCode: 500, body: error.toString() });
+        callback(null, { statusCode: 500, body: { error } });
       }
     })();
   } catch (err) {

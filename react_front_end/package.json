@@ -38,11 +38,11 @@
     "uuid": "^8.0.0"
   },
   "scripts": {
-    "start": "run-p start:*",
+    "start": "REACT_APP_DEVELOPMENT_ENV=development run-p start:*",
     "start:app": "react-scripts start",
     "start:lambda": "yarn watch:functions",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "REACT_APP_DEVELOPMENT_ENV=development react-scripts test",
     "eject": "react-scripts eject",
     "run_lambda": "netlify-lambda -c ./webpack.functions.js build ./functions",
     "watch:functions": "npm-watch run_lambda"
