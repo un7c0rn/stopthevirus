@@ -1,6 +1,5 @@
 import React from "react";
 import { withStyles } from "@material-ui/core";
-import Footer from "../common/Footer";
 import { makeStyles } from "@material-ui/core/styles";
 import AppTitle from "../common/AppTitle";
 import LogoContainer from "../common/LogoContainer";
@@ -32,7 +31,6 @@ const AdvertPage = () => {
           <TriangleLogo />
           <StatisticsRight />
         </LogoContainer>
-        {/* <Footer /> */}
       </section>
     </>
   );

@@ -1,11 +1,16 @@
-.root {
+.root-container {
   display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   overflow: visible;
   background-color: black;
   width: 100vw;
-  height: 100%;
-  align-items: center;
-  flex-direction: row;
+  height: auto;
+  padding: 4em 0;
+
+  animation: effect-fade-in 3s ease 1, effect-blur-in 3s ease 1;
+  animation-fill-mode: forwards;
 
   @media screen and (max-width: 600px) {
     .column {

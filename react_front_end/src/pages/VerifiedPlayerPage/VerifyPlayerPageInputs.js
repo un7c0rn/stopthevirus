@@ -69,6 +69,7 @@ const VerifyPlayerPageInputs = () => {
               width: "100vw",
               maxWidth: maxButtonWidth,
               fontWeight: "bold",
+              borderRadius: "0",
             }}
           >
             VERIFY ME

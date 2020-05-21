@@ -155,6 +155,7 @@ export default function JoinGameInputs() {
                 width: "100vw",
                 maxWidth: maxButtonWidth,
                 fontWeight: "bold",
+                borderRadius: "0",
               }}
             >
               JOIN THIS GAME
