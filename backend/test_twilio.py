@@ -12,11 +12,12 @@ import mock
 from twilio.rest import Client
 
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
-
+_TEST_GAME_ID = "f49f0cfd-c93b-4132-8c5b-ebea4bf81eae"
 
 def _twilio_client() -> TwilioSMSNotifier:
     return TwilioSMSNotifier(
-        json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH)
+        json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
+        game_id=_TEST_GAME_ID)
 
 
 class TwilioSMSTest(unittest.TestCase):

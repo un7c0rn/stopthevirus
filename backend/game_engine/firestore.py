@@ -23,9 +23,6 @@ _THREAD_POOL_SIZE = 100
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
-def _log_message(message):
-    logging.info(message)
-
 
 class FirestoreData(Data):
     """This class wraps firebase objects with dynamically assigned
