@@ -114,7 +114,9 @@ exports.handler = (event, context, callback) => {
       } catch (error) {
         callback(null, {
           statusCode: 500,
-          body: error.toString()
+          body: {
+            error
+          }
         });
       }
     })();

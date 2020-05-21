@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { getProfile } from "../services/TikTok";
+import { getProfile, metricParser } from "../services/TikTok";
 import { v4 as uuidv4 } from "uuid";
 
 export const startGame = async ({
@@ -156,4 +156,52 @@ export const joinGame = async ({
   );
 
   return addPlayerResponse.status === 200 && sendCodeResponse.status === 200;
+};
+
+export const submitChallenge = async ({
+  phone = null,
+  game = null,
+  url = null,
+  challenge = null,
+  testId = "a1b2c3d4e5f6g7h8i9j",
+}) => {
+  if (!phone || !game || !url || !challenge) return false;
+
+  const data = await metricParser(url);
+
+  const requestGamePlayer = await fetch(
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/get_game_player`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/get_game_player`,
+    {
+      method: "POST",
+      body: JSON.stringify({ game, phone }),
+    }
+  );
+
+  const playerData = await requestGamePlayer.json();
+
+  const challengePayload = {
+    game,
+    likes: data.diggCount,
+    views: data.playCount,
+    player_id: playerData.id,
+    team_id: playerData.team_id,
+    tribe_id: playerData.tribe_id,
+    challenge_id: challenge,
+    url,
+    testId: "a1b2c3d4e5f6g7h8i9j",
+  };
+
+  const createChallengeResponse = await fetch(
+    process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
+      ? `http://localhost:8888/.netlify/functions/add_submission_entry`
+      : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/add_submission_entry`,
+    {
+      method: "POST",
+      body: JSON.stringify(challengePayload),
+    }
+  );
+
+  return createChallengeResponse.status === 200;
 };

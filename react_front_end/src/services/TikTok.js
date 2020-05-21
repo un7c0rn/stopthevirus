@@ -9,7 +9,9 @@ export const metricParser = async (url = null) => {
         ? `http://localhost:8888/.netlify/functions/tiktok_video?url=${url}`
         : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/tiktok_video?url=${url}`
     );
+
     const data = await response.json();
+
     return data.video;
   } catch (e) {
     console.warn(e.message);
@@ -25,12 +27,13 @@ export const getProfile = async (handle = null) => {
     let url;
 
     if (process.env.REACT_APP_DEVELOPMENT_ENV === "development") {
-      url = `http://localhosts:8888/.netlify/functions/tiktok_profile?handle=${handle}`;
+      url = `http://localhost:8888/.netlify/functions/tiktok_profile?handle=${handle}`;
     } else {
       url = `${process.env.WEBHOOK_REDIRECT_URL}/.netlify/functions/tiktok_profile?handle=${handle}`;
     }
 
     const response = await fetch(url);
+
     return await response.json();
   } catch (e) {
     console.warn(e.message);

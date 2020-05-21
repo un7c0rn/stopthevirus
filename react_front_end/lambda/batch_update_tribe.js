@@ -468,6 +468,16 @@ _defineProperty(Firestore, "verify_code", async ({
   return "verified";
 });
 
+_defineProperty(Firestore, "player_from_phone_number", async ({
+  game = null,
+  phone = null
+}) => {
+  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone).limit(1);
+  const query = await player.get();
+  if (!query.docs.length) throw new Error("player not found");
+  return query.docs[0].data();
+});
+
 /***/ }),
 
 /***/ "./batch_update_tribe.js":

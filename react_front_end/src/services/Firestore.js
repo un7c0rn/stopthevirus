@@ -434,4 +434,17 @@ export default class Firestore {
 
     return "verified";
   };
+
+  static player_from_phone_number = async ({ game = null, phone = null }) => {
+    const player = this.firestore
+      .collection(`games/${game}/players`)
+      .where("phone", "==", phone)
+      .limit(1);
+
+    const query = await player.get();
+
+    if (!query.docs.length) throw new Error("player not found");
+
+    return query.docs[0].data();
+  };
 }

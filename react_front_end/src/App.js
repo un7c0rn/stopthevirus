@@ -69,7 +69,7 @@ function App() {
                   <Route path="/join-game/:gameId" element={<JoinGamePage />} />
                   <Route path="/game-info/:gameId" element={<GameInfoPage />} />
                   <Route
-                    path="/challenge-submission/:phone/:game"
+                    path="/challenge-submission/:phone/:game/:challenge"
                     element={<SubmitPage />}
                   />
                   <Route
