@@ -6,6 +6,7 @@ import React, { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { maxButtonWidth } from "../../utilities/Constants";
 import { submitChallenge } from "../../mediators/GameMediator";
+import Notification from "../common/Notification";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,6 +52,8 @@ export default function ChallengeSubmit() {
   const [tikTok, setTikTok] = useState("");
   const [didSubmit, setDidSubmit] = useState(false);
 
+  const [responseCode, setResponse] = useState();
+
   const inputClicked = (e) => {
     let style = document.querySelector(`#${e.target.getAttribute("id")}-label`)
       .style;
@@ -89,41 +92,48 @@ export default function ChallengeSubmit() {
 
     const response = await submitChallenge(payload);
     if (response) console.log("show success snack bar ===", response);
+
+    response && setResponse(200);
   };
 
   return (
-    <div className={classes.root}>
-      <Paper square>
-        <form className={classes.form} noValidate autoComplete="off">
-          <TextField
-            id="challenge-submission-inputs-tiktok"
-            label="YOUR TIKTOK VIDEO LINK"
-            variant="outlined"
-            inputRef={tikTokRef}
-            error={didSubmit && !tikTok.length}
-            onChange={(event) => setTikTok(event.target.value)}
-            value={tikTok}
-            className={classes.input}
-            onFocus={inputClicked}
-            onClick={inputClicked}
-            onBlur={inputBlur}
-            InputLabelProps={{ id: "challenge-submission-inputs-tiktok-label" }}
-          />
-          <Button
-            variant="contained"
-            onClick={submit}
-            style={{
-              backgroundColor: "white",
-              width: "100vw",
-              maxWidth: maxButtonWidth,
-              fontWeight: "bold",
-              borderRadius: "0",
-            }}
-          >
-            submit
-          </Button>
-        </form>
-      </Paper>
-    </div>
+    <>
+      <Notification status={responseCode} />
+      <div className={classes.root}>
+        <Paper square>
+          <form className={classes.form} noValidate autoComplete="off">
+            <TextField
+              id="challenge-submission-inputs-tiktok"
+              label="YOUR TIKTOK VIDEO LINK"
+              variant="outlined"
+              inputRef={tikTokRef}
+              error={didSubmit && !tikTok.length}
+              onChange={(event) => setTikTok(event.target.value)}
+              value={tikTok}
+              className={classes.input}
+              onFocus={inputClicked}
+              onClick={inputClicked}
+              onBlur={inputBlur}
+              InputLabelProps={{
+                id: "challenge-submission-inputs-tiktok-label",
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={submit}
+              style={{
+                backgroundColor: "white",
+                width: "100vw",
+                maxWidth: maxButtonWidth,
+                fontWeight: "bold",
+                borderRadius: "0",
+              }}
+            >
+              submit
+            </Button>
+          </form>
+        </Paper>
+      </div>
+    </>
   );
 }

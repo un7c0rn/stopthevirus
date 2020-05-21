@@ -6,6 +6,7 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import React, { useRef, useState } from "react";
 import { startGame } from "../../mediators/GameMediator";
 import { maxButtonWidth } from "../../utilities/Constants";
+import Notification from "../common/Notification";
 
 export default function StartGameInputs() {
   const useStyles = makeStyles(() => ({
@@ -54,6 +55,8 @@ export default function StartGameInputs() {
 
   const MINIMUM_PHONE_NUMBER_LENGTH = 6;
 
+  const [responseCode, setResponse] = useState();
+
   const submit = async () => {
     console.log("send to API endpoint");
     console.log(tikTokRef.current.value);
@@ -71,6 +74,8 @@ export default function StartGameInputs() {
 
     const response = await startGame(payload);
     if (response) console.log("show success snack bar ===", response);
+
+    response && setResponse(200);
   };
 
   function handleOnPhoneChange(value, countryObj) {
