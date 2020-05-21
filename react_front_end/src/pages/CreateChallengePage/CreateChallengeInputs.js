@@ -4,6 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import React, { useRef, useState } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
+import { useParams } from "react-router-dom";
+import { createChallenge } from "../../mediators/GameMediator";
 
 export default function CreateChallengeInputs() {
   const useStyles = makeStyles(() => ({
@@ -48,6 +50,8 @@ export default function CreateChallengeInputs() {
   const [didSubmit, setDidSubmit] = useState(false);
   const [challengeInstructions, setChallengeInstructions] = useState("");
 
+  const { phone, game } = useParams();
+
   const submit = async () => {
     console.log("send to API endpoint");
     console.log(challengeRef.current.value);
@@ -55,8 +59,16 @@ export default function CreateChallengeInputs() {
 
     setDidSubmit(true);
 
+    const payload = {
+      game,
+      name: challengeRef.current.value,
+      message: challengeInstructionsRef.current.value,
+      phone,
+    };
+    const response = await createChallenge(payload);
+
     // TODO send payload to mediator
-    // if (response) console.log("show success snack bar ===", response);
+    if (response) console.log("show success snack bar ===", response);
   };
 
   const inputClicked = (e) => {
