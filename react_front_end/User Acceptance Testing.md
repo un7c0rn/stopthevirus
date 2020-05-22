@@ -21,16 +21,50 @@ The Phone ID should be the mobile phone number of the tester.
 - Challenge ID: 2IADVgFgQ0lryWtxiMEr
 - Code: 233ff3da-0765-4d9c-8b56-b0932a88aa2a
 
-**Please note**
+# Acceptance Test Procedure
 
-This assumes that you have followed the instruction on how to start the project within a local development environment and it is running at `http://localhost:8888`.
+1. Install Netlify CLI https://www.npmjs.com/package/netlify-cli
 
-`ngrok http 8888` was run before hand. And you have updated your `.env` file endpoints with the HTTPS URLS provided by NGROK. I also recommend having the debugger open to take note of the success messages. Not all ends to the user journeys have been defined. If we'd like to show an advert, or a promotion, or something like that.
+the account associated w/ the CLI install must also contain the site name used in step (5)
+
+2. git clone https://github.com/un7c0rn/stopthevirus.git
+3. cd react_front_end/
+4. yarn
+5. netlify link, enter stopthevirus-develop
+
+it's unclear how the netlify app should be used by a tester. are testers expected to create a new netlify account?
+
+6. yarn build
+7. netlify deploy --prod --open --message "STV-FE-ATP" --json --dir="./build"
+
+this may take several minutes
+
+8. download and install ngrok https://ngrok.com/download
+9. sudo mv ~/Downloads/ngrok /usr/bin/ngrok
+10. ngrok http 8888
+
+this will occupy the entire terminal window and should be run in a dedicated terminal
+
+11. copy the URL from ngrok output https://<identifier>.ngrok.io
+12. export WEBHOOK_CODE_VERIFY=https://<identifier>.ngrok.io
+13. netlify dev
+
+this will occupy the entire terminal window and should be run in a dedicated terminal
+
+14. navigate to http://localhost:8888 using Google Chrome with developer tools visible
+15. Select iPhone X form factor (optional)
 
 # Starting a game
 
 1. Navigate to `http://localhost:8888/` and click **GET STARTED**.
-2. Enter the required information on the `http://localhost:8888/start-game` page. The hashtag requires a "#" prefix.
+2. Enter the following field values:
+
+TIK TOK: stv_fe_atp
+PHONE NUMBER: 1-(555)-555-5555
+GAME HASHTAG: #STV-FE-ATP
+
+Click **START A GAME**
+
 3. On your phone. Click the link to verify.
 4. On the `http://localhost:8888/verify` page, click the **VERIFY ME** button.
 
