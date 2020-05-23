@@ -13,6 +13,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "black",
     display: "flex",
     flexWrap: "wrap",
+    marginBottom: "0.35em",
+    paddingBottom: "4em",
     "& > *": {
       width: "100vw",
       display: "flex",
@@ -37,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     "& > *": {
-      margin: "1em 0",
+      margin: "0e",
     },
   },
 }));
@@ -127,6 +129,7 @@ export default function ChallengeSubmit() {
                 maxWidth: maxButtonWidth,
                 fontWeight: "bold",
                 borderRadius: "0",
+                marginTop: "2em",
               }}
             >
               submit

@@ -17,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: "0.35em",
+    paddingBottom: "4em",
   },
   title: {
     margin: "1em",
