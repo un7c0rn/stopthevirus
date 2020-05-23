@@ -12,6 +12,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: "0.35em",
+    paddingBottom: "4em",
   },
   title: {
     margin: "1em 0",
@@ -20,9 +22,6 @@ const useStyles = makeStyles((theme) => ({
   form: {
     display: "flex",
     flexDirection: "column",
-    "& > *": {
-      margin: "1em 0",
-    },
   },
 }));
 
@@ -62,6 +61,7 @@ export default function GameInfoButtonOptions() {
             maxWidth: maxButtonWidth,
             fontWeight: "bold",
             borderRadius: "0",
+            marginTop: "2em",
           }}
         >
           copy game invitation link
