@@ -17,9 +17,10 @@ export default function JoinGameInputs() {
       backgroundColor: "black",
       display: "flex",
       flexWrap: "wrap",
+      marginBottom: "0.35em",
+      paddingBottom: "4em",
       "& > *": {
         width: "100vw",
-        height: isLarge ? "50vh" : "",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -42,7 +43,9 @@ export default function JoinGameInputs() {
       display: "flex",
       flexDirection: "column",
       "& > *": {
-        margin: "1em 0",
+        "&:nth-child(even)": {
+          margin: "2em 0",
+        },
       },
     },
   }));
