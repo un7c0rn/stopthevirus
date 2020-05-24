@@ -74,7 +74,10 @@ export default function JoinGameInputs() {
 
     const payload = {
       tiktok: tikTokRef.current.value,
-      phone: phone.replace(/\+/, "").replace(/ /g, ""),
+      phone: phone
+        .replace(/\+/, "")
+        .replace(/ /g, "")
+        .replace(/\(|\)|\-/g, ""),
       game: gameId,
     };
 
@@ -82,6 +85,8 @@ export default function JoinGameInputs() {
     if (response) console.log("show success snack bar ===", response);
 
     response && setResponse(200);
+
+    !response && setResponse(500);
   };
 
   function handleOnPhoneChange(value, countryObj) {
