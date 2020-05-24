@@ -35,7 +35,7 @@ export default function Notification({ status }) {
   const getSnackBar = () => {
     if (status === 200) {
       return `Done!`;
-    } else if (isNaN(status)) {
+    } else if (status === 500) {
       return `There is a problem`;
     } else {
       return `?`;
