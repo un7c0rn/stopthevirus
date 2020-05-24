@@ -83,7 +83,8 @@ export default function StartGameInputs() {
     };
 
     const response = await startGame(payload);
-    if (response) console.log("show success snack bar ===", response);
+    if (response.status === 200)
+      console.log("show success snack bar ===", response);
 
     response && setResponse(200);
 

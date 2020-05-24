@@ -49,13 +49,13 @@ const VerifyPlayerPageInputs = () => {
       url = `${process.env.WEBHOOK_REDIRECT_URL}/.netlify/functions/verify_code?phone=${phone}&code=${code}&game=${game}`;
     }
 
-    console.log(url);
-
     const response = await fetch(url);
+    const data = await response.json();
+    if (!data?.error) console.log("show success snack bar ===", data.response);
 
-    console.log("verify player API reponse", response.status);
+    data?.response && setResponse(200);
 
-    setResponse(response.status);
+    !data?.response && setResponse(500);
   };
 
   return (
