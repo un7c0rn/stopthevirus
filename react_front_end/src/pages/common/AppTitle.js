@@ -34,28 +34,6 @@ const useStyles = makeStyles((theme) => ({
 export default function AppTitle() {
   const classes = useStyles();
 
-  const shuffle = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
-
-  useEffect(() => {
-    const list = document.querySelectorAll("svg g g use");
-    const iterate = () => {
-      const nodes = shuffle([...list]).slice(0, 1000);
-      while (nodes.length) {
-        const node = nodes.pop();
-        setTimeout(() => {
-          node.classList.add("effect-fill");
-        }, Math.random() * 2000);
-      }
-    };
-    list.length && iterate();
-  }, []);
-
   return (
     <div className={classes.root}>
       {/* <img src={Bg} className={classes.background} /> */}
