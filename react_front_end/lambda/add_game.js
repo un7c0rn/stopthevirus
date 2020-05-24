@@ -507,7 +507,9 @@ exports.handler = async (event, context, callback) => {
   } catch (err) {
     callback(null, {
       statusCode: 500,
-      body: err.toString()
+      body: {
+        err
+      }
     });
   }
 };

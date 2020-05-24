@@ -13,6 +13,6 @@ exports.handler = async (event, context, callback) => {
 
     callback(null, { statusCode: 200, body: JSON.stringify(response) });
   } catch (err) {
-    callback(null, { statusCode: 500, body: err.toString() });
+    callback(null, { statusCode: 500, body: { err } });
   }
 };

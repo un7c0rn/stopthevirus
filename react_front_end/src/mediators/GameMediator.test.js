@@ -25,7 +25,8 @@ describe("StartGame", () => {
     jest.setTimeout(30000);
     const obj = {
       handle: "who",
-      phone: process.env.REACT_APP_phone_number,
+      // phone: process.env.REACT_APP_phone_number,
+      phone: "15555555555",
       hashtag: "#who",
     };
 
