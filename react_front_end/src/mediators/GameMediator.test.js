@@ -21,12 +21,24 @@ describe("StartGame", () => {
     expect(response).toBe(false);
   });
 
+  it("should not start a new game with an invalid phone number", async () => {
+    jest.setTimeout(30000);
+    const obj = {
+      handle: "who",
+      phone: "15555555555",
+      hashtag: "#who",
+    };
+
+    const response = await startGame(obj);
+
+    expect(response).toBe(false);
+  });
+
   it("should start a new game", async () => {
     jest.setTimeout(30000);
     const obj = {
       handle: "who",
-      // phone: process.env.REACT_APP_phone_number,
-      phone: "15555555555",
+      phone: process.env.REACT_APP_phone_number,
       hashtag: "#who",
     };
 
