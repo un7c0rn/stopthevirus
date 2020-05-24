@@ -81,11 +81,23 @@ describe("StartGame", () => {
     expect(response).toBe(false);
   });
 
-  it("should join a game", async () => {
+  it("should not join a game when using an invalid number", async () => {
     const payload = {
       game: "0H3RzPqfq4dnf47BSgve",
       tiktok: "how",
       phone: "XXXXXXXXXXXX",
+      testId: true,
+    };
+    const response = await joinGame(payload);
+
+    expect(response).toBe(false);
+  });
+
+  it("should join a game", async () => {
+    const payload = {
+      game: "0H3RzPqfq4dnf47BSgve",
+      tiktok: "how",
+      phone: process.env.REACT_APP_phone_number,
       testId: true,
     };
     const response = await joinGame(payload);

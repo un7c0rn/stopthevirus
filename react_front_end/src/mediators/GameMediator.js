@@ -146,6 +146,10 @@ export const joinGame = async ({
     }
   );
 
+  const createPlayerResponse = await addPlayerResponse.json();
+
+  if (!createPlayerResponse?.id) return false;
+
   const verifyData = {
     phone,
     code,
@@ -162,7 +166,10 @@ export const joinGame = async ({
     }
   );
 
-  return addPlayerResponse.status === 200 && sendCodeResponse.status === 200;
+  const sendCodeData = await sendCodeResponse.json();
+
+  if (sendCodeData?.error) return false;
+  return true;
 };
 
 export const submitChallenge = async ({
