@@ -67,6 +67,7 @@ const LandingPageInformation = () => {
                 fontWeight: "bold",
                 maxWidth: maxButtonWidth,
                 color: "black",
+                borderRadius: "0",
               }}
             >
               GET STARTED

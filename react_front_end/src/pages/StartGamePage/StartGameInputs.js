@@ -14,6 +14,8 @@ export default function StartGameInputs() {
       backgroundColor: "black",
       display: "flex",
       flexWrap: "wrap",
+      marginBottom: "0.35em",
+      paddingBottom: "4em",
       "& > *": {
         width: "100vw",
         display: "flex",
@@ -38,7 +40,12 @@ export default function StartGameInputs() {
       display: "flex",
       flexDirection: "column",
       "& > *": {
-        margin: "1em 0",
+        "&:nth-child(even)": {
+          margin: "2em 0",
+        },
+        "&:last-child": {
+          marginBottom: "0",
+        },
       },
     },
   }));
@@ -68,14 +75,20 @@ export default function StartGameInputs() {
 
     const payload = {
       handle: tikTokRef.current.value,
-      phone: phone.replace(/\+/, "").replace(/ /g, ""),
+      phone: phone
+        .replace(/\+/, "")
+        .replace(/ /g, "")
+        .replace(/\(|\)|\-/g, ""),
       hashtag: gameNameRef.current.value,
     };
 
     const response = await startGame(payload);
-    if (response) console.log("show success snack bar ===", response);
+    if (response.status === 200)
+      console.log("show success snack bar ===", response);
 
     response && setResponse(200);
+
+    !response && setResponse(500);
   };
 
   function handleOnPhoneChange(value, countryObj) {
@@ -120,6 +133,7 @@ export default function StartGameInputs() {
 
   return (
     <div className={classes.root}>
+      <Notification status={responseCode} />
       <Paper square>
         <form className={classes.form} autoComplete="off">
           <TextField
@@ -169,6 +183,7 @@ export default function StartGameInputs() {
               width: "100vw",
               maxWidth: maxButtonWidth,
               fontWeight: "bold",
+              borderRadius: "0",
             }}
           >
             START A GAME

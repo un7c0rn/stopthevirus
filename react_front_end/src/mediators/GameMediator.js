@@ -31,6 +31,8 @@ export const startGame = async ({
 
   const gameId = await addedGameId.json();
 
+  if (!gameId?.length) return false;
+
   const code = uuidv4();
   const number = phone.replace("+", "").replace(/ /g, "");
 
@@ -46,7 +48,7 @@ export const startGame = async ({
     code,
   };
 
-  await fetch(
+  const createPlayer = await fetch(
     process.env?.REACT_APP_DEVELOPMENT_ENV === "development"
       ? `http://localhost:8888/.netlify/functions/add_player`
       : `${process.env?.WEBHOOK_REDIRECT_URL}/.netlify/functions/add_player`,
@@ -56,7 +58,9 @@ export const startGame = async ({
     }
   );
 
-  // TODO: Debug data not being in response
+  const createPlayerResponse = await createPlayer.json();
+
+  if (!createPlayerResponse?.id) return false;
 
   const verifyData = {
     phone: number,
@@ -74,7 +78,10 @@ export const startGame = async ({
     }
   );
 
-  return sendCodeResponse.status === 200;
+  const sendCodeData = await sendCodeResponse.json();
+
+  if (sendCodeData?.error) return false;
+  return true;
 };
 
 export const createChallenge = async ({
@@ -139,6 +146,10 @@ export const joinGame = async ({
     }
   );
 
+  const createPlayerResponse = await addPlayerResponse.json();
+
+  if (!createPlayerResponse?.id) return false;
+
   const verifyData = {
     phone,
     code,
@@ -155,7 +166,10 @@ export const joinGame = async ({
     }
   );
 
-  return addPlayerResponse.status === 200 && sendCodeResponse.status === 200;
+  const sendCodeData = await sendCodeResponse.json();
+
+  if (sendCodeData?.error) return false;
+  return true;
 };
 
 export const submitChallenge = async ({
