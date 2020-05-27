@@ -11,6 +11,8 @@
     "@testing-library/react-hooks": "^3.2.1",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "bufferutil": "^4.0.1",
+    "canvas": "^2.6.1",
     "dotenv": "^8.2.0",
     "firebase-admin": "^8.10.0",
     "history": "^4.10.1",
@@ -35,6 +37,7 @@
     "tiktok-scraper": "^1.1.3",
     "twilio": "^3.43.0",
     "use-error-boundary": "^1.2.0",
+    "utf-8-validate": "^5.0.2",
     "uuid": "^8.0.0"
   },
   "scripts": {
