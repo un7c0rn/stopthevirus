@@ -54,6 +54,11 @@ This assumes that you have followed the instruction on how to start the project 
 2. Enter the required information on the `http://localhost:8888/challenge-submission/447305841979/0H3RzPqfq4dnf47BSgve/jRGdp3VIzNtmg2gd0dvy` page.
 3. Click the **SUBMIT** button.
 
+# Game info
+
+1. Navigate to `http://localhost:8888/game-info/0H3RzPqfq4dnf47BSgve`.
+2. Review the information on the page.
+
 ---
 
 # Netlify setup
