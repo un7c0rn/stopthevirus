@@ -34,7 +34,7 @@ const LandingPageInformation = () => {
         <Paper square style={{ maxWidth: maxButtonWidth }}>
           <Typography
             gutterBottom
-            className="landing-page-information landing-page-information-animation"
+            className="landing-page-information landing-"
           >
             It’s Spring 2020 and Coachella, SXSW, the NBA, NHL, MLB and the
             Tokyo Olympics are cancelled this year. We’re at the height of human
@@ -45,7 +45,7 @@ const LandingPageInformation = () => {
           </Typography>
           <Typography
             gutterBottom
-            className="landing-page-information landing-page-information-animation"
+            className="landing-page-information landing-"
           >
             Despite this, many people are still unaware of the seriousness of
             COVID-19 and actions they can take to support our health care
@@ -55,10 +55,7 @@ const LandingPageInformation = () => {
             to help inspire the youth to stop the virus?
           </Typography>
         </Paper>
-        <Typography
-          gutterBottom
-          className="landing-page-information landing-page-information-animation"
-        >
+        <Typography gutterBottom className="landing-page-information landing-">
           <Link to="/start-game" style={{ textDecoration: "none" }}>
             <Button
               style={{

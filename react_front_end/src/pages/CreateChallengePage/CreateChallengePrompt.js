@@ -23,17 +23,11 @@ export default function CreateChallengePrompt() {
   return (
     <div className={classes.root}>
       <Paper square style={{ maxWidth: maxButtonWidth }}>
-        <Typography
-          gutterBottom
-          className="page-information page-information-animation"
-        >
+        <Typography gutterBottom className="page-information ">
           Challenges are scored using Tik Tok video likes divided by the number
           of views. Challenges are reviewed and may be removed without notice.
         </Typography>
-        <Typography
-          gutterBottom
-          className="page-information page-information-animation"
-        >
+        <Typography gutterBottom className="page-information ">
           Good challange ideas are fun, encouraging social distancing and are
           easy to score by liking on Tik Tok.
         </Typography>
