@@ -24,10 +24,7 @@ const VerifiedPageInformation = () => {
     <>
       <section className={classes.root}>
         <Paper square style={{ maxWidth: maxButtonWidth }}>
-          <Typography
-            gutterBottom
-            className="page-information page-information-animation"
-          >
+          <Typography gutterBottom className="page-information ">
             YOU'VE BEEN VERIFIED
           </Typography>
         </Paper>
