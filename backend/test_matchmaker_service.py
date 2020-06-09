@@ -16,9 +16,10 @@ class MatchmakerServiceTest(unittest.TestCase):
 
     def test_matchmaker_daemon(self):
         service = MatchmakerService()
-        service.start_matchmaker_daemon(sleep_seconds=1)
+        service.start_matchmaker_daemon(sleep_seconds=5)
         time.sleep(2)
         service.set_stop()
+        service.set_run()
 
         
         

@@ -29,16 +29,17 @@ class MatchmakerService:
         print ("STOPPING")
 
     def start_matchmaker_daemon(self, sleep_seconds=60):
-        if not self._daemon_started:
-            thread = threading.Thread(target=self.matchmaker_function, args=(sleep_seconds,))
+        if not self._daemon_started and not self._STOP:
+            self._thread = threading.Thread(target=self.matchmaker_function, args=(sleep_seconds,))
             self._daemon_started = True
-            thread.start()
+            self._thread.start()
         else:
             print("CAN ONLY RUN 1 DAEMON AT A TIME")
 
     def set_stop(self):
         print("TRYING TO STOP")
         self._STOP = True
+        self._thread.join() # Wait for thread to finish executing/sleeping. This may take a long time
         self._daemon_started = False
 
     def set_run(self):
