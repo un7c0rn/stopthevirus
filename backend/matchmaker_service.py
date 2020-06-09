@@ -1,5 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
+from game import Game
+from game_engine.common import GameOptions
 from game_engine.firestore import FirestoreDB
 import time
 import threading
@@ -11,9 +13,11 @@ json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
 
 
 class MatchmakerService:
-    def __init__(self, json_config_path=json_config_path, region="US"):
-        self._gamedb = FirestoreDB(json_config_path=json_config_path, game_id=123)
+    def __init__(self, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
+        self._gamedb = FirestoreDB(json_config_path=json_config_path)
+        self._min_players = min_players
         self._region=region
+        self._is_test = is_test
         self._STOP = False
         self._daemon_started = False
 
@@ -22,9 +26,22 @@ class MatchmakerService:
         # do some logging here
         while not self._STOP:
             #games = self._gamedb.find_matchmaker_games(region=self._region)
-            games = ["IM A GAME", "IM A GAME TOO"]
+            games = [{"id":"IM A GAME", "count_players":6}, {"id":"IM A GAME TOO", "count_players":4}]
             if len(games) >= 1:
                 print(games)
+                for game in games:
+                    print(game)
+                    if game["count_players"] >= self._min_players:
+                        options = GameOptions()
+                        g = Game(game_id=game["id"],options=options)
+                        if self._is_test:
+                            #start new process
+                            pass
+                        else:
+                            #start on new GCP instance
+                            pass
+                        #g.play()
+                        # Play the game
             time.sleep(sleep_seconds)
         print ("STOPPING")
 
