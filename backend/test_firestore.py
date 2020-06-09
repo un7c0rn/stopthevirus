@@ -3,6 +3,7 @@ import mock
 from game_engine.firestore import FirestoreDB
 import pprint
 import json
+import datetime
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TRIBE_TIGRAWAY_ID = '77TMV9omdLeW7ORvuheX'
@@ -344,11 +345,14 @@ class FirestoreDBTest(unittest.TestCase):
 
     def test_find_matchmaker_games(self):
         _gamedb.import_collections(_TEST_DATA_MATCHMAKER_JSON)
-        games = _gamedb.find_matchmaker_games()
-        print(games)
+        time_now = datetime.datetime(2020, 6, 9, 13, 0)
+        games = _gamedb.find_matchmaker_games(region="US", time_now=time_now)
+        self.assertEqual(len(games), 1)
+
+        time_now = time_now.replace(hour=11)
+        games = _gamedb.find_matchmaker_games(region="US", time_now=time_now)
+        self.assertEqual(len(games), 0)
         
-
-
-
+        
 if __name__ == '__main__':
     unittest.main()
