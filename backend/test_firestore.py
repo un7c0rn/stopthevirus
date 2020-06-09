@@ -142,6 +142,19 @@ _TEST_DATA_JSON = """
 }
 """
 
+_TEST_DATA_MATCHMAKER_JSON = """
+{
+   "games":{
+      "7rPwCJaiSkxYgDocGDw1":{
+         "count_teams":6,
+         "count_players":2,
+         "name":"test_game1",
+         "country_code":"US",
+         "game_start_time":"12:00"
+      }
+   }
+}
+"""
 
 
 class FirestoreDBTest(unittest.TestCase):
@@ -328,6 +341,13 @@ class FirestoreDBTest(unittest.TestCase):
     def test_clear_votes(self):
         _gamedb.clear_votes()
         self.assertEqual(_gamedb.count_votes(), {})
+
+    def test_find_matchmaker_games(self):
+        _gamedb.import_collections(_TEST_DATA_MATCHMAKER_JSON)
+        games = _gamedb.find_matchmaker_games()
+        print(games)
+        
+
 
 
 if __name__ == '__main__':

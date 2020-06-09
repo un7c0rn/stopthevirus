@@ -15,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 import copy
 import json
 import uuid
+import datetime
 
 # TODO(brandon): change Data interface to use counters instead of size
 # by convention.
@@ -414,3 +415,28 @@ class FirestoreDB(Database):
         votes = self._client.collection('votes').stream()
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._delete_vote_fn, votes)
+
+    def find_matchmaker_games(self, region="US", time_now="12:00") -> list:
+        games_list = []
+        db = self._client
+        games = db.collection(u'games').stream()
+
+        for game in games:
+            try:
+                country = game.get("country_code")
+
+                start = game.get("game_start_time")
+                now = datetime.datetime.now()
+
+                start_time = datetime.datetime.strptime(now.strftime('%Y/%m/%d ') + start, '%Y/%m/%d %H:%M')
+
+                if country == region and start_time <= now:
+                    games_list.append(game)
+            except:
+                pass
+        return games_list
+
+
+
+
+
