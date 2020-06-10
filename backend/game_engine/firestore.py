@@ -416,22 +416,14 @@ class FirestoreDB(Database):
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._delete_vote_fn, votes)
 
-    def find_matchmaker_games(self, region="US", time_now=datetime.datetime.now()) -> list:
-        # Time comparison is done solely based on the hour
+    def find_matchmaker_games(self, region="US") -> list:
         games_list = []
         db = self._client
-        games = db.collection(u'games').stream()
+        games = db.collection('games').where('country_code', '==', region).where('game_has_started', '==', False).stream()
 
         for game in games:
             try:
-                country = game.get("country_code")
-
-                start = game.get("game_start_time")
-
-                start_time = datetime.datetime.strptime(time_now.strftime('%Y/%m/%d ') + start, '%Y/%m/%d %H:%M')
-
-                if country == region and start_time <= time_now:
-                    games_list.append(game)
+                games_list.append(game)
             except:
                 pass
         return games_list
