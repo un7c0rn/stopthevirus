@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from game import Game
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek
+from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
 from google.cloud.firestore_v1.document import DocumentSnapshot
 import time
@@ -11,6 +12,7 @@ import datetime
 _FIRESTORE_PROD_CONF_JSON_PATH = ''
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
+_AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
 
 _test_games_data = [{
                     "count_teams":6,
@@ -38,11 +40,26 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
+    def play_game(self, game: Game):
+        print("playing a game")
+        _TRIBE_1_ID = ''
+        _TRIBE_2_ID = ''
+        engine = Engine(options=game._options,
+                        game_id=game._game_id,
+                        sqs_config_path=_AMAZON_SQS_PROD_CONF_JSON_PATH)
+        database = self._gamedb
+        game.play(tribe1=database.tribe_from_id(_TRIBE_1_ID),
+                tribe2=database.tribe_from_id(_TRIBE_2_ID),
+                gamedb=database,
+                engine=engine)
+
+
     def start_game(self, game: Game):
         print(game)
         if self._is_test:
             #start new process
             pass
+            #self.play_game(game)
         else:
             #start on new GCP instance
             pass
@@ -63,11 +80,11 @@ class MatchmakerService:
         # do some logging here
         while not self._stop.is_set():
             games = self._gamedb.find_matchmaker_games(region=self._region)
-            print(games)
             #games = _test_games_data
             if len(games) >= 1:
                 for game in games:
                     game_dict = game.to_dict()
+                    print(game_dict)
                     if game_dict["count_players"] >= self._min_players:
                         schedule = STV_I18N_TABLE[self._region]
                         start_day = schedule.game_start_day_of_week
