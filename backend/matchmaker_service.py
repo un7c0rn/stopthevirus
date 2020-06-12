@@ -4,6 +4,7 @@ from game import Game
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
+from game_engine.matchmaker import MatchMakerRoundRobin
 from google.cloud.firestore_v1.document import DocumentSnapshot
 import time
 import threading
@@ -13,6 +14,8 @@ _FIRESTORE_PROD_CONF_JSON_PATH = ''
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
 _AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
+_TEST_AMAZON_SQS_CONFIG_PATH = '../amazon/stopthevirus.fifo.json'
+_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
 
 _test_games_data = [{
                     "count_teams":6,
@@ -32,34 +35,40 @@ _test_games_data = [{
 
 
 class MatchmakerService:
+    # Handles scheduling and communication with other services for starting games
+    # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
     def __init__(self, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
-        self._gamedb = FirestoreDB(json_config_path=json_config_path)
+        self._gamedb = FirestoreDB(json_config_path=json_config_path) 
         self._min_players = min_players
         self._region=region
         self._is_test = is_test
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game):
+    def play_game(self, game: Game, players):
         print("playing a game")
-        _TRIBE_1_ID = ''
-        _TRIBE_2_ID = ''
+        print(players)
+
+        game_data = MatchMakerRoundRobin.generate_teams_tribes(game_id=game._game_id, players=players, team_size=game._options.target_team_size)
+        tribes = game_data['tribes']        
+        database = self._gamedb
         engine = Engine(options=game._options,
                         game_id=game._game_id,
-                        sqs_config_path=_AMAZON_SQS_PROD_CONF_JSON_PATH)
-        database = self._gamedb
-        game.play(tribe1=database.tribe_from_id(_TRIBE_1_ID),
-                tribe2=database.tribe_from_id(_TRIBE_2_ID),
+                        sqs_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
+                        twilio_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
+                        gamedb=database
+        )
+        
+        game.play(tribe1=tribes[0],
+                tribe2=tribes[1],
                 gamedb=database,
                 engine=engine)
 
 
-    def start_game(self, game: Game):
-        print(game)
+    def start_game(self, game: Game, players):
         if self._is_test:
             #start new process
-            pass
-            #self.play_game(game)
+            self.play_game(game=game, players=players)
         else:
             #start on new GCP instance
             pass
@@ -84,7 +93,11 @@ class MatchmakerService:
             if len(games) >= 1:
                 for game in games:
                     game_dict = game.to_dict()
-                    print(game_dict)
+                    players = game.reference.collection("players").stream()
+                    players_list = []
+                    for player in players:
+                        players_list.append(player)
+
                     if game_dict["count_players"] >= self._min_players:
                         schedule = STV_I18N_TABLE[self._region]
                         start_day = schedule.game_start_day_of_week
@@ -97,8 +110,8 @@ class MatchmakerService:
                             options = GameOptions(game_schedule=schedule)
                             g = Game(game_id=game_dict["id"], options=options)
                             # Play the game
-                            self.start_game(game=g)
-                            self.set_game_has_started(game=game)
+                            self.start_game(game=g, players=players_list)
+                            #self.set_game_has_started(game=game)
                             
             time.sleep(sleep_seconds)
         print ("STOPPING")

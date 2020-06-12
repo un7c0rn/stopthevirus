@@ -138,6 +138,12 @@ class MatchMakerInterface(ABC):
         # Take in game_id and list of Players and return a list of Teams
         return
 
+    @classmethod
+    @abstractmethod
+    def generate_teams_tribes(cls, game_id: Text, players: list) -> dict:
+        # Take in game_id and list of Players and return a list of Teams and Tribes
+        return
+
 class MatchMakerRoundRobin(MatchMakerInterface):
     @classmethod
     def generate_teams(cls, game_id: Text, players: list, team_size: int) -> dict:
@@ -163,3 +169,68 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             teams_dict[team.id] = team.to_dict()
             del teams_dict[team.id]['id']
         return teams_dict
+
+    @classmethod
+    def generate_teams_tribes(cls, game_id: Text, players, team_size: int) -> dict:
+        tribes = []
+        teams = []
+        count_players = len(players)
+        if count_players<team_size:
+            raise Exception("Insufficient players for given team size")
+
+        # generate tribes
+        for tribe_name in [_DEFAULT_TRIBE_NAMES[int(n)] for n in random.sample(range(0, len(_DEFAULT_TRIBE_NAMES)), 2)]:
+            tribe = database.Tribe(
+                id=str(uuid.uuid4()),
+                name="tribe/{}".format(tribe_name)
+            )
+            tribes.append(tribe)
+
+        # generate teams
+        for n in range(0, math.floor(count_players / team_size)):
+            team = database.Team(
+                id=str(uuid.uuid4()),
+                name="team/{}".format(n),
+            )
+            teams.append(team)
+
+        count_tribes = len(tribes)
+        count_teams = len(teams)
+
+        # randomly assign team, tribe to each player
+        for n, player in enumerate(players):
+            print(player)
+            print ("---------------->")
+            tribe = tribes[n % count_tribes]
+            team = teams[n % count_teams]
+            player.tribe_id = tribe.id
+            player.team_id = team.id
+            team.tribe_id = tribe.id
+            tribe.size += 1
+            team.size += 1
+            print(player)
+            print('====================')
+
+        
+
+        # players_dict = {}
+        # teams_dict = {}
+        # tribes_dict = {}
+        
+        # for player in players:
+        #     players_dict[player.id] = player.to_dict()
+        #     del players_dict[player.id]['id']
+        
+        # for team in teams:
+        #     teams_dict[team.id] = team.to_dict()
+        #     del teams_dict[team.id]['id']
+
+        # for tribe in tribes:
+        #     tribes_dict[tribe.id] = tribe.to_dict()
+        #     del tribes_dict[tribe.id]['id']
+
+        d = {}
+        d['players'] = players
+        d['teams'] = teams
+        d['tribes'] = tribes
+        return d

@@ -4,7 +4,7 @@ from game_engine import events
 import uuid
 import game
 from contextlib import contextmanager
-from game_engine.matchmaker import GameSimulator, MatchMakerRoundRobin
+from game_engine.matchmaker import MatchMakerRoundRobin
 from game_engine.database import Player, Team
 import copy 
 
@@ -29,18 +29,40 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
             players.append(player)
         return players
 
-    def test_matchmaker(self):
+    def test_generate_teams(self):
         players = self.generate_players()
         teams=MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players, 
         team_size=_TEAM_SIZE)
         self.assertEqual(len(teams),2)
 
-    def test_matchmaker_insufficient_players(self):
+    def test_generate_teams_insufficient_players(self):
         players = [_TEST_PLAYER1]
         with self.assertRaises(Exception) as context:
             MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players, 
             team_size=_TEAM_SIZE)
         self.assertTrue(context.exception)
+
+    def test_generate_teams_tribes(self):
+        players = self.generate_players()
+        data=MatchMakerRoundRobin.generate_teams_tribes(game_id=_TEST_GAME_ID, players=players, 
+        team_size=_TEAM_SIZE)
+        players = data['players']
+        teams = data['teams']
+        tribes = data['tribes']
+        for p in players:
+            pass
+            print(p)
+        
+        for t in tribes:
+            pass
+            print(t)
+
+        for tm in teams:
+            pass
+            print(tm)
+
+        # print(data['tribes'])
+        # print(data['teams'])
     
 
 if __name__ == '__main__':
