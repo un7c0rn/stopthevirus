@@ -4,7 +4,7 @@ from game import Game
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
-from game_engine.matchmaker import MatchMakerRoundRobin
+from game_engine.matchmaker import MatchMakerInterface
 from google.cloud.firestore_v1.document import DocumentSnapshot
 import time
 import threading
@@ -37,7 +37,8 @@ _test_games_data = [{
 class MatchmakerService:
     # Handles scheduling and communication with other services for starting games
     # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
-    def __init__(self, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
+    def __init__(self, matchmaker: MatchMakerInterface, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
+        self._matchmaker = matchmaker
         self._gamedb = FirestoreDB(json_config_path=json_config_path) 
         self._min_players = min_players
         self._region=region
@@ -49,7 +50,7 @@ class MatchmakerService:
         print("playing a game")
         print(players)
 
-        game_data = MatchMakerRoundRobin.generate_teams_tribes(game_id=game._game_id, players=players, team_size=game._options.target_team_size)
+        game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, team_size=game._options.target_team_size)
         tribes = game_data['tribes']        
         database = self._gamedb
         engine = Engine(options=game._options,
