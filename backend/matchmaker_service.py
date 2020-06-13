@@ -39,26 +39,33 @@ class MatchmakerService:
     # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
     def __init__(self, matchmaker: MatchMakerInterface, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
         self._matchmaker = matchmaker
-        self._gamedb = FirestoreDB(json_config_path=json_config_path) 
+        self._gamedb = FirestoreDB(json_config_path=json_config_path) #TODO use firestore.client() 
         self._min_players = min_players
-        self._region=region
+        self._region = region
         self._is_test = is_test
         self._stop = threading.Event()
         self._daemon_started = False
 
     def play_game(self, game: Game, players):
         print("playing a game")
-        print(players)
 
         game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, team_size=game._options.target_team_size)
         tribes = game_data['tribes']        
-        database = self._gamedb
+        database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id)#db needs to have correct game_id
         engine = Engine(options=game._options,
                         game_id=game._game_id,
                         sqs_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
                         twilio_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
                         gamedb=database
         )
+
+        print("TRIBES")
+        print(tribes)
+        tribe1=tribes[0]
+        tribe2=tribes[1]
+        database.save(tribe1)
+        database.save(tribe2)
+
         
         game.play(tribe1=tribes[0],
                 tribe2=tribes[1],
@@ -94,6 +101,7 @@ class MatchmakerService:
             if len(games) >= 1:
                 for game in games:
                     game_dict = game.to_dict()
+                    print(game_dict)
                     players = game.reference.collection("players").stream()
                     players_list = []
                     for player in players:

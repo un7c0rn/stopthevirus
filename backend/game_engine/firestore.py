@@ -169,7 +169,13 @@ class FirestoreDB(Database):
             'tribe_id', '==', from_tribe.id).stream()
         player_count = self.count_players(from_tribe=from_tribe)
         team_count = self.count_teams(from_tribe=from_tribe)
-
+        print("PLAYER_COUNT")
+        print(player_count)
+        print("TEAM COUNT")
+        print(team_count)
+        print("GAME ID")
+        print(self._game_id)
+        print("_____________")
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._tribe_update_fn, teams,
                             {"tribe_id": to_tribe.id})
