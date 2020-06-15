@@ -290,10 +290,11 @@ class FirestoreDB(Database):
         l = []
         for c in query.stream():
             d = c.to_dict()
+            x = self.challenge_from_id(d.get("id"))
             print("PRINTING CHALLENGE")
-            print(d)
+            print(x)
             print("PRINTED")
-            l.append(d)
+            l.append(x)
         return l
 
     def list_players(self, from_team: Team, active_player_predicate_value=True) -> Iterable[Player]:
