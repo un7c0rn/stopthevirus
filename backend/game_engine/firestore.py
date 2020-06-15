@@ -287,7 +287,14 @@ class FirestoreDB(Database):
         query = self._client.collection(
             'games/{}/challenges'.format(self._game_id)).where(
                 'complete', '==', challenge_completed_predicate_value)
-        return FirestoreChallengeStream(query.stream())
+        l = []
+        for c in query.stream():
+            d = c.to_dict()
+            print("PRINTING CHALLENGE")
+            print(d)
+            print("PRINTED")
+            l.append(d)
+        return l
 
     def list_players(self, from_team: Team, active_player_predicate_value=True) -> Iterable[Player]:
         query = self._client.collection(
