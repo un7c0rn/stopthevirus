@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from game import Game
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek
+from game_engine.database import Database
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerInterface
@@ -37,9 +38,9 @@ _test_games_data = [{
 class MatchmakerService:
     # Handles scheduling and communication with other services for starting games
     # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
-    def __init__(self, matchmaker: MatchMakerInterface, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
+    def __init__(self, matchmaker: MatchMakerInterface, gamedb: Database, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
         self._matchmaker = matchmaker
-        self._gamedb = FirestoreDB(json_config_path=json_config_path) #TODO use firestore.client() 
+        self._gamedb = gamedb
         self._min_players = min_players
         self._region = region
         self._is_test = is_test
