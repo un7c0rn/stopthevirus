@@ -1,5 +1,6 @@
 from typing import Text
 from game_engine import database
+from game_engine.common import GameOptions
 from game_engine.database import Player, Team
 import uuid
 import names
@@ -134,14 +135,14 @@ class MatchMakerInterface(ABC):
 
     @classmethod
     @abstractmethod
-    def generate_teams(cls, game_id: Text, players: list) -> dict:
+    def generate_teams(cls, game_id: Text, players: list, team_size: int) -> dict:
         # Take in game_id and list of Players and return a list of Teams
         return
 
     @classmethod
     @abstractmethod
-    def generate_teams_tribes(cls, game_id: Text, players: list) -> dict:
-        # Take in game_id and list of Players and return a list of Teams and Tribes
+    def generate_teams_tribes(cls, game_id: Text, players: list, game_options: GameOptions) -> dict:
+        # Take in game_id, list of Players, and gameOptions, and return a list of Teams and Tribes
         return
 
 class MatchMakerRoundRobin(MatchMakerInterface):
@@ -171,13 +172,14 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         return teams_dict
 
     @classmethod
-    def generate_teams_tribes(cls, game_id: Text, players, team_size: int) -> dict:
+    def generate_teams_tribes(cls, game_id: Text, players, game_options: GameOptions) -> dict:
         tribes = []
         teams = []
         count_players = len(players)
-        if count_players<team_size:
+        if count_players < game_options.target_team_size:
             raise Exception("Insufficient players for given team size")
-
+        if count_players < game_options.multi_tribe_min_tribe_size * 2:
+            raise Exception("Insufficient players to make 2 tribes")
         # generate tribes
         for tribe_name in [_DEFAULT_TRIBE_NAMES[int(n)] for n in random.sample(range(0, len(_DEFAULT_TRIBE_NAMES)), 2)]:
             tribe = database.Tribe(
@@ -187,7 +189,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             tribes.append(tribe)
 
         # generate teams
-        for n in range(0, math.floor(count_players / team_size)):
+        for n in range(0, math.floor(count_players / game_options.target_team_size)):
             team = database.Team(
                 id=str(uuid.uuid4()),
                 name="team/{}".format(n),

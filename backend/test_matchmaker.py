@@ -1,6 +1,7 @@
 import unittest
 import mock
 from game_engine import events
+from game_engine.common import GameOptions
 import uuid
 import game
 from contextlib import contextmanager
@@ -31,6 +32,7 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
 
     def test_generate_teams(self):
         players = self.generate_players()
+        options = GameOptions(target_team_size=_TEAM_SIZE)
         teams=MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players, 
         team_size=_TEAM_SIZE)
         self.assertEqual(len(teams),2)
@@ -44,8 +46,9 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
 
     def test_generate_teams_tribes(self):
         players = self.generate_players()
+        options = GameOptions(target_team_size=_TEAM_SIZE)
         data=MatchMakerRoundRobin.generate_teams_tribes(game_id=_TEST_GAME_ID, players=players, 
-        team_size=_TEAM_SIZE)
+        game_options=options)
         players = data['players']
         teams = data['teams']
         tribes = data['tribes']

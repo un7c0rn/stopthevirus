@@ -49,8 +49,9 @@ class MatchmakerService:
     def play_game(self, game: Game, players):
         print("playing a game")
 
-        game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, team_size=game._options.target_team_size)
-        tribes = game_data['tribes']        
+        game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options)
+        tribes = game_data['tribes']
+        #TO DO(DAVID): Update DB with this data
         database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id)#db needs to have correct game_id
         engine = Engine(options=game._options,
                         game_id=game._game_id,
