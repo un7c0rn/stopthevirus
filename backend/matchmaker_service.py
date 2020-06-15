@@ -117,7 +117,7 @@ class MatchmakerService:
                             now_day = ISODayOfWeek(5)
                         if now_day == start_day:
                             print ("Starting game")
-                            options = GameOptions(game_schedule=schedule)
+                            options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
                             g = Game(game_id=game_dict["id"], options=options)
                             # Play the game
                             self.start_game(game=g, players=players_list)
