@@ -3,6 +3,7 @@ import mock
 from matchmaker_service import MatchmakerService
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerRoundRobin
+from test_game import MockDatabase
 import pprint
 import json
 import datetime
@@ -45,7 +46,8 @@ class MatchmakerServiceTest(unittest.TestCase):
 
 
     def test_matchmaker_daemon(self):
-        gamedb = FirestoreDB(json_config_path=json_config_path)
+        #gamedb = FirestoreDB(json_config_path=json_config_path)
+        gamedb = MockDatabase()
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb)
         service.start_matchmaker_daemon(sleep_seconds=1)
         time.sleep(2)

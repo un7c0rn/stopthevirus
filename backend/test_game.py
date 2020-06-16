@@ -1,5 +1,6 @@
 import unittest
 import mock
+import types
 from game import Game
 from game import GameOptions
 from game_engine.engine import Engine
@@ -81,6 +82,23 @@ class MockDatabase(Database):
             'entry/7': Entry(id='entry/7', likes=1, views=1, player_id='player/14', tribe_id='tribe/2', challenge_id='challenge/1'),
             'entry/8': Entry(id='entry/8', likes=1, views=1, player_id='player/15', tribe_id='tribe/2', challenge_id='challenge/1'),
             'entry/9': Entry(id='entry/9', likes=1, views=1, player_id='player/16', tribe_id='tribe/2', challenge_id='challenge/1'),
+        }
+
+        self._games = {
+            "7rPwCJaiSkxYgDocGDw1":{
+                "count_teams":6,
+                "count_players":8,
+                "name":"test_game1",
+                "country_code":"US",
+                "game_has_started": False,
+            },
+            "FFFFFFFFFFFFFFFFFFFF":{
+                "count_teams":6,
+                "count_players":5,
+                "name":"test_game2",
+                "country_code":"EU",
+                "game_has_started": True
+            }
         }
 
         self._votes = {}
@@ -224,6 +242,32 @@ class MockDatabase(Database):
 
         if isinstance(data, Team):
             self._teams[data.id] = data
+
+    def find_matchmaker_games(self, region="US") -> list:
+        class TestGame(dict):
+            class Reference():
+                class Stream(dict):
+                    def stream(self):
+                        return self
+                def collection(self, inp):
+                    if inp =="players":
+                        return self.Stream()
+
+
+            reference = Reference()
+            def to_dict(self):
+                return self
+            
+        filtered = filter(lambda elem: elem[1]['country_code'] == region and not elem[1]['game_has_started'], self._games.items())
+        games = list(filtered)
+        games_list = []
+        for g_tuple in games:
+            game = TestGame(g_tuple[1])
+            games_list.append(game)
+        return games_list
+        
+
+
 
 
 class GameTest(unittest.TestCase):
