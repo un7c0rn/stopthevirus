@@ -45,7 +45,7 @@ class MatchmakerServiceTest(unittest.TestCase):
         pass
 
 
-    def test_matchmaker_daemon(self):
+    def test_matchmaker_daemon(self, use_mock=True):
         #gamedb = FirestoreDB(json_config_path=json_config_path)
         gamedb = MockDatabase()
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb)

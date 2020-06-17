@@ -91,13 +91,15 @@ class MockDatabase(Database):
                 "name":"test_game1",
                 "country_code":"US",
                 "game_has_started": False,
+                "id": "7rPwCJaiSkxYgDocGDw1"
             },
             "FFFFFFFFFFFFFFFFFFFF":{
                 "count_teams":6,
                 "count_players":5,
                 "name":"test_game2",
                 "country_code":"EU",
-                "game_has_started": True
+                "game_has_started": True,
+                "id": "FFFFFFFFFFFFFFFFFFFF"
             }
         }
 
@@ -247,17 +249,18 @@ class MockDatabase(Database):
         class TestGame(dict):
             class Reference():
                 class Stream(dict):
-                    def stream(self):
-                        return self
-                def collection(self, inp):
+                    def stream(self3):
+                        players_dict = self._players
+                        players_list = []
+                        for key, val in players_dict.items():
+                            players_list.append(val)
+                        return players_list
+                def collection(self2, inp):
                     if inp =="players":
-                        return self.Stream()
-
-
+                        return self2.Stream()
             reference = Reference()
             def to_dict(self):
                 return self
-            
         filtered = filter(lambda elem: elem[1]['country_code'] == region and not elem[1]['game_has_started'], self._games.items())
         games = list(filtered)
         games_list = []

@@ -104,11 +104,12 @@ class MatchmakerService:
                 for game in games:
                     game_dict = game.to_dict()
                     print(game_dict)
-                    players = game.reference.collection("players").stream()
+                    players_stream = game.reference.collection("players").stream()
                     players_list = []
-                    for player in players:
+                    for player in players_stream:
+                        print("PLAYER")
+                        print(type(player))
                         players_list.append(player)
-
                     if game_dict["count_players"] >= self._min_players:
                         schedule = STV_I18N_TABLE[self._region]
                         start_day = schedule.game_start_day_of_week
@@ -118,6 +119,7 @@ class MatchmakerService:
                             now_day = ISODayOfWeek(5)
                         if now_day == start_day:
                             print ("Starting game")
+                            print(game_dict)
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
                             g = Game(game_id=game_dict["id"], options=options)
                             # Play the game
