@@ -6,10 +6,13 @@ from game_engine.database import Database
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerInterface
+from test_game import MockDatabase
 from google.cloud.firestore_v1.document import DocumentSnapshot
 import time
 import threading
 import datetime
+from game_engine import events
+from multiprocessing import Process
 
 _FIRESTORE_PROD_CONF_JSON_PATH = ''
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
@@ -18,65 +21,53 @@ _AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
 _TEST_AMAZON_SQS_CONFIG_PATH = '../amazon/stopthevirus.fifo.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
 
-_test_games_data = [{
-                    "count_teams":6,
-                    "count_players":6,
-                    "name":"test_game1",
-                    "country_code":"US",
-                    "game_has_started": False
-                    },
-                    {
-                    "count_teams":6,
-                    "count_players":4,
-                    "name":"test_game2",
-                    "country_code":"US",
-                    "game_has_started": False
-                    }
-]
 
 
 class MatchmakerService:
     # Handles scheduling and communication with other services for starting games
     # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
-    def __init__(self, matchmaker: MatchMakerInterface, gamedb: Database, json_config_path=json_config_path, region="US", min_players=5, is_test=True):
+    def __init__(self, matchmaker: MatchMakerInterface, gamedb: Database, json_config_path=json_config_path, region="US", min_players=5, is_mvp=True):
         self._matchmaker = matchmaker
         self._gamedb = gamedb
         self._min_players = min_players
         self._region = region
-        self._is_test = is_test
+        self._is_mvp = is_mvp
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players):
+    def play_game(self, game: Game, players, is_test=True):
         print("playing a game")
 
         game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options)
         tribes = game_data['tribes']
         #TO DO(DAVID): Update DB with this data
-        database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id)#db needs to have correct game_id
-        engine = Engine(options=game._options,
-                        game_id=game._game_id,
-                        sqs_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
-                        twilio_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
-                        gamedb=database
-        )
+        if is_test:
+            database = MockDatabase()
+        else:
+            database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id)#db needs to have correct game_id
+            engine = Engine(options=game._options,
+                            game_id=game._game_id,
+                            sqs_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
+                            twilio_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
+                            gamedb=database
+            )
 
         print("TRIBES")
         print(tribes)
         tribe1=tribes[0]
         tribe2=tribes[1]
-        database.save(tribe1)
-        database.save(tribe2)
+        # database.save(tribe1)
+        # database.save(tribe2)
 
         
-        game.play(tribe1=tribes[0],
-                tribe2=tribes[1],
-                gamedb=database,
-                engine=engine)
+        # game.play(tribe1=tribes[0],
+        #         tribe2=tribes[1],
+        #         gamedb=database,
+        #         engine=engine)
 
 
     def start_game(self, game: Game, players):
-        if self._is_test:
+        if self._is_mvp:
             #start new process
             self.play_game(game=game, players=players)
         else:
@@ -99,7 +90,6 @@ class MatchmakerService:
         # do some logging here
         while not self._stop.is_set():
             games = self._gamedb.find_matchmaker_games(region=self._region)
-            #games = _test_games_data
             if len(games) >= 1:
                 for game in games:
                     game_dict = game.to_dict()
