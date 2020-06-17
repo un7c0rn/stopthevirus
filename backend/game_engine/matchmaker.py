@@ -201,8 +201,6 @@ class MatchMakerRoundRobin(MatchMakerInterface):
 
         # randomly assign team, tribe to each player
         for n, player in enumerate(players):
-            print(player)
-            print ("---------------->")
             tribe = tribes[n % count_tribes]
             team = teams[n % count_teams]
             player.tribe_id = tribe.id
@@ -210,8 +208,6 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             team.tribe_id = tribe.id
             tribe.size += 1
             team.size += 1
-            print(player)
-            print('====================')
 
         
 

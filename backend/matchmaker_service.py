@@ -6,7 +6,7 @@ from game_engine.database import Database
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerInterface
-from test_game import MockDatabase
+from test_game import MockDatabase, MockPlayEngine
 from google.cloud.firestore_v1.document import DocumentSnapshot
 import time
 import threading
@@ -43,6 +43,7 @@ class MatchmakerService:
         #TO DO(DAVID): Update DB with this data
         if is_test:
             database = MockDatabase()
+            engine = MockPlayEngine().CreateEngine(database)
         else:
             database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id)#db needs to have correct game_id
             engine = Engine(options=game._options,
@@ -56,8 +57,8 @@ class MatchmakerService:
         print(tribes)
         tribe1=tribes[0]
         tribe2=tribes[1]
-        # database.save(tribe1)
-        # database.save(tribe2)
+        database.save(tribe1)
+        database.save(tribe2)
 
         
         # game.play(tribe1=tribes[0],
@@ -97,8 +98,6 @@ class MatchmakerService:
                     players_stream = game.reference.collection("players").stream()
                     players_list = []
                     for player in players_stream:
-                        print("PLAYER")
-                        print(type(player))
                         players_list.append(player)
                     if game_dict["count_players"] >= self._min_players:
                         schedule = STV_I18N_TABLE[self._region]
