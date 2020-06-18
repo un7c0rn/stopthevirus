@@ -35,7 +35,7 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players, is_test=True):
+    def play_game(self, game: Game, players, is_test=False):
         print("playing a game")
 
         game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options)
@@ -61,10 +61,10 @@ class MatchmakerService:
         database.save(tribe2)
 
         
-        # game.play(tribe1=tribes[0],
-        #         tribe2=tribes[1],
-        #         gamedb=database,
-        #         engine=engine)
+        game.play(tribe1=tribes[0],
+                tribe2=tribes[1],
+                gamedb=database,
+                engine=engine)
 
 
     def start_game(self, game: Game, players):

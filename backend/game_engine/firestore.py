@@ -289,8 +289,8 @@ class FirestoreDB(Database):
                 'complete', '==', challenge_completed_predicate_value)
         l = []
         for c in query.stream():
-            d = c.to_dict()
-            x = self.challenge_from_id(d.get("id"))
+            #x = self.challenge_from_id(d.get("id"))
+            x = FirestoreChallenge(document=c)
             print("PRINTING CHALLENGE")
             print(x)
             print("PRINTED")
