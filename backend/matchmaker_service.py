@@ -35,7 +35,7 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players, is_test=False):
+    def play_game(self, game: Game, players, is_test=True):
         print("playing a game")
 
         game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options)

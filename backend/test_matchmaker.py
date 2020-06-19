@@ -7,6 +7,9 @@ import game
 from contextlib import contextmanager
 from game_engine.matchmaker import MatchMakerRoundRobin
 from game_engine.database import Player, Team
+from game_engine.firestore import FirestoreDB
+from test_game import MockDatabase
+
 import copy 
 
 _TEST_GAME_ID = '7rPwCJaiSkxYgDocGDw1'
@@ -18,6 +21,10 @@ _TEST_PLAYER1 = Player(
     active=True
 )
 _TEAM_SIZE = 10
+
+_TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
+json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
+
 
 class MatchMakerRoundRobinTest(unittest.TestCase):
 
@@ -45,24 +52,23 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
         self.assertTrue(context.exception)
 
     def test_generate_teams_tribes(self):
+        gamedb = FirestoreDB(json_config_path=json_config_path, game_id=_TEST_GAME_ID)
+        # gamedb = MockDatabase()
         players = self.generate_players()
         options = GameOptions(target_team_size=_TEAM_SIZE)
         data=MatchMakerRoundRobin.generate_teams_tribes(game_id=_TEST_GAME_ID, players=players, 
-        game_options=options)
+        game_options=options, gamedb=gamedb)
         players = data['players']
         teams = data['teams']
         tribes = data['tribes']
         for p in players:
             pass
-            print(p)
         
         for t in tribes:
             pass
-            print(t)
 
         for tm in teams:
             pass
-            print(tm)
 
         # print(data['tribes'])
         # print(data['teams'])

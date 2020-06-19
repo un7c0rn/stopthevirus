@@ -15,7 +15,6 @@ _TEST_GAME_ID = '7rPwCJaiSkxYgDocGDw1'
 _gamedb = FirestoreDB(
     json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, game_id=_TEST_GAME_ID)
 
-_TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
 
 _TEST_DATA_MATCHMAKER_JSON = """

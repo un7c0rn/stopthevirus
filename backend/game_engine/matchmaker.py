@@ -2,6 +2,10 @@ from typing import Text
 from game_engine import database
 from game_engine.common import GameOptions
 from game_engine.database import Player, Team
+from game_engine.firestore import FirestoreTribe
+from google.cloud.firestore_v1.document import DocumentReference
+from game_engine.database import Database
+
 import uuid
 import names
 import random
@@ -9,6 +13,7 @@ import math
 from queue import Queue
 import json
 from abc import ABC, abstractmethod
+import pdb
 
 
 _VIR_US_FE_HOSTNAME = 'https://localhost:3000'
@@ -172,7 +177,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         return teams_dict
 
     @classmethod
-    def generate_teams_tribes(cls, game_id: Text, players, game_options: GameOptions) -> dict:
+    def generate_teams_tribes(cls, game_id: Text, players, game_options: GameOptions, gamedb: Database) -> dict:
         tribes = []
         teams = []
         count_players = len(players)
@@ -208,6 +213,11 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             team.tribe_id = tribe.id
             tribe.size += 1
             team.size += 1
+
+        for tribe in tribes:
+            print("THE TRIBE! --------------")
+            gamedb.save(tribe)
+            print(tribe)
 
         
 
