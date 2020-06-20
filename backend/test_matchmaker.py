@@ -14,7 +14,7 @@ import copy
 
 _TEST_GAME_ID = '7rPwCJaiSkxYgDocGDw1'
 _TEST_PLAYER1 = Player(
-    id='id/foo1',
+    id=str(uuid.uuid4()),
     tiktok='tiktok/bar',
     email='email/foo',
     phone_number='sms/bar',
@@ -33,7 +33,7 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
         players=[_TEST_PLAYER1]
         for x in range(2,21):
             player = copy.deepcopy(_TEST_PLAYER1)
-            player.id='id/foo' + str(x)
+            player.id = str(uuid.uuid4())
             players.append(player)
         return players
 
@@ -52,8 +52,8 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
         self.assertTrue(context.exception)
 
     def test_generate_teams_tribes(self):
-        gamedb = FirestoreDB(json_config_path=json_config_path, game_id=_TEST_GAME_ID)
-        # gamedb = MockDatabase()
+        # gamedb = FirestoreDB(json_config_path=json_config_path, game_id=_TEST_GAME_ID)
+        gamedb = MockDatabase()
         players = self.generate_players()
         options = GameOptions(target_team_size=_TEAM_SIZE)
         data=MatchMakerRoundRobin.generate_teams_tribes(game_id=_TEST_GAME_ID, players=players, 

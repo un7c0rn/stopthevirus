@@ -35,11 +35,9 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players, is_test=True):
+    def play_game(self, game: Game, players:list, is_test=False):
         print("playing a game")
 
-        game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options)
-        tribes = game_data['tribes']
         #TO DO(DAVID): Update DB with this data
         if is_test:
             database = MockDatabase()
@@ -53,6 +51,8 @@ class MatchmakerService:
                             gamedb=database
             )
 
+        game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
+        tribes = game_data['tribes']
         print("TRIBES")
         print(tribes)
         tribe1=tribes[0]
@@ -67,7 +67,7 @@ class MatchmakerService:
                 engine=engine)
 
 
-    def start_game(self, game: Game, players):
+    def start_game(self, game: Game, players:list):
         if self._is_mvp:
             #start new process
             self.play_game(game=game, players=players)

@@ -177,7 +177,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         return teams_dict
 
     @classmethod
-    def generate_teams_tribes(cls, game_id: Text, players, game_options: GameOptions, gamedb: Database) -> dict:
+    def generate_teams_tribes(cls, game_id: Text, players: list, game_options: GameOptions, gamedb: Database) -> dict:
         tribes = []
         teams = []
         count_players = len(players)
@@ -218,6 +218,16 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             print("THE TRIBE! --------------")
             gamedb.save(tribe)
             print(tribe)
+        
+        for player in players:
+            print("THE PLAYER! --------------")
+            gamedb.save(player)
+            print(player)
+
+        for team in teams:
+            print("THE TEAM! --------------")
+            gamedb.save(team)
+            print(team)
 
         
 
