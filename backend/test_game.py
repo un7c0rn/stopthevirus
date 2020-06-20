@@ -497,6 +497,7 @@ class MockDatabase(Database):
 
         if from_team:
             for vote in self._votes.values():
+                print(vote)
                 voter = self.player_from_id(vote.from_id)
                 team = self._teams[voter.team_id]
                 if team.id != from_team.id or not voter.active:

@@ -35,7 +35,7 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players:list, is_test=False):
+    def play_game(self, game: Game, players:list, is_test=True):
         print("playing a game")
 
         #TO DO(DAVID): Update DB with this data
@@ -109,7 +109,11 @@ class MatchmakerService:
                         if now_day == start_day:
                             print ("Starting game")
                             print(game_dict)
-                            options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
+                            options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
+                            single_tribe_council_time_sec=1 if is_test else 300,
+                            single_team_council_time_sec=1 if is_test else 300,
+                            final_tribal_council_time_sec=1 if is_test else 300,
+                            multi_tribe_council_time_sec=1 if is_test else 300)
                             g = Game(game_id=game_dict["id"], options=options)
                             # Play the game
                             self.start_game(game=g, players=players_list)

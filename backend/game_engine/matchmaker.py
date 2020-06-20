@@ -214,6 +214,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             tribe.size += 1
             team.size += 1
 
+        # Save data
         for tribe in tribes:
             print("THE TRIBE! --------------")
             gamedb.save(tribe)
