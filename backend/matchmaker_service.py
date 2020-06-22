@@ -38,7 +38,6 @@ class MatchmakerService:
     def play_game(self, game: Game, players:list, is_test=True):
         print("playing a game")
 
-        #TO DO(DAVID): Update DB with this data
         if is_test:
             database = MockDatabase()
             engine = MockPlayEngine().CreateEngine(database)
@@ -57,8 +56,6 @@ class MatchmakerService:
         print(tribes)
         tribe1=tribes[0]
         tribe2=tribes[1]
-        database.save(tribe1)
-        database.save(tribe2)
 
         
         game.play(tribe1=tribes[0],
@@ -84,6 +81,34 @@ class MatchmakerService:
             game.reference.update(field_updates)
         except:
             print("Error setting game document game_has_started field to True")
+    
+    def reschedule_game(self, game: DocumentSnapshot):
+        print("RESCHEDULING GAME")
+
+        game_dict = game.to_dict()
+        
+        now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        print(now_date)
+
+        if now_date != game_dict["last_checked_date"]:
+            if game_dict["times_rescheduled"] < game_dict["max_reschedules"]:
+                # Reschedule the game
+                times_rescheduled = game_dict["times_rescheduled"] + 1 if game_dict.get("times_rescheduled") else 1
+                field_updates = {
+                    'last_checked_date': now_date,
+                    'times_rescheduled': times_rescheduled
+                }
+                try:
+                    game.reference.update(field_updates)
+                    print("I RESCHEDULED THE GAME!")
+                except:
+                    print("Error rescheduling game")
+            else:
+                # Cancel the game
+                pass
+
+
+
 
 
     def matchmaker_function(self, sleep_seconds=60, is_test=False):
@@ -99,18 +124,19 @@ class MatchmakerService:
                     players_list = []
                     for player in players_stream:
                         players_list.append(player)
-                    if game_dict["count_players"] >= self._min_players:
-                        schedule = STV_I18N_TABLE[self._region]
-                        start_day = schedule.game_start_day_of_week
-                        now = datetime.datetime.now()
-                        now_day = ISODayOfWeek(now.isoweekday())
-                        if is_test:
-                            now_day = ISODayOfWeek(5)
-                        if now_day == start_day:
+
+                    schedule = STV_I18N_TABLE[self._region]
+                    start_day = schedule.game_start_day_of_week
+                    now = datetime.datetime.now()
+                    now_day = ISODayOfWeek(now.isoweekday())
+                    if is_test:
+                        now_day = ISODayOfWeek(5)
+                    if now_day == start_day:
+                        if game_dict["count_players"] >= self._min_players:
                             print ("Starting game")
                             print(game_dict)
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
-                            single_tribe_council_time_sec=1 if is_test else 300,
+                            single_tribe_council_time_sec=1 if is_test else 300,# is there a way to get the default values from GameOptions?
                             single_team_council_time_sec=1 if is_test else 300,
                             final_tribal_council_time_sec=1 if is_test else 300,
                             multi_tribe_council_time_sec=1 if is_test else 300)
@@ -118,7 +144,10 @@ class MatchmakerService:
                             # Play the game
                             self.start_game(game=g, players=players_list)
                             #self.set_game_has_started(game=game)
-                            
+                        else:
+                            # Reschedule the game
+                            self.reschedule_game(game=game)
+                                               
             time.sleep(sleep_seconds)
         print ("STOPPING")
 
