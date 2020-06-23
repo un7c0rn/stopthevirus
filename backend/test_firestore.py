@@ -151,14 +151,32 @@ _TEST_DATA_MATCHMAKER_JSON = """
          "count_players":8,
          "name":"test_game1",
          "country_code":"US",
-         "game_has_started": false
+         "game_has_started": false,
+         "to_be_deleted": false
+      },
+      "11111111111111111111":{
+         "count_teams":6,
+         "count_players":8,
+         "name":"test_game1",
+         "country_code":"JP",
+         "game_has_started": false,
+         "to_be_deleted": true
+      },
+      "22222222222222222222":{
+         "count_teams":6,
+         "count_players":8,
+         "name":"test_game1",
+         "country_code":"JP",
+         "game_has_started": false,
+         "to_be_deleted": false
       },
       "FFFFFFFFFFFFFFFFFFFF":{
          "count_teams":6,
          "count_players":5,
          "name":"test_game2",
          "country_code":"EU",
-         "game_has_started": true
+         "game_has_started": true,
+         "to_be_deleted": false
       }
    }
 }
@@ -358,6 +376,10 @@ class FirestoreDBTest(unittest.TestCase):
         # EU game has already started
         games = _gamedb.find_matchmaker_games(region="EU")
         self.assertEqual(len(games), 0)
+
+        # Should not return games with to_be_deleted flag set
+        games = _gamedb.find_matchmaker_games(region="JP")
+        self.assertEqual(len(games), 1)
         
         
 if __name__ == '__main__':

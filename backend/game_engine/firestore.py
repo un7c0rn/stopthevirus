@@ -443,6 +443,7 @@ class FirestoreDB(Database):
 
         for game in games:
             try:
+                # Avoid checking in query to allow for key to not exist
                 if not game.to_dict().get("to_be_deleted"):
                     games_list.append(game)
             except:
