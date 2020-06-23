@@ -89,7 +89,8 @@ class MatchmakerService:
 
         if now_date != game_dict["last_checked_date"]:
             if game_dict["times_rescheduled"] < game_dict["max_reschedules"]:
-                # Reschedule the game
+                # Reschedule the game by setting current UTC date to last_checked_date. 
+                # Server will then not check the game until following week
                 times_rescheduled = game_dict["times_rescheduled"] + 1 if game_dict.get("times_rescheduled") else 1
                 field_updates = {
                     'last_checked_date': now_date,
@@ -132,11 +133,13 @@ class MatchmakerService:
 
                     schedule = STV_I18N_TABLE[self._region]
                     start_day = schedule.game_start_day_of_week
-                    now = datetime.datetime.now()
+                    now = datetime.datetime.utcnow()
                     now_day = ISODayOfWeek(now.isoweekday())
+
+                    now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
                     if is_test:
                         now_day = ISODayOfWeek(5)
-                    if now_day == start_day:
+                    if now_day == start_day and now_date != game_dict["last_checked_date"]: #TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
                             print ("Starting game")
                             print(game_dict)
