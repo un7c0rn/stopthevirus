@@ -54,10 +54,7 @@ class MatchmakerService:
         tribes = game_data['tribes']
         print("TRIBES")
         print(tribes)
-        tribe1=tribes[0]
-        tribe2=tribes[1]
-
-        
+        # TODO notify users that game started 
         game.play(tribe1=tribes[0],
                 tribe2=tribes[1],
                 gamedb=database,
@@ -105,6 +102,14 @@ class MatchmakerService:
                     print("Error rescheduling game")
             else:
                 # Cancel the game
+                field_updates = {
+                    'to_be_deleted': True,
+                }
+                try:
+                    game.reference.update(field_updates)
+                    print("Cancelled the game (set to_be_deleted flag)")
+                except:
+                    print("Error cancelling game")
                 pass
 
 
