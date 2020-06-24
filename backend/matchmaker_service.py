@@ -62,7 +62,8 @@ class MatchmakerService:
                 engine=engine)
 
 
-    def start_game(self, game: Game, players:list):
+    def start_game(self, game: Game, game_snap: DocumentSnapshot, players:list):
+        self.set_game_has_started(game_snap=game_snap)
         if self._is_mvp:
             #start new process
             p = multiprocessing.Process(target=self.play_game, args=(game, players))
@@ -72,19 +73,20 @@ class MatchmakerService:
             pass
         #g.play()
 
-    def set_game_has_started(self, game: DocumentSnapshot):
+    def set_game_has_started(self, game_snap: DocumentSnapshot):
         field_updates = {
             'game_has_started': True
         }
         try:
-            game.reference.update(field_updates)
-        except:
-            print("Error setting game document game_has_started field to True")
+            game_snap.reference.update(field_updates)
+            print("Marked game as started in db")
+        except Exception as e:
+            print("Error setting game document game_has_started field to True:", e)
     
-    def reschedule_game(self, game: DocumentSnapshot):
+    def reschedule_game(self, game_snap: DocumentSnapshot):
         print("RESCHEDULING GAME")
 
-        game_dict = game.to_dict()
+        game_dict = game_snap.to_dict()
         
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
         print(now_date)
@@ -100,20 +102,20 @@ class MatchmakerService:
                     'times_rescheduled': times_rescheduled
                 }
                 try:
-                    game.reference.update(field_updates)
+                    game_snap.reference.update(field_updates)
                     print("I RESCHEDULED THE GAME!")
-                except:
-                    print("Error rescheduling game")
+                except Exception as e:
+                    print("Error rescheduling game:", e)
             else:
                 # Cancel the game
                 field_updates = {
                     'to_be_deleted': True,
                 }
                 try:
-                    game.reference.update(field_updates)
+                    game_snap.reference.update(field_updates)
                     print("Cancelled the game (set to_be_deleted flag)")
-                except:
-                    print("Error cancelling game")
+                except Exception as e:
+                    print("Error cancelling game:", e)
                 pass
 
 
@@ -126,10 +128,10 @@ class MatchmakerService:
         while not self._stop.is_set():
             games = self._gamedb.find_matchmaker_games(region=self._region)
             if len(games) >= 1:
-                for game in games:
-                    game_dict = game.to_dict()
+                for game_snap in games:
+                    game_dict = game_snap.to_dict()
                     print(game_dict)
-                    players_stream = game.reference.collection("players").stream()
+                    players_stream = game_snap.reference.collection("players").stream()
                     players_list = []
                     for player in players_stream:
                         players_list.append(player)
@@ -153,12 +155,11 @@ class MatchmakerService:
                             multi_tribe_council_time_sec=1 if is_test else 300)
                             g = Game(game_id=game_dict["id"], options=options)
                             # Play the game
-                            self.start_game(game=g, players=players_list)
-                            #self.set_game_has_started(game=game)
+                            self.start_game(game=g, game_snap=game_snap, players=players_list)
                         else:
                             # Reschedule the game
                             print ("Rescheduling/cancelling game")
-                            self.reschedule_game(game=game)
+                            self.reschedule_game(game_snap=game_snap)
                                                
             time.sleep(sleep_seconds)
         print ("STOPPING")
