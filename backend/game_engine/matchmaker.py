@@ -216,19 +216,13 @@ class MatchMakerRoundRobin(MatchMakerInterface):
 
         # Save data
         for tribe in tribes:
-            print("THE TRIBE! --------------")
             gamedb.save(tribe)
-            print(tribe)
         
         for player in players:
-            print("THE PLAYER! --------------")
             gamedb.save(player)
-            print(player)
 
         for team in teams:
-            print("THE TEAM! --------------")
             gamedb.save(team)
-            print(team)
 
         
 

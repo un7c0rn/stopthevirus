@@ -13,6 +13,7 @@ import threading
 import datetime
 from game_engine import events
 from multiprocessing import Process
+import multiprocessing
 
 _FIRESTORE_PROD_CONF_JSON_PATH = ''
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
@@ -64,7 +65,8 @@ class MatchmakerService:
     def start_game(self, game: Game, players:list):
         if self._is_mvp:
             #start new process
-            self.play_game(game=game, players=players)
+            p = multiprocessing.Process(target=self.play_game, args=(game, players))
+            p.start()
         else:
             #start on new GCP instance
             pass
@@ -87,8 +89,8 @@ class MatchmakerService:
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
         print(now_date)
 
-        if now_date != game_dict["last_checked_date"]:
-            if game_dict["times_rescheduled"] < game_dict["max_reschedules"]:
+        if now_date != game_dict.get("last_checked_date"):
+            if game_dict.get("times_rescheduled") < game_dict.get("max_reschedules"):
                 # Reschedule the game by setting current UTC date to last_checked_date. 
                 # Server will then not check the game until following week
                 times_rescheduled = game_dict["times_rescheduled"] + 1 if game_dict.get("times_rescheduled") else 1
@@ -139,7 +141,7 @@ class MatchmakerService:
                     now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
                     if is_test:
                         now_day = ISODayOfWeek(5)
-                    if now_day == start_day and now_date != game_dict["last_checked_date"]: #TODO: Do these checks in query
+                    if now_day == start_day and now_date != game_dict.get("last_checked_date"): #TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
                             print ("Starting game")
                             print(game_dict)
@@ -154,6 +156,7 @@ class MatchmakerService:
                             #self.set_game_has_started(game=game)
                         else:
                             # Reschedule the game
+                            print ("Rescheduling/cancelling game")
                             self.reschedule_game(game=game)
                                                
             time.sleep(sleep_seconds)
