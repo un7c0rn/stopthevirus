@@ -90,9 +90,10 @@ class MatchmakerService:
         print(now_date)
 
         if now_date != game_dict.get("last_checked_date"):
-            if game_dict.get("times_rescheduled") < game_dict.get("max_reschedules"):
+            if (game_dict.get("times_rescheduled") if game_dict.get("times_rescheduled") else 0) < game_dict.get("max_reschedules"):
                 # Reschedule the game by setting current UTC date to last_checked_date. 
                 # Server will then not check the game until following week
+                # Assume times_rescheduled is optional and max_reschedules is True
                 times_rescheduled = game_dict["times_rescheduled"] + 1 if game_dict.get("times_rescheduled") else 1
                 field_updates = {
                     'last_checked_date': now_date,
