@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 from game import Game
-from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek
+from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek, log_message
 from game_engine.database import Database
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
@@ -36,8 +36,8 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players:list, is_test=True):
-        print("playing a game")
+    def play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
+        log_message("Starting a game", game_id=game_dict.get("id"), additional_tags=game_dict)
 
         if is_test:
             database = MockDatabase()
@@ -53,8 +53,6 @@ class MatchmakerService:
 
         game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
         tribes = game_data['tribes']
-        print("TRIBES")
-        print(tribes)
         # TODO notify users that game started 
         game.play(tribe1=tribes[0],
                 tribe2=tribes[1],
@@ -62,34 +60,30 @@ class MatchmakerService:
                 engine=engine)
 
 
-    def start_game(self, game: Game, game_snap: DocumentSnapshot, players:list):
-        self.set_game_has_started(game_snap=game_snap)
+    def start_game(self, game: Game, game_snap: DocumentSnapshot, players:list, game_dict: dict):
+        self.set_game_has_started(game_snap=game_snap, game=game)
         if self._is_mvp:
             #start new process
-            p = multiprocessing.Process(target=self.play_game, args=(game, players))
+            p = multiprocessing.Process(target=self.play_game, args=(game, players, game_dict))
             p.start()
         else:
             #start on new GCP instance
             pass
-        #g.play()
 
-    def set_game_has_started(self, game_snap: DocumentSnapshot):
+    def set_game_has_started(self, game_snap: DocumentSnapshot, game: Game):
         field_updates = {
             'game_has_started': True
         }
         try:
             game_snap.reference.update(field_updates)
-            print("Marked game as started in db")
+            log_message(message="Marked game as started in db", game_id=game._game_id)
         except Exception as e:
-            print("Error setting game document game_has_started field to True:", e)
+            log_message(message="Error setting game document game_has_started field to True: {}".format(e), game_id=game._game_id)
     
-    def reschedule_game(self, game_snap: DocumentSnapshot):
-        print("RESCHEDULING GAME")
+    def reschedule_game(self, game_snap: DocumentSnapshot, game_dict: dict):
+        log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
 
-        game_dict = game_snap.to_dict()
-        
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        print(now_date)
 
         if now_date != game_dict.get("last_checked_date"):
             if (game_dict.get("times_rescheduled") if game_dict.get("times_rescheduled") else 0) < game_dict.get("max_reschedules"):
@@ -103,9 +97,9 @@ class MatchmakerService:
                 }
                 try:
                     game_snap.reference.update(field_updates)
-                    print("I RESCHEDULED THE GAME!")
+                    log_message(message="Game successfully rescheduled", game_id=game_dict.get("id"))
                 except Exception as e:
-                    print("Error rescheduling game:", e)
+                    log_message(message="Error rescheduling game: {}".format(e), game_id=game_dict.get("id"))
             else:
                 # Cancel the game
                 field_updates = {
@@ -113,9 +107,9 @@ class MatchmakerService:
                 }
                 try:
                     game_snap.reference.update(field_updates)
-                    print("Cancelled the game (set to_be_deleted flag)")
+                    log_message(message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
                 except Exception as e:
-                    print("Error cancelling game:", e)
+                    log_message(message="Error cancelling game: {}".format(e), game_id=game_dict.get("id"))
                 pass
 
 
@@ -123,14 +117,12 @@ class MatchmakerService:
 
 
     def matchmaker_function(self, sleep_seconds=60, is_test=False):
-        print("HELLO")
-        # do some logging here
+        log_message("Starting matchmaker for region={}".format(self._region))
         while not self._stop.is_set():
             games = self._gamedb.find_matchmaker_games(region=self._region)
             if len(games) >= 1:
                 for game_snap in games:
                     game_dict = game_snap.to_dict()
-                    print(game_dict)
                     players_stream = game_snap.reference.collection("players").stream()
                     players_list = []
                     for player in players_stream:
@@ -146,8 +138,7 @@ class MatchmakerService:
                         now_day = ISODayOfWeek(5)
                     if now_day == start_day and now_date != game_dict.get("last_checked_date"): #TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
-                            print ("Starting game")
-                            print(game_dict)
+                            log_message("Starting game", game_id=game_dict.get("id"), additional_tags=game_dict)
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
                             single_tribe_council_time_sec=1 if is_test else 300,# is there a way to get the default values from GameOptions?
                             single_team_council_time_sec=1 if is_test else 300,
@@ -155,14 +146,13 @@ class MatchmakerService:
                             multi_tribe_council_time_sec=1 if is_test else 300)
                             g = Game(game_id=game_dict["id"], options=options)
                             # Play the game
-                            self.start_game(game=g, game_snap=game_snap, players=players_list)
+                            self.start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
                         else:
                             # Reschedule the game
-                            print ("Rescheduling/cancelling game")
-                            self.reschedule_game(game_snap=game_snap)
+                            self.reschedule_game(game_snap=game_snap, game_dict=game_dict)
                                                
             time.sleep(sleep_seconds)
-        print ("STOPPING")
+        log_message("Stopped matchmaker for region={}".format(self._region))
 
     def start_matchmaker_daemon(self, sleep_seconds=60):
         if not self._daemon_started and not self._stop.is_set():
@@ -170,15 +160,15 @@ class MatchmakerService:
             self._daemon_started = True
             self._thread.start()
         else:
-            print("CAN ONLY RUN 1 DAEMON AT A TIME")
+            log_message("Failed to start new matchmaker for region={} (matchmaker already running)".format(self._region))
 
     def set_stop(self):
-        print("TRYING TO STOP")
+        log_message("Received stop signal for matchmaker in region={}".format(self._region))
         self._stop.set()
         self._thread.join() # Wait for thread to finish executing/sleeping. This may take a long time
         self._daemon_started = False
 
     def clear_stop(self):
         self._stop.clear()
-        print("STOP CONDITION REMOVED")
+        log_message("Cleared stop signal for matchmaker in region={}".format(self._region))
 

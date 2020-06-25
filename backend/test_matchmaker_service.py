@@ -25,7 +25,10 @@ _TEST_DATA_MATCHMAKER_JSON = """
          "count_players":8,
          "name":"test_game1",
          "country_code":"US",
-         "game_has_started": false
+         "game_has_started": false,
+         "last_checked_date": "",
+         "to_be_deleted": false,
+         "times_rescheduled": 0
       },
       "FFFFFFFFFFFFFFFFFFFF":{
          "count_teams":6,
@@ -58,6 +61,7 @@ class MatchmakerServiceTest(unittest.TestCase):
         gamedb = FirestoreDB(json_config_path=json_config_path)
         #gamedb = MockDatabase()
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
+        service.start_matchmaker_daemon(sleep_seconds=1)
         service.start_matchmaker_daemon(sleep_seconds=1)
         time.sleep(2)
         service.set_stop()

@@ -225,17 +225,19 @@ def log_message(message: Text, game_id: Text = None, additional_tags: Dict = Non
         # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
         init_sentry()
     with push_scope() as scope:
-        if additional_tags:
-            for tag, value in additional_tags.items():
-                logging.info(tag +  '->' + value)
-                scope.set_tag(tag, value)
-
         if game_id:
             logging.info("game_id " + game_id)
             scope.set_tag("game_id", game_id)
+
+        logging.info(message)
+
+        if additional_tags:
+            for tag, value in additional_tags.items():
+                logging.info(tag +  '->' + str(value))
+                scope.set_tag(tag, str(value))
+
 
         if push_to_sentry:
             logging.info("pushing to sentry")
             capture_message(message)
 
-        logging.info(message)
