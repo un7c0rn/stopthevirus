@@ -80,37 +80,36 @@ class MatchmakerService:
         except Exception as e:
             log_message(message="Error setting game document game_has_started field to True: {}".format(e), game_id=game._game_id)
     
-    def reschedule_game(self, game_snap: DocumentSnapshot, game_dict: dict):
+    def reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
 
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
-        if now_date != game_dict.get("last_checked_date"):
-            if (game_dict.get("times_rescheduled") if game_dict.get("times_rescheduled") else 0) < game_dict.get("max_reschedules"):
-                # Reschedule the game by setting current UTC date to last_checked_date. 
-                # Server will then not check the game until following week
-                # Assume times_rescheduled is optional and max_reschedules is True
-                times_rescheduled = game_dict["times_rescheduled"] + 1 if game_dict.get("times_rescheduled") else 1
-                field_updates = {
-                    'last_checked_date': now_date,
-                    'times_rescheduled': times_rescheduled
-                }
-                try:
-                    game_snap.reference.update(field_updates)
-                    log_message(message="Game successfully rescheduled", game_id=game_dict.get("id"))
-                except Exception as e:
-                    log_message(message="Error rescheduling game: {}".format(e), game_id=game_dict.get("id"))
-            else:
-                # Cancel the game
-                field_updates = {
-                    'to_be_deleted': True,
-                }
-                try:
-                    game_snap.reference.update(field_updates)
-                    log_message(message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
-                except Exception as e:
-                    log_message(message="Error cancelling game: {}".format(e), game_id=game_dict.get("id"))
-                pass
+        if (game_dict.get("times_rescheduled") if game_dict.get("times_rescheduled") else 0) < game_dict.get("max_reschedules"):
+            # Reschedule the game by setting current UTC date to last_checked_date. 
+            # Server will then not check the game until following week
+            # Assume times_rescheduled is optional and max_reschedules is True
+            times_rescheduled = game_dict["times_rescheduled"] + 1 if game_dict.get("times_rescheduled") else 1
+            field_updates = {
+                'last_checked_date': now_date,
+                'times_rescheduled': times_rescheduled
+            }
+            try:
+                game_snap.reference.update(field_updates)
+                log_message(message="Game successfully rescheduled", game_id=game_dict.get("id"))
+            except Exception as e:
+                log_message(message="Error rescheduling game: {}".format(e), game_id=game_dict.get("id"))
+        else:
+            # Cancel the game
+            field_updates = {
+                'to_be_deleted': True,
+            }
+            try:
+                game_snap.reference.update(field_updates)
+                log_message(message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
+            except Exception as e:
+                log_message(message="Error cancelling game: {}".format(e), game_id=game_dict.get("id"))
+            pass
 
 
 
@@ -138,18 +137,15 @@ class MatchmakerService:
                         now_day = ISODayOfWeek(5)
                     if now_day == start_day and now_date != game_dict.get("last_checked_date"): #TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
-                            log_message("Starting game", game_id=game_dict.get("id"), additional_tags=game_dict)
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
                             single_tribe_council_time_sec=1 if is_test else 300,# is there a way to get the default values from GameOptions?
                             single_team_council_time_sec=1 if is_test else 300,
                             final_tribal_council_time_sec=1 if is_test else 300,
                             multi_tribe_council_time_sec=1 if is_test else 300)
                             g = Game(game_id=game_dict["id"], options=options)
-                            # Play the game
                             self.start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
                         else:
-                            # Reschedule the game
-                            self.reschedule_game(game_snap=game_snap, game_dict=game_dict)
+                            self.reschedule_cancel_game(game_snap=game_snap, game_dict=game_dict)
                                                
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))
