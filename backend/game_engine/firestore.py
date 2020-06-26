@@ -169,13 +169,6 @@ class FirestoreDB(Database):
             'tribe_id', '==', from_tribe.id).stream()
         player_count = self.count_players(from_tribe=from_tribe)
         team_count = self.count_teams(from_tribe=from_tribe)
-        print("PLAYER_COUNT")
-        print(player_count)
-        print("TEAM COUNT")
-        print(team_count)
-        print("GAME ID")
-        print(self._game_id)
-        print("_____________")
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._tribe_update_fn, teams,
                             {"tribe_id": to_tribe.id})
@@ -289,12 +282,8 @@ class FirestoreDB(Database):
                 'complete', '==', challenge_completed_predicate_value)
         l = []
         for c in query.stream():
-            #x = self.challenge_from_id(d.get("id"))
-            x = FirestoreChallenge(document=c)
-            print("PRINTING CHALLENGE")
-            print(x)
-            print("PRINTED")
-            l.append(x)
+            fc = FirestoreChallenge(document=c)
+            l.append(fc)
         return l
 
     def list_players(self, from_team: Team, active_player_predicate_value=True) -> Iterable[Player]:
@@ -378,8 +367,6 @@ class FirestoreDB(Database):
         properties_dict = copy.deepcopy(data.__dict__)
         if '_document' in properties_dict:
             del properties_dict['_document']
-        print("THE PROPERTIES DICT")
-        print(properties_dict)
         if isinstance(data, Player):
             self._client.document("games/{}/players/{}".format(self._game_id, data.id)).set(
                 properties_dict

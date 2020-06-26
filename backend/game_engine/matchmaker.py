@@ -13,7 +13,6 @@ import math
 from queue import Queue
 import json
 from abc import ABC, abstractmethod
-import pdb
 
 
 _VIR_US_FE_HOSTNAME = 'https://localhost:3000'
@@ -247,3 +246,4 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         d['teams'] = teams
         d['tribes'] = tribes
         return d
+        
