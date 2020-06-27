@@ -36,7 +36,7 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
+    def _play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
         log_message("Starting a game", game_id=game_dict.get("id"), additional_tags=game_dict)
 
         if is_test:
@@ -60,17 +60,17 @@ class MatchmakerService:
                 engine=engine)
 
 
-    def start_game(self, game: Game, game_snap: DocumentSnapshot, players:list, game_dict: dict):
-        self.set_game_has_started(game_snap=game_snap, game=game)
+    def _start_game(self, game: Game, game_snap: DocumentSnapshot, players:list, game_dict: dict):
+        self._set_game_has_started(game_snap=game_snap, game=game)
         if self._is_mvp:
             #start new process
-            p = multiprocessing.Process(target=self.play_game, args=(game, players, game_dict))
+            p = multiprocessing.Process(target=self._play_game, args=(game, players, game_dict))
             p.start()
         else:
             #start on new GCP instance
             pass
 
-    def set_game_has_started(self, game_snap: DocumentSnapshot, game: Game):
+    def _set_game_has_started(self, game_snap: DocumentSnapshot, game: Game):
         field_updates = {
             'game_has_started': True
         }
@@ -80,7 +80,7 @@ class MatchmakerService:
         except Exception as e:
             log_message(message="Error setting game document game_has_started field to True: {}".format(e), game_id=game._game_id)
     
-    def reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict):
+    def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
 
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
@@ -115,7 +115,7 @@ class MatchmakerService:
 
 
 
-    def matchmaker_function(self, sleep_seconds=60, is_test=False):
+    def _matchmaker_function(self, sleep_seconds=60, is_test=False):
         log_message("Starting matchmaker for region={}".format(self._region))
         while not self._stop.is_set():
             games = self._gamedb.find_matchmaker_games(region=self._region)
@@ -143,16 +143,16 @@ class MatchmakerService:
                             final_tribal_council_time_sec=1 if is_test else 300,
                             multi_tribe_council_time_sec=1 if is_test else 300)
                             g = Game(game_id=game_dict["id"], options=options)
-                            self.start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
+                            self._start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
                         else:
-                            self.reschedule_cancel_game(game_snap=game_snap, game_dict=game_dict)
+                            self._reschedule_cancel_game(game_snap=game_snap, game_dict=game_dict)
                                                
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))
 
     def start_matchmaker_daemon(self, sleep_seconds=60):
         if not self._daemon_started and not self._stop.is_set():
-            self._thread = threading.Thread(target=self.matchmaker_function, args=(sleep_seconds,True))
+            self._thread = threading.Thread(target=self._matchmaker_function, args=(sleep_seconds,True))
             self._daemon_started = True
             self._thread.start()
         else:
