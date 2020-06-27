@@ -149,6 +149,19 @@ NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT = """
 Next challenge starts tomorrow {date} at {time}.
 """
 
+NOTIFY_GAME_STARTED_EVENT_MSG_FMT = """
+{header} Your game {game} has started!
+"""
+
+NOTIFY_GAME_CANCELLED_EVENT_MSG_FMT = """
+{header} Due to {reason}, your game {game} has been cancelled.
+"""
+
+NOTIFY_GAME_RESCHEDULED_EVENT_MSG_FMT = """
+{header} Due to {reason}, your game {game} has been rescheduled
+and will begin on {date} at {time}.
+"""
+
 GAME_START_MSG_FMT = """
 {header} Your game {game} has been created and will begin on {date} at {time}.
 Invite players to join your game using this link {link}

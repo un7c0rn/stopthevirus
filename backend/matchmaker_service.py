@@ -1,13 +1,16 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 from game import Game
+from game_engine import messages
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE, ISODayOfWeek, log_message
 from game_engine.database import Database
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerInterface
+from game_engine.twilio import TwilioSMSNotifier
 from test_game import MockDatabase, MockPlayEngine
 from google.cloud.firestore_v1.document import DocumentSnapshot
+from typing import Text
 import time
 import threading
 import datetime
@@ -20,8 +23,14 @@ _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
 _AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
 _TEST_AMAZON_SQS_CONFIG_PATH = '../amazon/stopthevirus.fifo.json'
-_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
+#_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
+_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 
+
+def _twilio_client(game_id: Text) -> TwilioSMSNotifier:
+    return TwilioSMSNotifier(
+        json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
+        game_id=game_id)
 
 
 class MatchmakerService:
@@ -36,8 +45,25 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
+    def _notify_players(self, game_id:Text, players:list):
+        twilio = _twilio_client(game_id=game_id)
+
+        # iterate over players and get their phone numbers
+        recipient_phone_numbers =  list(map(lambda player: player.to_dict().get("phone_number") if player.to_dict().get("phone_number") else "", players))
+        
+        # twilio.send_bulk_sms(
+        #     message='message/foo',
+        #     recipient_addresses=[
+        #         '1915417543010',
+        #         '10015417543010',
+        #     ]
+        # )
+        print(recipient_phone_numbers)
+        print("ThE PLAYERS ARE HERE ^^^^^^^^^^^^")
+
     def _play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
         log_message("Starting a game", game_id=game_dict.get("id"), additional_tags=game_dict)
+        self._notify_players(game_id=game._game_id, players=players)
 
         if is_test:
             database = MockDatabase()
