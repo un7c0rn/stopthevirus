@@ -49,16 +49,14 @@ class MatchmakerService:
         twilio = _twilio_client(game_id=game_id)
 
         # iterate over players and get their phone numbers
-        recipient_phone_numbers =  list(map(lambda player: player.to_dict().get("phone_number") if player.to_dict().get("phone_number") else "", players))
+        recipient_phone_numbers =  list(map(lambda player: player.to_dict().get("phone_number"), players))
+        filtered_phone_numbers = list(filter(lambda number: not not number, recipient_phone_numbers))
         
-        # twilio.send_bulk_sms(
-        #     message='message/foo',
-        #     recipient_addresses=[
-        #         '1915417543010',
-        #         '10015417543010',
-        #     ]
-        # )
-        print(recipient_phone_numbers)
+        twilio.send_bulk_sms(
+            message='message/foo',
+            recipient_addresses=filtered_phone_numbers
+        )
+        print(filtered_phone_numbers)
         print("ThE PLAYERS ARE HERE ^^^^^^^^^^^^")
 
     def _play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
