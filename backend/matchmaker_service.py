@@ -32,7 +32,6 @@ def _twilio_client(game_id: Text) -> TwilioSMSNotifier:
         json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
         game_id=game_id)
 
-
 class MatchmakerService:
     # Handles scheduling and communication with other services for starting games
     # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
@@ -45,29 +44,28 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def _notify_players(self, game_id:Text, players:list):
+    def _notify_players(self, game_id:Text, players:list, message:Text):
         twilio = _twilio_client(game_id=game_id)
 
         # iterate over players and get their phone numbers
-        recipient_phone_numbers =  list(map(lambda player: player.to_dict().get("phone_number"), players))
+        recipient_phone_numbers = list(map(lambda player: player.to_dict().get("phone_number"), players))
+        # filter out players with no phone number
         filtered_phone_numbers = list(filter(lambda number: not not number, recipient_phone_numbers))
-        
-        twilio.send_bulk_sms(
-            message='message/foo',
-            recipient_addresses=filtered_phone_numbers
-        )
-        print(filtered_phone_numbers)
-        print("ThE PLAYERS ARE HERE ^^^^^^^^^^^^")
+
+        # twilio.send_bulk_sms(
+        #     message=message,
+        #     recipient_addresses=filtered_phone_numbers
+        # )
+        log_message(message="Notified players with message:{}".format(message), game_id=game_id)
 
     def _play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
         log_message("Starting a game", game_id=game_dict.get("id"), additional_tags=game_dict)
-        self._notify_players(game_id=game._game_id, players=players)
 
         if is_test:
             database = MockDatabase()
             engine = MockPlayEngine().CreateEngine(database)
         else:
-            database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id)#db needs to have correct game_id
+            database = FirestoreDB(json_config_path=json_config_path, game_id=game._game_id) # db needs to have correct game_id
             engine = Engine(options=game._options,
                             game_id=game._game_id,
                             sqs_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
@@ -77,12 +75,15 @@ class MatchmakerService:
 
         game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
         tribes = game_data['tribes']
-        # TODO notify users that game started 
+        message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
+            header=messages.VIR_US_SMS_HEADER,
+            game=game_dict.get('hashtag')
+        )
+        self._notify_players(game_id=game._game_id, players=players, message=message)
         game.play(tribe1=tribes[0],
                 tribe2=tribes[1],
                 gamedb=database,
                 engine=engine)
-
 
     def _start_game(self, game: Game, game_snap: DocumentSnapshot, players:list, game_dict: dict):
         self._set_game_has_started(game_snap=game_snap, game=game)
@@ -104,7 +105,7 @@ class MatchmakerService:
         except Exception as e:
             log_message(message="Error setting game document game_has_started field to True: {}".format(e), game_id=game._game_id)
     
-    def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict):
+    def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players:list):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
 
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
@@ -121,6 +122,18 @@ class MatchmakerService:
             try:
                 game_snap.reference.update(field_updates)
                 log_message(message="Game successfully rescheduled", game_id=game_dict.get("id"))
+
+                schedule = STV_I18N_TABLE[self._region]
+                notif_message = messages.NOTIFY_GAME_RESCHEDULED_EVENT_MSG_FMT.format(
+                    header=messages.VIR_US_SMS_HEADER,
+                    game=game_dict.get("hashtag"),
+                    reason="insufficient players",
+                    date=schedule.nextweek_localized_string,
+                    time=schedule.localized_time_string(
+                        schedule.daily_challenge_start_time
+                    )
+                )
+                self._notify_players(game_id=game_dict.get("id"), players=players, message=notif_message)
             except Exception as e:
                 log_message(message="Error rescheduling game: {}".format(e), game_id=game_dict.get("id"))
         else:
@@ -131,13 +144,15 @@ class MatchmakerService:
             try:
                 game_snap.reference.update(field_updates)
                 log_message(message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
+                notif_message = messages.NOTIFY_GAME_CANCELLED_EVENT_MSG_FMT.format(
+                    header=messages.VIR_US_SMS_HEADER,
+                    game=game_dict.get("hashtag"),
+                    reason="insufficient players"
+                )
+                self._notify_players(game_id=game_dict.get("id"), players=players, message=notif_message)
             except Exception as e:
                 log_message(message="Error cancelling game: {}".format(e), game_id=game_dict.get("id"))
             pass
-
-
-
-
 
     def _matchmaker_function(self, sleep_seconds=60, is_test=False):
         log_message("Starting matchmaker for region={}".format(self._region))
@@ -159,17 +174,17 @@ class MatchmakerService:
                     now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
                     if is_test:
                         now_day = ISODayOfWeek(5)
-                    if now_day == start_day and now_date != game_dict.get("last_checked_date"): #TODO: Do these checks in query
+                    if now_day == start_day and now_date != game_dict.get("last_checked_date"): # TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
-                            single_tribe_council_time_sec=1 if is_test else 300,# is there a way to get the default values from GameOptions?
+                            single_tribe_council_time_sec=1 if is_test else 300, # is there a way to get the default values from GameOptions?
                             single_team_council_time_sec=1 if is_test else 300,
                             final_tribal_council_time_sec=1 if is_test else 300,
                             multi_tribe_council_time_sec=1 if is_test else 300)
                             g = Game(game_id=game_dict["id"], options=options)
                             self._start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
                         else:
-                            self._reschedule_cancel_game(game_snap=game_snap, game_dict=game_dict)
+                            self._reschedule_cancel_game(game_snap=game_snap, game_dict=game_dict, players=players_list)
                                                
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))

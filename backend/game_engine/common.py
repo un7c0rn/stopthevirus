@@ -53,6 +53,13 @@ class GameSchedule(object):
         return tomorrow_l.strftime("%B %d, %Y")
 
     @property
+    def nextweek_localized_string(self) -> Text:
+        nextweek_l = self.game_time_zone.localize(
+            datetime.datetime.today() + datetime.timedelta(days=7)
+        )
+        return nextweek_l.strftime("%B %d, %Y")
+
+    @property
     def today_localized_string(self) -> Text:
         today_l = self.game_time_zone.localize(
             datetime.datetime.today()
