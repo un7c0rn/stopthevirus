@@ -280,11 +280,11 @@ class FirestoreDB(Database):
         query = self._client.collection(
             'games/{}/challenges'.format(self._game_id)).where(
                 'complete', '==', challenge_completed_predicate_value)
-        l = []
-        for c in query.stream():
-            fc = FirestoreChallenge(document=c)
-            l.append(fc)
-        return l
+        challenge_list = []
+        for doc in query.stream():
+            fc = FirestoreChallenge(document=doc)
+            challenge_list.append(fc)
+        return challenge_list
 
     def list_players(self, from_team: Team, active_player_predicate_value=True) -> Iterable[Player]:
         query = self._client.collection(

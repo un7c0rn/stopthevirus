@@ -32,6 +32,8 @@ _DEFAULT_TRIBE_NAMES = [
     "NAPHTALI"
 ]
 
+class MatchMakerError(Exception):
+    pass
 
 class GameSimulator(object):
 
@@ -145,17 +147,18 @@ class MatchMakerInterface(ABC):
 
     @classmethod
     @abstractmethod
-    def generate_teams_tribes(cls, game_id: Text, players: list, game_options: GameOptions) -> dict:
+    def generate_tribes(cls, game_id: Text, players: list, game_options: GameOptions) -> dict:
         # Take in game_id, list of Players, and gameOptions, and return a list of Teams and Tribes
         return
 
 class MatchMakerRoundRobin(MatchMakerInterface):
+
     @classmethod
     def generate_teams(cls, game_id: Text, players: list, team_size: int) -> dict:
         teams = []
         count_players = len(players)
-        if count_players<team_size:
-            raise Exception("Insufficient players for given team size")
+        if count_players < team_size:
+            raise MatchMakerError("Insufficient players for given team size")
         for n in range(0, math.floor(count_players / team_size)):
             team = database.Team(
                 id=str(uuid.uuid4()),
@@ -176,14 +179,14 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         return teams_dict
 
     @classmethod
-    def generate_teams_tribes(cls, game_id: Text, players: list, game_options: GameOptions, gamedb: Database) -> dict:
+    def generate_tribes(cls, game_id: Text, players: list, game_options: GameOptions, gamedb: Database) -> dict:
         tribes = []
         teams = []
         count_players = len(players)
         if count_players < game_options.target_team_size:
-            raise Exception("Insufficient players for given team size")
+            raise MatchMakerError("Insufficient players for given team size")
         if count_players < game_options.multi_tribe_min_tribe_size * 2:
-            raise Exception("Insufficient players to make 2 tribes")
+            raise MatchMakerError("Insufficient players to make 2 tribes")
         # generate tribes
         for tribe_name in [_DEFAULT_TRIBE_NAMES[int(n)] for n in random.sample(range(0, len(_DEFAULT_TRIBE_NAMES)), 2)]:
             tribe = database.Tribe(
@@ -222,25 +225,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
 
         for team in teams:
             gamedb.save(team)
-
         
-
-        # players_dict = {}
-        # teams_dict = {}
-        # tribes_dict = {}
-        
-        # for player in players:
-        #     players_dict[player.id] = player.to_dict()
-        #     del players_dict[player.id]['id']
-        
-        # for team in teams:
-        #     teams_dict[team.id] = team.to_dict()
-        #     del teams_dict[team.id]['id']
-
-        # for tribe in tribes:
-        #     tribes_dict[tribe.id] = tribe.to_dict()
-        #     del tribes_dict[tribe.id]['id']
-
         d = {}
         d['players'] = players
         d['teams'] = teams

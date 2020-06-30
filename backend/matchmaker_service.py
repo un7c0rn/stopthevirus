@@ -35,7 +35,8 @@ def _twilio_client(game_id: Text) -> TwilioSMSNotifier:
 class MatchmakerService:
     # Handles scheduling and communication with other services for starting games
     # TDOO(David): Add function to run all games that are supposed to be running at start(in MVP/test)
-    def __init__(self, matchmaker: MatchMakerInterface, gamedb: Database, json_config_path=json_config_path, region="US", min_players=5, is_mvp=True):
+    def __init__(self, matchmaker: MatchMakerInterface, gamedb: Database, json_config_path: str = json_config_path, 
+    region: str = "US", min_players: int = 5, is_mvp: bool = True):
         self._matchmaker = matchmaker
         self._gamedb = gamedb
         self._min_players = min_players
@@ -44,7 +45,7 @@ class MatchmakerService:
         self._stop = threading.Event()
         self._daemon_started = False
 
-    def _notify_players(self, game_id:Text, players:list, message:Text):
+    def _notify_players(self, game_id: Text, players: list, message: Text):
         twilio = _twilio_client(game_id=game_id)
 
         # iterate over players and get their phone numbers
@@ -58,7 +59,7 @@ class MatchmakerService:
         # )
         log_message(message="Notified players with message:{}".format(message), game_id=game_id)
 
-    def _play_game(self, game: Game, players:list, game_dict:dict, is_test=True):
+    def _play_game(self, game: Game, players: list, game_dict: dict, is_test: bool = True):
         log_message("Starting a game", game_id=game_dict.get("id"), additional_tags=game_dict)
 
         if is_test:
@@ -73,7 +74,7 @@ class MatchmakerService:
                             gamedb=database
             )
 
-        game_data = self._matchmaker.generate_teams_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
+        game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
         tribes = game_data['tribes']
         message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
             header=messages.VIR_US_SMS_HEADER,
@@ -85,7 +86,7 @@ class MatchmakerService:
                 gamedb=database,
                 engine=engine)
 
-    def _start_game(self, game: Game, game_snap: DocumentSnapshot, players:list, game_dict: dict):
+    def _start_game(self, game: Game, game_snap: DocumentSnapshot, players :list, game_dict: dict):
         self._set_game_has_started(game_snap=game_snap, game=game)
         if self._is_mvp:
             #start new process
@@ -105,7 +106,7 @@ class MatchmakerService:
         except Exception as e:
             log_message(message="Error setting game document game_has_started field to True: {}".format(e), game_id=game._game_id)
     
-    def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players:list):
+    def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players: list):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
 
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
@@ -154,7 +155,7 @@ class MatchmakerService:
                 log_message(message="Error cancelling game: {}".format(e), game_id=game_dict.get("id"))
             pass
 
-    def _matchmaker_function(self, sleep_seconds=60, is_test=False):
+    def _matchmaker_function(self, sleep_seconds: int = 60, is_test: bool = False):
         log_message("Starting matchmaker for region={}".format(self._region))
         while not self._stop.is_set():
             games = self._gamedb.find_matchmaker_games(region=self._region)
@@ -189,7 +190,7 @@ class MatchmakerService:
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))
 
-    def start_matchmaker_daemon(self, sleep_seconds=60):
+    def start_matchmaker_daemon(self, sleep_seconds: int = 60):
         if not self._daemon_started and not self._stop.is_set():
             self._thread = threading.Thread(target=self._matchmaker_function, args=(sleep_seconds,True))
             self._daemon_started = True

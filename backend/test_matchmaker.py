@@ -39,7 +39,6 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
 
     def test_generate_teams(self):
         players = self.generate_players()
-        options = GameOptions(target_team_size=_TEAM_SIZE)
         teams=MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players, 
         team_size=_TEAM_SIZE)
         self.assertEqual(len(teams),2)
@@ -51,27 +50,20 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
             team_size=_TEAM_SIZE)
         self.assertTrue(context.exception)
 
-    def test_generate_teams_tribes(self):
-        # gamedb = FirestoreDB(json_config_path=json_config_path, game_id=_TEST_GAME_ID)
+    def test_generate_tribes(self):
         gamedb = MockDatabase()
         players = self.generate_players()
         options = GameOptions(target_team_size=_TEAM_SIZE)
-        data=MatchMakerRoundRobin.generate_teams_tribes(game_id=_TEST_GAME_ID, players=players, 
+        data=MatchMakerRoundRobin.generate_tribes(game_id=_TEST_GAME_ID, players=players, 
         game_options=options, gamedb=gamedb)
+        
         players = data['players']
         teams = data['teams']
         tribes = data['tribes']
-        for p in players:
-            pass
-        
-        for t in tribes:
-            pass
 
-        for tm in teams:
-            pass
-
-        # print(data['tribes'])
-        # print(data['teams'])
+        self.assertEqual(len(players), 20)
+        self.assertEqual(len(teams), 2)
+        self.assertEqual(len(tribes), 2)
     
 
 if __name__ == '__main__':
