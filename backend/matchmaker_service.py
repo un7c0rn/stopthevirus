@@ -7,6 +7,7 @@ from game_engine.database import Database
 from game_engine.engine import Engine
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerInterface
+from game_engine.matchmaker import MatchMakerError
 from game_engine.twilio import TwilioSMSNotifier
 from test_game import MockDatabase, MockPlayEngine
 from google.cloud.firestore_v1.document import DocumentSnapshot
@@ -59,7 +60,7 @@ class MatchmakerService:
         # )
         log_message(message="Notified players with message:{}".format(message), game_id=game_id)
 
-    def _play_game(self, game: Game, players: list, game_dict: dict, is_test: bool = True):
+    def _play_game(self, game: Game, game_snap: DocumentSnapshot, players: list, game_dict: dict, is_test: bool = True):
         log_message("Starting a game", game_id=game_dict.get("id"), additional_tags=game_dict)
 
         if is_test:
@@ -73,38 +74,42 @@ class MatchmakerService:
                             twilio_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
                             gamedb=database
             )
-
-        game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
-        tribes = game_data['tribes']
-        message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
-            header=messages.VIR_US_SMS_HEADER,
-            game=game_dict.get('hashtag')
-        )
-        self._notify_players(game_id=game._game_id, players=players, message=message)
-        game.play(tribe1=tribes[0],
-                tribe2=tribes[1],
-                gamedb=database,
-                engine=engine)
+        try:
+            game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
+            tribes = game_data['tribes']
+            message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
+                header=messages.VIR_US_SMS_HEADER,
+                game=game_dict.get('hashtag')
+            )
+            self._notify_players(game_id=game._game_id, players=players, message=message)
+            game.play(tribe1=tribes[0],
+                    tribe2=tribes[1],
+                    gamedb=database,
+                    engine=engine)
+        except MatchMakerError as e:
+            log_message(message="Matchmaker Error: {}".format(e), game_id=game._game_id)
+            #self._set_game_has_started(game_snap=game_snap, game=game, value=False)
 
     def _start_game(self, game: Game, game_snap: DocumentSnapshot, players :list, game_dict: dict):
         self._set_game_has_started(game_snap=game_snap, game=game)
         if self._is_mvp:
             #start new process
-            p = multiprocessing.Process(target=self._play_game, args=(game, players, game_dict))
+            p = multiprocessing.Process(target=self._play_game, args=(game, game_snap, players, game_dict))
             p.start()
         else:
             #start on new GCP instance
             pass
 
-    def _set_game_has_started(self, game_snap: DocumentSnapshot, game: Game):
+    def _set_game_has_started(self, game_snap: DocumentSnapshot, game: Game, value: bool = True):
+        print("THE VAAAALUE",value)
         field_updates = {
-            'game_has_started': True
+            'game_has_started': value
         }
         try:
             game_snap.reference.update(field_updates)
-            log_message(message="Marked game as started in db", game_id=game._game_id)
+            log_message(message="Set game_has_started field to {}".format(value), game_id=game._game_id)
         except Exception as e:
-            log_message(message="Error setting game document game_has_started field to True: {}".format(e), game_id=game._game_id)
+            log_message(message="Error setting game document game_has_started field to {}: {}".format(value, e), game_id=game._game_id)
     
     def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players: list):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
