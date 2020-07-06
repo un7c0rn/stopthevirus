@@ -233,14 +233,14 @@ def log_message(message: Text, game_id: Text = None, additional_tags: Dict = Non
         init_sentry()
     with push_scope() as scope:
         if game_id:
-            logging.info("game_id " + game_id)
+            logging.info("game_id {}".format(game_id))
             scope.set_tag("game_id", game_id)
 
         logging.info(message)
 
         if additional_tags:
             for tag, value in additional_tags.items():
-                logging.info(tag +  '->' + str(value))
+                logging.info("{} -> {}".format(tag, str(value)))
                 scope.set_tag(tag, str(value))
 
 

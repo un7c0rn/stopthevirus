@@ -75,7 +75,7 @@ class MatchmakerService:
                             gamedb=database
             )
         try:
-            game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=[], game_options=game._options, gamedb=database)
+            game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
             tribes = game_data['tribes']
             message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
                 header=messages.VIR_US_SMS_HEADER,
@@ -93,6 +93,7 @@ class MatchmakerService:
             # Catches error from matchmaker algorithm
             log_message(message="Matchmaker Error: {}".format(e), game_id=game._game_id)
             self._set_game_has_started(game_snap=game_snap, game=game, value=False)
+            # TODO: Notify players?
 
     def _start_game(self, game: Game, game_snap: DocumentSnapshot, players :list, game_dict: dict):
         self._set_game_has_started(game_snap=game_snap, game=game)
