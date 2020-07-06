@@ -109,7 +109,7 @@ class MatchmakerService:
         except Exception as e:
             log_message(message="Error setting game document game_has_started field to {}: {}".format(value, e), game_id=game._game_id)
     
-    def _reschedule_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players: list):
+    def _reschedule_or_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players: list):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
 
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
@@ -188,7 +188,7 @@ class MatchmakerService:
                             g = Game(game_id=game_dict["id"], options=options)
                             self._start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
                         else:
-                            self._reschedule_cancel_game(game_snap=game_snap, game_dict=game_dict, players=players_list)
+                            self._reschedule_or_cancel_game(game_snap=game_snap, game_dict=game_dict, players=players_list)
                                                
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))
