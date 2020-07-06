@@ -75,33 +75,30 @@ class MatchmakerService:
                             gamedb=database
             )
         try:
-            game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
+            game_data = self._matchmaker.generate_tribes(game_id=game._game_id, players=[], game_options=game._options, gamedb=database)
             tribes = game_data['tribes']
             message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
                 header=messages.VIR_US_SMS_HEADER,
                 game=game_dict.get('hashtag')
             )
             self._notify_players(game_id=game._game_id, players=players, message=message)
-            game.play(tribe1=tribes[0],
-                    tribe2=tribes[1],
-                    gamedb=database,
-                    engine=engine)
+            if self._is_mvp:
+                # start new process
+                p = multiprocessing.Process(target=game.play, args=(tribes[0], tribes[1], database, engine))
+                p.start()
+            else:
+                # start on new GCP instance
+                pass
         except MatchMakerError as e:
+            # Catches error from matchmaker algorithm
             log_message(message="Matchmaker Error: {}".format(e), game_id=game._game_id)
-            #self._set_game_has_started(game_snap=game_snap, game=game, value=False)
+            self._set_game_has_started(game_snap=game_snap, game=game, value=False)
 
     def _start_game(self, game: Game, game_snap: DocumentSnapshot, players :list, game_dict: dict):
         self._set_game_has_started(game_snap=game_snap, game=game)
-        if self._is_mvp:
-            #start new process
-            p = multiprocessing.Process(target=self._play_game, args=(game, game_snap, players, game_dict))
-            p.start()
-        else:
-            #start on new GCP instance
-            pass
+        self._play_game(game=game, game_snap=game_snap, players=players, game_dict=game_dict)
 
     def _set_game_has_started(self, game_snap: DocumentSnapshot, game: Game, value: bool = True):
-        print("THE VAAAALUE",value)
         field_updates = {
             'game_has_started': value
         }
