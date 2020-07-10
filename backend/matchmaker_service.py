@@ -158,6 +158,28 @@ class MatchmakerService:
                 log_message(message="Error cancelling game: {}".format(e), game_id=game_dict.get("id"))
             pass
 
+    def _check_start_time(self, schedule: GameSchedule, 
+        now_dt_with_tz: datetime.datetime,
+        is_test: bool = False):
+        start_day = schedule.game_start_day_of_week
+        
+        if is_test:
+            now_day = ISODayOfWeek(5) # games usually begin on Friday. TODO: Is this needed?
+        else:
+            now_day = ISODayOfWeek(now_dt_with_tz.isoweekday())
+
+        start_time = schedule.game_start_time
+        # now = datetime.datetime.now(tz=schedule.game_time_zone) # do same for the day
+        actual_start = datetime.datetime(year=now_dt_with_tz.year, month=now_dt_with_tz.month, day=now_dt_with_tz.day, hour=start_time.hour,
+        minute=start_time.minute)
+        actual_start = schedule.game_time_zone.localize(actual_start)
+
+        print(actual_start)
+        print(now_dt_with_tz)
+
+        return now_day == start_day
+
+
     def _matchmaker_function(self, sleep_seconds: int = 60, is_test: bool = False):
         log_message("Starting matchmaker for region={}".format(self._region))
         while not self._stop.is_set():
@@ -169,16 +191,12 @@ class MatchmakerService:
                     players_list = []
                     for player in players_stream:
                         players_list.append(player)
-
                     schedule = STV_I18N_TABLE[self._region]
-                    start_day = schedule.game_start_day_of_week
-                    now = datetime.datetime.utcnow()
-                    now_day = ISODayOfWeek(now.isoweekday())
 
-                    now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-                    if is_test:
-                        now_day = ISODayOfWeek(5)
-                    if now_day == start_day and now_date != game_dict.get("last_checked_date"): # TODO: Do these checks in query
+                    now_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+
+                    if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now(tz=schedule.game_time_zone), 
+                        is_test=is_test) and now_utc != game_dict.get("last_checked_date"): # TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
                             single_tribe_council_time_sec=1 if is_test else 300, # is there a way to get the default values from GameOptions?
