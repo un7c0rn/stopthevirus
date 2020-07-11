@@ -1,7 +1,7 @@
 import unittest
 import mock
 from matchmaker_service import MatchmakerService
-from game_engine.common import STV_I18N_TABLE
+from game_engine.common import GameSchedule, ISODayOfWeek, STV_I18N_TABLE
 from game_engine.firestore import FirestoreDB
 from game_engine.matchmaker import MatchMakerRoundRobin
 from test_game import MockDatabase
@@ -9,6 +9,7 @@ import pprint
 import json
 import datetime
 import time
+import pytz
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_GAME_ID = '7rPwCJaiSkxYgDocGDw1'
@@ -75,15 +76,56 @@ class MatchmakerServiceTest(unittest.TestCase):
     def test_check_start_time(self):
         gamedb = FirestoreDB(json_config_path=json_config_path)
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
-        schedule = STV_I18N_TABLE['US']
+
+        mock_schedule = GameSchedule(
+            country='United States',
+            country_code='US',
+            game_time_zone=pytz.timezone('America/New_York'),
+            game_start_day_of_week=ISODayOfWeek.Friday,
+            game_start_time=datetime.time(hour=12),
+            daily_challenge_start_time=datetime.time(hour=12),
+            daily_challenge_end_time=datetime.time(hour=18),
+            daily_tribal_council_start_time=datetime.time(hour=19),
+            daily_tribal_council_end_time=datetime.time(hour=21),
+        )
 
         # Case 1: before start_time
-        
-        service._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now(tz=schedule.game_time_zone))
+        time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour-1)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, False)
+
+        # Case 1.5: after start_time, but on a previous day
+
+        time = datetime.datetime(year=2020, month=7, day=9, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, False)
 
         # Case 2: Within 24 hours after start_time
+        time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, True)
+
+        # Case 2.5: Within 24 hours after start_time, on different day
+
+        time = datetime.datetime(year=2020, month=7, day=11, hour=mock_schedule.game_start_time.hour-2)
+        print("Case 2.5", time)
+        
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, True)        
 
         # Case 3: 24 hours or more after start_time
+        time = datetime.datetime(year=2020, month=7, day=11, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, False)
+
+        time = datetime.datetime(year=2020, month=7, day=13, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, False)
+
+        # Case 4: 1 Week after, on the right time/date
+        time = datetime.datetime(year=2020, month=7, day=17, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        self.assertEqual(result, True)
 
 
 
