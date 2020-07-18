@@ -161,29 +161,18 @@ class MatchmakerService:
     def _check_start_time(self, schedule: GameSchedule, 
         now_dt_with_tz: datetime.datetime,
         is_test: bool = False):
-        start_day = schedule.game_start_day_of_week
-        
-        if is_test:
-            now_day = ISODayOfWeek(5) # games usually begin on Friday. TODO: Is this needed?
-        else:
-            now_day = ISODayOfWeek(now_dt_with_tz.isoweekday())
-
+        start_day = schedule.game_start_day_of_week.value
         start_time = schedule.game_start_time
-        # now = datetime.datetime.now(tz=schedule.game_time_zone) # do same for the day
-        actual_start = datetime.datetime(year=now_dt_with_tz.year, month=now_dt_with_tz.month, day=now_dt_with_tz.day, hour=start_time.hour,
-        minute=start_time.minute) # TODO: Find the actual date of the start_day
-        actual_start = schedule.game_time_zone.localize(actual_start)
 
-        print("actual_start", actual_start)
-        print("now_dt_with_tz", now_dt_with_tz)
+        localized_time = now_dt_with_tz.astimezone(schedule.game_time_zone)
+        now_day = localized_time.isoweekday()
+        now_time = localized_time.time()
 
-        day_later = actual_start + datetime.timedelta(days=1)
+        if is_test:
+            now_day = start_day
+            now_time = start_time
 
-        d = now_dt_with_tz >= actual_start and now_dt_with_tz < day_later
-        print(d)
-
-        return d
-
+        return now_day == start_day and now_time >= start_time
 
     def _matchmaker_function(self, sleep_seconds: int = 60, is_test: bool = False):
         log_message("Starting matchmaker for region={}".format(self._region))
@@ -200,7 +189,7 @@ class MatchmakerService:
 
                     now_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
-                    if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now(tz=schedule.game_time_zone), 
+                    if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(), 
                         is_test=is_test) and now_utc != game_dict.get("last_checked_date"): # TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
                             options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,

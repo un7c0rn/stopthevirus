@@ -100,20 +100,17 @@ class MatchmakerServiceTest(unittest.TestCase):
         result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
         self.assertEqual(result, False)
 
-        # Case 2: Within 24 hours after start_time
+        # Case 2: On same day as start_day and after start_time
         time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
         result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
         self.assertEqual(result, True)
 
-        # Case 2.5: Within 24 hours after start_time, on different day
+        # Case 2.5: On same day as start_day and after start_time, but in different timezone
+        time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=pytz.timezone("Asia/Tokyo").localize(time))
+        self.assertEqual(result, False)
 
-        time = datetime.datetime(year=2020, month=7, day=11, hour=mock_schedule.game_start_time.hour-2)
-        print("Case 2.5", time)
-        
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
-        self.assertEqual(result, True)        
-
-        # Case 3: 24 hours or more after start_time
+        # Case 3: Day following start_day and after start_time
         time = datetime.datetime(year=2020, month=7, day=11, hour=mock_schedule.game_start_time.hour)
         result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
         self.assertEqual(result, False)
