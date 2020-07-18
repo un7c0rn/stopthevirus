@@ -171,13 +171,18 @@ class MatchmakerService:
         start_time = schedule.game_start_time
         # now = datetime.datetime.now(tz=schedule.game_time_zone) # do same for the day
         actual_start = datetime.datetime(year=now_dt_with_tz.year, month=now_dt_with_tz.month, day=now_dt_with_tz.day, hour=start_time.hour,
-        minute=start_time.minute)
+        minute=start_time.minute) # TODO: Find the actual date of the start_day
         actual_start = schedule.game_time_zone.localize(actual_start)
 
-        print(actual_start)
-        print(now_dt_with_tz)
+        print("actual_start", actual_start)
+        print("now_dt_with_tz", now_dt_with_tz)
 
-        return now_day == start_day
+        day_later = actual_start + datetime.timedelta(days=1)
+
+        d = now_dt_with_tz >= actual_start and now_dt_with_tz < day_later
+        print(d)
+
+        return d
 
 
     def _matchmaker_function(self, sleep_seconds: int = 60, is_test: bool = False):
