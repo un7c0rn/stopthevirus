@@ -7,7 +7,6 @@ import AppTitle from "../common/AppTitle";
 import LogoContainer from "../common/LogoContainer";
 import { StatisticsLeft, StatisticsRight } from "../common/GameStatistics";
 import TriangleLogo from "../common/TriangleLogo";
-import Notification from "../common/Notification";
 
 const useStyles = makeStyles((theme) => ({
   root: {

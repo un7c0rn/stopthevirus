@@ -3,7 +3,6 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { isL } from "../../utilities/Utilities";
 import React, { useRef, useState } from "react";
 import { maxButtonWidth } from "../../utilities/Constants";
 import { joinGame } from "../../mediators/GameMediator";
@@ -11,7 +10,6 @@ import { useParams } from "react-router-dom";
 import Notification from "../common/Notification";
 
 export default function JoinGameInputs() {
-  const isLarge = isL();
   const useStyles = makeStyles((theme) => ({
     root: {
       backgroundColor: "black",
@@ -77,7 +75,7 @@ export default function JoinGameInputs() {
       phone: phone
         .replace(/\+/, "")
         .replace(/ /g, "")
-        .replace(/\(|\)|\-/g, ""),
+        .replace(/\(|\)|-/g, ""),
       game: gameId,
     };
 
