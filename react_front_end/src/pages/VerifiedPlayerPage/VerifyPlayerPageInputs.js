@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { withStyles } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import { maxButtonWidth } from "../../utilities/Constants";
 import { useParams } from "react-router-dom";
+import { AppContext } from "../../App";
 import Notification from "../common/Notification";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,6 +31,12 @@ const VerifyPlayerPageInputs = () => {
   const classes = useStyles();
 
   const { phone, code, game } = useParams();
+
+  const {
+    setNotificationOpen,
+    setNotificationSuccess,
+    // setNotificationError,
+  } = useContext(AppContext);
 
   const [responseCode, setResponse] = useState();
 

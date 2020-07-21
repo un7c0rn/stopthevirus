@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../../assets/vir-us.logo.type.white.letters.svg";
 import { ReactComponent as Bg } from "../../assets/vir-us_world_map_transparent_canvas.svg";
@@ -38,7 +38,7 @@ export default function AppTitle() {
     <div className={classes.root}>
       {/* <img src={Bg} className={classes.background} /> */}
       <Map className={classes.background} />
-      <img src={logo} className="logo logo-animation" alt="logo" />
+      <img src={logo} className="logo logo-animation" />
     </div>
   );
 }

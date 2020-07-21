@@ -3,14 +3,20 @@ import { CircularProgress } from "@material-ui/core";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import React, { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+// import { Link } from "react-router-dom";
+import { isSm } from "../../utilities/Utilities";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../App";
 import { JoinGameName } from "../common/JoinGameName";
 import { JoinGameNameNumberOfPlayers } from "../common/JoinGameNameNumberOfPlayers";
 import { JoinGameNameStartDateAndTime } from "../common/JoinGameNameStartDateAndTime";
+import { maxButtonWidth } from "../../utilities/Constants";
 
 export default function JoinGamePrompt() {
+  const sm = isSm();
+
   const useStyles = makeStyles((theme) => ({
     root: {
       display: "flex",
