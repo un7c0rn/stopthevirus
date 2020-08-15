@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { withStyles } from "@material-ui/core";
 import Footer from "../common/Footer";
 import { makeStyles } from "@material-ui/core/styles";
