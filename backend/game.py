@@ -346,6 +346,7 @@ class Game(object):
             time.sleep(self._options.game_wait_sleep_interval_sec)
             available_challenges = gamedb.list_challenges(
                 challenge_completed_predicate_value=False)
+
             available_challenge_count = len(available_challenges)
         return available_challenges[0]
 

@@ -15,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 import copy
 import json
 import uuid
+import datetime
 
 # TODO(brandon): change Data interface to use counters instead of size
 # by convention.
@@ -168,7 +169,6 @@ class FirestoreDB(Database):
             'tribe_id', '==', from_tribe.id).stream()
         player_count = self.count_players(from_tribe=from_tribe)
         team_count = self.count_teams(from_tribe=from_tribe)
-
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._tribe_update_fn, teams,
                             {"tribe_id": to_tribe.id})
@@ -280,7 +280,11 @@ class FirestoreDB(Database):
         query = self._client.collection(
             'games/{}/challenges'.format(self._game_id)).where(
                 'complete', '==', challenge_completed_predicate_value)
-        return FirestoreChallengeStream(query.stream())
+        challenge_list = []
+        for doc in query.stream():
+            fc = FirestoreChallenge(document=doc)
+            challenge_list.append(fc)
+        return challenge_list
 
     def list_players(self, from_team: Team, active_player_predicate_value=True) -> Iterable[Player]:
         query = self._client.collection(
@@ -371,7 +375,11 @@ class FirestoreDB(Database):
             self._client.document("games/{}/teams/{}".format(self._game_id, data.id)).set(
                 properties_dict
             )
-
+        elif isinstance(data, Tribe):
+            self._client.document("games/{}/tribes/{}".format(self._game_id, data.id)).set(
+                properties_dict
+            )
+            
     def tribe(self, name: Text) -> Tribe:
         tribe_ref = self._client.collection(
             "games/{}/tribes".format(self._game_id)).document()
@@ -414,3 +422,22 @@ class FirestoreDB(Database):
         votes = self._client.collection('votes').stream()
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._delete_vote_fn, votes)
+
+    def find_matchmaker_games(self, region="US") -> list:
+        games_list = []
+        db = self._client
+        games = db.collection('games').where('country_code', '==', region).where('game_has_started', '==', False).stream()
+
+        for game in games:
+            try:
+                # Avoid checking in query to allow for key to not exist
+                if not game.to_dict().get("to_be_deleted"):
+                    games_list.append(game)
+            except:
+                pass
+        return games_list
+
+
+
+
+
