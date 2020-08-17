@@ -5,7 +5,12 @@ from game_engine.common import Serializable
 
 
 class Data(ABC, Serializable):
-    pass
+    def save(self):
+        pass
+
+    def sync(self):
+        pass
+
 
 @attr.s
 class Game(Data):
