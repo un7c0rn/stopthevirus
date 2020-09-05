@@ -1,9 +1,5 @@
 // eslint-disable-next-line
-import {
-  createMuiTheme,
-  makeStyles,
-  ThemeProvider,
-} from "@material-ui/core/styles";
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import React, { createContext, lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
@@ -19,9 +15,13 @@ const GameInfoPage = lazy(() => import("./pages/GameInfoPage/GameInfoPage"));
 const CreateChallengePage = lazy(() =>
   import("./pages/CreateChallengePage/CreateChallengePage")
 );
+const VerifyPlayerPage = lazy(() =>
+  import("./pages/VerifiedPlayerPage/VerifyPlayerPage")
+);
 const VerifiedPlayerPage = lazy(() =>
   import("./pages/VerifiedPlayerPage/VerifiedPlayerPage")
 );
+const AdvertPage = lazy(() => import("./pages/AdvertPage/AdvertPage"));
 
 const theme = createMuiTheme({
   background: "black",
@@ -36,25 +36,9 @@ const theme = createMuiTheme({
 
 export const AppContext = createContext();
 
-// eslint-disable-next-line
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    flexWrap: "wrap",
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "black",
-  },
-}));
-
 function App() {
   // eslint-disable-next-line
-  const classes = useStyles();
   const [gameInfo, setGameInfo] = useState(false);
-  const [blurUi, setBlurUi] = useState(false);
 
   const {
     ErrorBoundary, // class - The react component to wrap your children in. This WILL NOT CHANGE
@@ -71,8 +55,6 @@ function App() {
           value={{
             gameInfo,
             setGameInfo,
-            blurUi,
-            setBlurUi,
           }}
         >
           <Suspense fallback={<Preloader />}>
@@ -83,14 +65,19 @@ function App() {
                   <Route path="/join-game/:gameId" element={<JoinGamePage />} />
                   <Route path="/game-info/:gameId" element={<GameInfoPage />} />
                   <Route
-                    path="/challenge-submission/:phone/:game"
+                    path="/challenge-submission/:phone/:game/:challenge"
                     element={<SubmitPage />}
                   />
                   <Route
                     path="/create-challenge/:phone/:game"
                     element={<CreateChallengePage />}
                   />
+                  <Route
+                    path="/verify/:phone/:code/:game"
+                    element={<VerifyPlayerPage />}
+                  />
                   <Route path="/verified" element={<VerifiedPlayerPage />} />
+                  <Route path="/advert" element={<AdvertPage />} />
                   <Route path="/*" element={<LandingPage />} />
                 </Routes>
               </BrowserRouter>

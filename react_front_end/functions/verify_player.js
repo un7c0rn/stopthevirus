@@ -11,7 +11,7 @@ exports.handler = async (event, context, callback) => {
     const client = require("twilio")(accountSid, authToken);
 
     const url = encodeURI(
-      `${process.env.WEBHOOK_CODE_VERIFY}/.netlify/functions/verify_code?phone=${body.phone}&code=${body.code}&game=${body.game}`
+      `${process.env.WEBHOOK_CODE_VERIFY}/${body.phone}/${body.code}/${body.game}`
     );
     const sms = await client.messages.create({
       body: `Hi there! Click the link to verify: ${url}`,
@@ -21,6 +21,6 @@ exports.handler = async (event, context, callback) => {
 
     callback(null, { statusCode: 200, body: JSON.stringify(sms.sid) });
   } catch (err) {
-    callback(null, { statusCode: 500, body: err.toString() });
+    callback(null, { statusCode: 200, body: JSON.stringify({ error: err }) });
   }
 };

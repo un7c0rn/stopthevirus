@@ -3,6 +3,7 @@ import mock
 from game_engine.firestore import FirestoreDB
 import pprint
 import json
+import datetime
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TRIBE_TIGRAWAY_ID = '77TMV9omdLeW7ORvuheX'
@@ -142,6 +143,44 @@ _TEST_DATA_JSON = """
 }
 """
 
+_TEST_DATA_MATCHMAKER_JSON = """
+{
+   "games":{
+      "7rPwCJaiSkxYgDocGDw1":{
+         "count_teams":6,
+         "count_players":8,
+         "name":"test_game1",
+         "country_code":"US",
+         "game_has_started": false,
+         "to_be_deleted": false
+      },
+      "11111111111111111111":{
+         "count_teams":6,
+         "count_players":8,
+         "name":"test_game1",
+         "country_code":"JP",
+         "game_has_started": false,
+         "to_be_deleted": true
+      },
+      "22222222222222222222":{
+         "count_teams":6,
+         "count_players":8,
+         "name":"test_game1",
+         "country_code":"JP",
+         "game_has_started": false,
+         "to_be_deleted": false
+      },
+      "FFFFFFFFFFFFFFFFFFFF":{
+         "count_teams":6,
+         "count_players":5,
+         "name":"test_game2",
+         "country_code":"EU",
+         "game_has_started": true,
+         "to_be_deleted": false
+      }
+   }
+}
+"""
 
 
 class FirestoreDBTest(unittest.TestCase):
@@ -329,6 +368,19 @@ class FirestoreDBTest(unittest.TestCase):
         _gamedb.clear_votes()
         self.assertEqual(_gamedb.count_votes(), {})
 
+    def test_find_matchmaker_games(self):
+        _gamedb.import_collections(_TEST_DATA_MATCHMAKER_JSON)
+        games = _gamedb.find_matchmaker_games(region="US")
+        self.assertEqual(len(games), 1)
 
+        # EU game has already started
+        games = _gamedb.find_matchmaker_games(region="EU")
+        self.assertEqual(len(games), 0)
+
+        # Should not return games with to_be_deleted flag set
+        games = _gamedb.find_matchmaker_games(region="JP")
+        self.assertEqual(len(games), 1)
+        
+        
 if __name__ == '__main__':
     unittest.main()

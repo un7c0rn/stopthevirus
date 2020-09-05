@@ -15,6 +15,7 @@ const SubmitPage = () => {
       display: "flex",
       flexDirection: "column",
       justifyContent: "flex-start",
+      marginTop: "4em",
     },
   }));
 

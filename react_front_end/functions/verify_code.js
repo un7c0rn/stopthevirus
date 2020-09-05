@@ -15,14 +15,10 @@ exports.handler = async (event, context, callback) => {
       code,
     });
     callback(null, {
-      statusCode: 301,
-      headers: {
-        "Content-Type": "text/richtext",
-        Location: `${process.env.WEBHOOK_REDIRECT_URL}`,
-      },
-      body: JSON.stringify(response),
+      statusCode: 200,
+      body: JSON.stringify({ response }),
     });
   } catch (err) {
-    callback(null, { statusCode: 500, body: err.toString() });
+    callback(null, { statusCode: 200, body: JSON.stringify({ error: err }) });
   }
 };

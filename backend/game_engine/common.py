@@ -10,6 +10,13 @@ from datetime import date
 import enum
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+import sentry_sdk
+from sentry_sdk import capture_message
+from sentry_sdk import configure_scope
+from sentry_sdk import push_scope
+
+
+
 
 
 class GameError(Exception):
@@ -44,6 +51,13 @@ class GameSchedule(object):
             datetime.datetime.today() + datetime.timedelta(days=1)
         )
         return tomorrow_l.strftime("%B %d, %Y")
+
+    @property
+    def nextweek_localized_string(self) -> Text:
+        nextweek_l = self.game_time_zone.localize(
+            datetime.datetime.today() + datetime.timedelta(days=7)
+        )
+        return nextweek_l.strftime("%B %d, %Y")
 
     @property
     def today_localized_string(self) -> Text:
@@ -187,7 +201,6 @@ class Serializable(object):
                 'Serializable object contains unsupported attribute {}'.format(v))
 
     def to_dict(self):
-        log_message('to_dict called for {}'.format(self.__class__))
         d = {'class': self.__class__.__name__}
         for k, v in vars(self).items():
             d[k] = self._to_dict_item(v)
@@ -210,6 +223,28 @@ class Serializable(object):
     def to_json(self):
         return json.dumps(self.to_dict())
 
+def init_sentry():
+    sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
+                    attach_stacktrace=True)
 
-def log_message(message):
-    logging.info(message)
+def log_message(message: Text, game_id: Text = None, additional_tags: Dict = None, push_to_sentry = False):
+    if push_to_sentry:
+        # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
+        init_sentry()
+    with push_scope() as scope:
+        if game_id:
+            logging.info("game_id {}".format(game_id))
+            scope.set_tag("game_id", game_id)
+
+        logging.info(message)
+
+        if additional_tags:
+            for tag, value in additional_tags.items():
+                logging.info("{} -> {}".format(tag, str(value)))
+                scope.set_tag(tag, str(value))
+
+
+        if push_to_sentry:
+            logging.info("pushing to sentry")
+            capture_message(message)
+
