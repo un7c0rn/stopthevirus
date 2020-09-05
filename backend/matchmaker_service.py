@@ -83,9 +83,9 @@ class MatchmakerService:
             )
             self._notify_players(game_id=game._game_id, players=players, message=message)
             if self._is_mvp:
-                # start new process
-                p = multiprocessing.Process(target=game.play, args=(tribes[0], tribes[1], database, engine))
-                p.start()
+                # NOTE(brandon): changing to thread for now. can't pickle non-primitive engine object.
+                game_thread = threading.Thread(target=game.play, args=(tribes[0], tribes[1], database, engine))
+                game_thread.start()
             else:
                 # start on new GCP instance
                 pass
@@ -108,6 +108,7 @@ class MatchmakerService:
             log_message(message="Set game_has_started field to {}".format(value), game_id=game._game_id)
         except Exception as e:
             log_message(message="Error setting game document game_has_started field to {}: {}".format(value, e), game_id=game._game_id)
+            raise RuntimeError(str(e))
     
     def _reschedule_or_cancel_game(self, game_snap: DocumentSnapshot, game_dict: dict, players: list):
         log_message(message="Rescheduling or cancelling game", game_id=game_dict.get("id"))
