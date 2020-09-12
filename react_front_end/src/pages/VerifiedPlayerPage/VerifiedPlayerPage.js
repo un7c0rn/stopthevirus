@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { withStyles } from "@material-ui/core";
 import Footer from "../common/Footer";
 import { makeStyles } from "@material-ui/core/styles";
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LandingPage = () => {
+const VerifiedPlayerPage = () => {
   const classes = useStyles();
 
   return (
@@ -40,4 +40,4 @@ const LandingPage = () => {
   );
 };
 
-export default withStyles(useStyles)(LandingPage);
+export default withStyles(useStyles)(VerifiedPlayerPage);

@@ -8,7 +8,6 @@ from game_engine import messages
 from typing import Iterable, List
 import boto3
 import json
-import logging
 import sys
 from concurrent.futures import ThreadPoolExecutor
 import copy
@@ -84,7 +83,8 @@ class EventQueueError(Exception):
 
 
 class AmazonSQS(EventQueue):
-    def __init__(self, json_config_path: Text, game_options: GameOptions = None) -> None:
+    def __init__(self, json_config_path: Text, game_id: Text, game_options: GameOptions = None) -> None:
+        self.game_id = game_id
         with open(json_config_path, 'r') as f:
             config = json.loads(f.read())
             self._url = config['url']
@@ -112,13 +112,13 @@ class AmazonSQS(EventQueue):
             ],
             MaxNumberOfMessages=1,
             WaitTimeSeconds=20)
-        log_message(str(response))
+        log_message(message=str(response), game_id=self.game_id)
 
         if 'Messages' in response:
             message = response['Messages'][0]
             message_body = message['Body']
             log_message(
-                'Received event with message body {}'.format(message_body))
+                message='Received event with message body {}'.format(message_body), game_id=self.game_id)
             self._delete_message(message['ReceiptHandle'])
             return SMSEvent.from_json(json_text=message_body, game_options=self._game_options)
         else:
@@ -126,15 +126,15 @@ class AmazonSQS(EventQueue):
 
     def put_fn(self, event: SMSEvent) -> None:
         # TODO(brandon) add retry logic and error handling.
-        log_message("Putting {} on queue {}.".format(
-            event.to_json(), self._url))
+        log_message(message="Putting {} on queue {}.".format(
+            event.to_json(), self._url), game_id=self.game_id)
         response = self._client.send_message(
             QueueUrl=self._url,
             MessageBody=event.to_json(),
             MessageGroupId=event.game_id,
             MessageDeduplicationId=str(uuid.uuid4())
         )
-        log_message(response)
+        log_message(message=response, game_id=self.game_id)
 
     def put(self, event: SMSEvent, blocking: bool = False) -> None:
         if blocking:

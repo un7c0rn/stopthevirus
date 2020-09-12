@@ -460,12 +460,22 @@ _defineProperty(Firestore, "verify_code", async ({
   if (!phone || !code || !game) return false;
   const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone).where("code", "==", code).limit(1);
   const query = await player.get();
-  if (!query.docs.length) throw new Error("player not found");
+  if (!query.docs.length) return false;
   const data = query.docs[0];
   data.ref.update({
     active: true
   });
-  return "verified";
+  return true;
+});
+
+_defineProperty(Firestore, "player_from_phone_number", async ({
+  game = null,
+  phone = null
+}) => {
+  const player = Firestore.firestore.collection(`games/${game}/players`).where("phone", "==", phone).limit(1);
+  const query = await player.get();
+  if (!query.docs.length) throw new Error("player not found");
+  return query.docs[0].data();
 });
 
 /***/ }),

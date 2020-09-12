@@ -313,7 +313,8 @@ class SMSMessageUXTest(unittest.TestCase):
         self.game_options = GameOptions()
         self.game_options.game_schedule = STV_I18N_TABLE['US']
         self.twilio = TwilioSMSNotifier(
-            json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH)
+            json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
+            game_id=_TEST_GAME_ID)
 
     def test_notify_player_score_event_msg(self):
         event = events.NotifyPlayerScoreEvent(

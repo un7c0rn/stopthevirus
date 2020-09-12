@@ -36,7 +36,7 @@ export default function UiForAppError({ error }) {
           <TriangleLogo />
           <StatisticsRight />
         </LogoContainer>
-        <h1>{error.message}</h1>
+        <h1 style={{ textAlign: "center" }}>{error.message}</h1>
         <Footer />
       </section>
     </>
