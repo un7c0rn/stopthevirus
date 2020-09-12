@@ -1,5 +1,6 @@
 import unittest
 import mock
+from unittest.mock import patch
 from matchmaker_service import MatchmakerService
 from game_engine.common import GameSchedule, ISODayOfWeek, STV_I18N_TABLE
 from game_engine.firestore import FirestoreDB
@@ -42,6 +43,10 @@ _TEST_DATA_MATCHMAKER_JSON = """
    }
 }
 """
+
+@patch.object(MatchmakerService, '_set_game_has_started', return_value=None)
+@patch.object(MatchmakerService, '_play_game', return_value=None)
+@patch.object(MatchmakerService, '_reschedule_or_cancel_game', return_value=None)
 class MatchmakerServiceTest(unittest.TestCase):
 
     def setUp(self):
@@ -49,7 +54,7 @@ class MatchmakerServiceTest(unittest.TestCase):
         pass
 
 
-    def test_matchmaker_daemon_happy(self, use_mock=False):
+    def test_matchmaker_daemon_happy(self, use_mock=False, *_):
         # Test happy path
         if use_mock:
             gamedb = MockDatabase()
@@ -61,7 +66,7 @@ class MatchmakerServiceTest(unittest.TestCase):
         service.set_stop()
         service.clear_stop()
 
-    def test_matchmaker_daemon_reschedule(self, use_mock=False):
+    def test_matchmaker_daemon_reschedule(self, use_mock=False, *_):
         if use_mock:
             gamedb = MockDatabase()
         else:
@@ -73,7 +78,7 @@ class MatchmakerServiceTest(unittest.TestCase):
         service.set_stop()
         service.clear_stop()
 
-    def test_check_start_time(self):
+    def test_check_start_time(self, *_):
         gamedb = FirestoreDB(json_config_path=json_config_path)
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
 
