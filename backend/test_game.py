@@ -594,13 +594,10 @@ class GameTest(unittest.TestCase):
     def setUp(self):
         self._game = Game(game_id=str(uuid.uuid4()), options=GameOptions(
             game_wait_sleep_interval_sec=0.1,
-            single_tribe_council_time_sec=.2,
+            tribe_council_time_sec=.2,
             single_tribe_top_k_threshold=0.5,
-            single_team_council_time_sec=.2,
-            final_tribal_council_time_sec=.2,
             multi_tribe_min_tribe_size=5,
-            multi_tribe_team_immunity_likelihood=0.0,
-            multi_tribe_council_time_sec=.2))
+            multi_tribe_team_immunity_likelihood=0.0))
 
     def test_play(self):
         gamedb = MockDatabase()
@@ -1650,17 +1647,17 @@ class GameTest(unittest.TestCase):
         for k, v in gamedb._players.items():
             self.assertEqual(v.team_id, expected_player_to_team_dict[k])
 
-    def test_get_challenge(self):
+    def test_get_next_challenge(self):
         gamedb = MockDatabase()
         challenges = set()
         for _ in range(5):
-            challenge = self._game._get_challenge(gamedb=gamedb)
+            challenge = self._game._get_next_challenge(gamedb=gamedb)
             challenges.add(challenge.name)
         self.assertSetEqual(challenges, set(
             ['name/challenge1']))
 
         for _ in range(5):
-            challenge = self._game._get_challenge(gamedb=gamedb)
+            challenge = self._game._get_next_challenge(gamedb=gamedb)
             challenges.add(challenge.name)
             gamedb._challenges[challenge.id].complete = True
         self.assertSetEqual(challenges, set(

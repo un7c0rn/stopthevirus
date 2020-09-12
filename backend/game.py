@@ -18,6 +18,7 @@ import heapq
 from game_engine.firestore import FirestoreDB
 from concurrent.futures import ThreadPoolExecutor
 from game_engine.common import GameError
+from game_engine.common import GameClockMode
 from game_engine.common import GameOptions
 from game_engine.common import log_message
 import uuid
@@ -38,10 +39,17 @@ class Game(object):
 
     def __init__(self, game_id: Text, options: GameOptions):
         self._options = options
-        self._stop = threading.Event()
         self._game_id = game_id
+        self._stop_event = threading.Event()
+        self._wait_for_game_start_event = threading.Event()
+        self._wait_for_tribal_council_start_event = threading.Event()
+        self._wait_for_tribal_council_end_event = threading.Event()
+        self._wait_for_challenge_start_event = threading.Event()
+        self._wait_for_challenge_end_event = threading.Event()
 
     def play(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Player:
+        self._wait_for_game_start_time()
+
         last_tribe_standing = self._play_multi_tribe(tribe1=tribe1, tribe2=tribe2,
                                                      gamedb=gamedb, engine=engine)
         log_message(message="Last tribe standing is {}.".format(last_tribe_standing), game_id=self._game_id)
@@ -65,8 +73,8 @@ class Game(object):
             log_message(message="Tribe {} size {} tribe {} size {}.".format(
                 tribe1, tribe1.size, tribe2, tribe2.size), game_id=self._game_id)
 
-            log_message(message="Getting new challenge.", game_id=self._game_id)
-            challenge = self._get_challenge(gamedb=gamedb)
+            log_message("Getting new challenge.")
+            challenge = self._get_next_challenge(gamedb=gamedb)
 
             log_message(message="Running challenge {}.".format(challenge), game_id=self._game_id)
             self._run_challenge(challenge=challenge,
@@ -99,8 +107,8 @@ class Game(object):
             log_message(message="Teams remaining = {}.".format(
                 gamedb.count_teams(active_team_predicate_value=True)), game_id=self._game_id)
 
-            log_message(message="Getting new challenge.", game_id=self._game_id)
-            challenge = self._get_challenge(gamedb=gamedb)
+            log_message("Getting new challenge.")
+            challenge = self._get_next_challenge(gamedb=gamedb)
 
             log_message(message="Running challenge {}.".format(challenge), game_id=self._game_id)
             self._run_challenge(challenge=challenge,
@@ -122,7 +130,7 @@ class Game(object):
 
     def _play_single_team(self, team: Team, gamedb: Database, engine: Engine) -> List[Player]:
         while team.size > self._options.target_finalist_count:
-            challenge = self._get_challenge(gamedb=gamedb)
+            challenge = self._get_next_challenge(gamedb=gamedb)
             self._run_challenge(challenge=challenge,
                                 gamedb=gamedb, engine=engine)
             losing_players = self._score_entries_top_k_players(
@@ -155,8 +163,104 @@ class Game(object):
         else:
             raise GameError("Unable to determine voted out player.")
 
-    # fraction of teams in losing tribe must vote
+    def set_game_start_event(self) -> None:
+        self._wait_for_game_start_event.set()
+        self._wait_for_game_start_event.clear()
+
+    def set_tribal_council_start_event(self) -> None:
+        self._wait_for_tribal_council_start_event.set()
+        self._wait_for_tribal_council_start_event.clear()
+
+    def set_tribal_council_end_event(self) -> None:
+        self._wait_for_tribal_council_end_event.set()
+        self._wait_for_tribal_council_end_event.clear()
+
+    def set_challenge_start_event(self) -> None:
+        self._wait_for_challenge_start_event.set()
+        self._wait_for_challenge_start_event.clear()
+
+    def set_challenge_end_event(self) -> None:
+        self._wait_for_challenge_end_event.set()
+        self._wait_for_challenge_end_event.clear()
+
+    def set_stop_event(self) -> None:
+        self._stop_event.set()
+        self._stop_event.clear()
+
+    def _wait_for_game_start_time(self) -> None:
+        if self._options.game_clock_mode == GameClockMode.SYNC:
+            game_start_time_sec = _unixtime() + self._options.game_schedule.localized_time_delta_sec(
+                end_time=self._options.game_schedule.game_start_time)
+            while((_unixtime() < game_start_time_sec) and not self._stop_event.is_set() and not self._wait_for_game_start_event.is_set()):
+                log_message("Waiting until {} for game start.".format(
+                    game_start_time_sec))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+        elif self._options.game_clock_mode == GameClockMode.ASYNC:
+            # start immediately.
+            log_message("Initiating game {} with timing mode.".format(
+                self._options.game_clock_mode))
+
+    def _wait_for_tribal_council_start_time(self) -> None:
+        if self._options.game_clock_mode == GameClockMode.SYNC:
+            tribal_council_start_time_sec = _unixtime() + self._options.game_schedule.localized_time_delta_sec(
+                end_time=self._options.game_schedule.daily_tribal_council_start_time)
+            while((_unixtime() < tribal_council_start_time_sec) and not self._stop_event.is_set() and not self._wait_for_tribal_council_start_event.is_set()):
+                log_message("Waiting until {} for tribal council.".format(
+                    tribal_council_start_time_sec))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+        elif self._options.game_clock_mode == GameClockMode.ASYNC:
+            # start immediately.
+            log_message("Initiating tribal council in {} game timing mode.".format(
+                self._options.game_clock_mode))
+            return
+
+    def _wait_for_tribal_council_end_time(self) -> None:
+        if self._options.game_clock_mode == GameClockMode.SYNC:
+            tribal_council_end_time_sec = _unixtime() + self._options.game_schedule.localized_time_delta_sec(
+                end_time=self._options.game_schedule.daily_tribal_council_end_time)
+            while((_unixtime() < tribal_council_end_time_sec) and not self._stop_event.is_set() and not self._wait_for_tribal_council_start_event.is_set()):
+                log_message("Waiting until {} for tribal council.".format(
+                    tribal_council_end_time_sec))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+        elif self._options.game_clock_mode == GameClockMode.ASYNC:
+            tribal_council_start_timestamp = _unixtime()
+            while (((_unixtime() - tribal_council_start_timestamp)
+                    < self._options.tribe_council_time_sec) and not self._stop_event.is_set() and not self._wait_for_tribal_council_end_event.is_set()):
+                log_message("Waiting for tribal council to end.")
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+
+    def _wait_for_challenge_start_time(self, challenge: Challenge) -> None:
+        if self._options.game_clock_mode == GameClockMode.SYNC:
+            challenge_start_time_sec = _unixtime() + self._options.game_schedule.localized_time_delta_sec(
+                end_time=self._options.game_schedule.daily_challenge_start_time)
+            while((_unixtime() < challenge_start_time_sec) and not self._stop_event.is_set() and not self._wait_for_challenge_start_event.is_set()):
+                log_message("Waiting until {} for daily challenge start.".format(
+                    challenge_start_time_sec))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+        elif self._options.game_clock_mode == GameClockMode.ASYNC:
+            while (_unixtime() < challenge.start_timestamp) and not self._stop_event.is_set() and not self._wait_for_challenge_start_event.is_set():
+                log_message("Waiting {}s for challenge to {} to begin.".format(
+                    challenge.start_timestamp - _unixtime(), challenge))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+
+    def _wait_for_challenge_end_time(self, challenge: Challenge) -> None:
+        if self._options.game_clock_mode == GameClockMode.SYNC:
+            challenge_end_time_sec = _unixtime() + self._options.game_schedule.localized_time_delta_sec(
+                end_time=self._options.game_schedule.daily_challenge_end_time)
+            while((_unixtime() < challenge_end_time_sec) and not self._stop_event.is_set() and not self._wait_for_challenge_end_event.is_set()):
+                log_message("Waiting until {} for daily challenge start.".format(
+                    challenge_end_time_sec))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+        elif self._options.game_clock_mode == GameClockMode.ASYNC:
+            while (_unixtime() < challenge.end_timestamp) and not self._stop_event.is_set() and not self._wait_for_challenge_end_event.is_set():
+                log_message("Waiting {}s for challenge to {} to end.".format(
+                    challenge.end_timestamp - _unixtime(), challenge))
+                time.sleep(self._options.game_wait_sleep_interval_sec)
+
     def _run_multi_tribe_council(self, winning_tribe: Tribe, losing_tribe: Tribe, gamedb: Database, engine: Engine):
+        self._wait_for_tribal_council_start_time()
+
+        # fraction of teams in losing tribe must vote
         non_immune_teams = list()
         for team in gamedb.stream_teams(from_tribe=losing_tribe):
             log_message(message="Found losing team {}.".format(team), game_id=self._game_id)
@@ -168,16 +272,10 @@ class Game(object):
                     game_id=self._game_id, game_options=self._options, team=team))
 
         # announce winner and tribal council for losing tribe
-        tribal_council_start_timestamp = _unixtime()
         gamedb.clear_votes()
         engine.add_event(events.NotifyMultiTribeCouncilEvent(game_id=self._game_id, game_options=self._options,
                                                              winning_tribe=winning_tribe, losing_tribe=losing_tribe))
-
-        # wait for votes
-        while (((_unixtime() - tribal_council_start_timestamp)
-                < self._options.multi_tribe_council_time_sec) and not self._stop.is_set()):
-            log_message(message="Waiting for tribal council to end.", game_id=self._game_id)
-            time.sleep(self._options.game_wait_sleep_interval_sec)
+        self._wait_for_tribal_council_end_time()
 
         # count votes
         for team in non_immune_teams:
@@ -194,22 +292,17 @@ class Game(object):
         engine.add_event(events.NotifyTribalCouncilCompletionEvent(
             game_id=self._game_id, game_options=self._options))
 
-    # keep top K teams
     def _run_single_tribe_council(self, winning_teams: List[Team], losing_teams: List[Team],
                                   gamedb: Database, engine: Engine):
+        self._wait_for_tribal_council_start_time()
+        # keep top K teams
 
         # announce winner and tribal council for losing teams
         gamedb.clear_votes()
         engine.add_event(events.NotifySingleTribeCouncilEvent(
             game_id=self._game_id, game_options=self._options,
             winning_teams=winning_teams, losing_teams=losing_teams))
-        tribal_council_start_timestamp = _unixtime()
-
-        # wait for votes
-        while (((_unixtime() - tribal_council_start_timestamp)
-                < self._options.single_tribe_council_time_sec) and not self._stop.is_set()):
-            log_message(message="Waiting for tribal council to end.", game_id=self._game_id)
-            time.sleep(self._options.game_wait_sleep_interval_sec)
+        self._wait_for_tribal_council_end_time()
 
         # count votes
         for team in losing_teams:
@@ -230,6 +323,8 @@ class Game(object):
             events.NotifyTribalCouncilCompletionEvent(game_id=self._game_id, game_options=self._options))
 
     def _run_single_team_council(self, team: Team, losing_players: List[Player], gamedb: Database, engine: Engine):
+        self._wait_for_tribal_council_start_time()
+
         # announce winner and tribal council for losing teams
         gamedb.clear_votes()
 
@@ -237,16 +332,11 @@ class Game(object):
             from_team=team) if player not in losing_players][0]
         engine.add_event(events.NotifySingleTeamCouncilEvent(game_id=self._game_id, game_options=self._options,
                                                              winning_player=winning_player, losing_players=losing_players))
-        tribal_council_start_timestamp = _unixtime()
-
-        # wait for votes
-        while (((_unixtime() - tribal_council_start_timestamp)
-                < self._options.single_team_council_time_sec) and not self._stop.is_set()):
-            log_message(message="Waiting for tribal council to end.", game_id=self._game_id)
-            time.sleep(self._options.game_wait_sleep_interval_sec)
+        self._wait_for_tribal_council_end_time()
 
         # count votes
-        voted_out_player = self._get_voted_out_player(team=team, gamedb=gamedb)
+        voted_out_player = self._get_voted_out_player(
+            team=team, gamedb=gamedb)
         if voted_out_player:
             gamedb.deactivate_player(player=voted_out_player)
             log_message(message="Deactivated player {}.".format(voted_out_player), game_id=self._game_id)
@@ -259,17 +349,12 @@ class Game(object):
 
     def _run_finalist_tribe_council(self, finalists: List[Player], gamedb: Database, engine: Engine) -> Player:
         gamedb.clear_votes()
+        self._wait_for_tribal_council_start_time()
 
         engine.add_event(
             events.NotifyFinalTribalCouncilEvent(
                 game_id=self._game_id, game_options=self._options, finalists=finalists))
-        tribal_council_start_timestamp = _unixtime()
-
-        # wait for votes
-        while (((_unixtime() - tribal_council_start_timestamp)
-                < self._options.final_tribal_council_time_sec) and not self._stop.is_set()):
-            log_message(message="Waiting for tribal council to end.", game_id=self._game_id)
-            time.sleep(self._options.game_wait_sleep_interval_sec)
+        self._wait_for_tribal_council_end_time()
 
         # count votes
         player_votes = gamedb.count_votes(is_for_win=True)
@@ -339,10 +424,10 @@ class Game(object):
                 engine.add_event(events.NotifyTeamReassignmentEvent(game_id=self._game_id, game_options=self._options, player=player,
                                                                     team=team))
 
-    def _get_challenge(self, gamedb: Database) -> Challenge:
+    def _get_next_challenge(self, gamedb: Database) -> Challenge:
         available_challenge_count = 0
-        while available_challenge_count == 0 and not self._stop.is_set():
-            log_message(message="Waiting for next challenge to become available.", game_id=self._game_id)
+        while available_challenge_count == 0 and not self._stop_event.is_set():
+            log_message("Waiting for next challenge to become available.")
             time.sleep(self._options.game_wait_sleep_interval_sec)
             available_challenges = gamedb.list_challenges(
                 challenge_completed_predicate_value=False)
@@ -352,20 +437,14 @@ class Game(object):
 
     def _run_challenge(self, challenge: Challenge, gamedb: Database, engine: Engine):
         # wait for challenge to begin
-        while (_unixtime() < challenge.start_timestamp) and not self._stop.is_set():
-            log_message(message="Waiting {}s for challenge to {} to begin.".format(
-                challenge.start_timestamp - _unixtime(), challenge), game_id=self._game_id)
-            time.sleep(self._options.game_wait_sleep_interval_sec)
+        self._wait_for_challenge_start_time(challenge=challenge)
 
         # notify players
         engine.add_event(
             events.NotifyTribalChallengeEvent(game_id=self._game_id, game_options=self._options, challenge=challenge))
 
         # wait for challenge to end
-        while (_unixtime() < challenge.end_timestamp) and not self._stop.is_set():
-            log_message(message="Waiting {}s for challenge to {} to end.".format(
-                challenge.end_timestamp - _unixtime(), challenge), game_id=self._game_id)
-            time.sleep(self._options.game_wait_sleep_interval_sec)
+        self._wait_for_challenge_end_time(challenge=challenge)
 
         challenge.complete = True
         gamedb.save(challenge)
@@ -375,7 +454,7 @@ class Game(object):
         atomically increment the score int held in score_dict."""
 
         entries_iter = iter(entries)
-        while not self._stop.is_set():
+        while not self._stop_event.is_set():
             try:
                 entry = next(entries_iter)
                 pprint.pprint(entry)
@@ -406,7 +485,7 @@ class Game(object):
 
     def _score_entries_top_k_teams_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
         entries_iter = iter(entries)
-        while not self._stop.is_set():
+        while not self._stop_event.is_set():
             try:
                 entry = next(entries_iter)
                 log_message(message="Entry {}.".format(entry), game_id=self._game_id)
@@ -467,7 +546,7 @@ class Game(object):
 
     def _score_entries_top_k_players_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
         entries_iter = iter(entries)
-        while not self._stop.is_set():
+        while not self._stop_event.is_set():
             try:
                 entry = next(entries_iter)
                 log_message(message="Entry {}.".format(entry), game_id=self._game_id)

@@ -22,6 +22,16 @@ from sentry_sdk import push_scope
 class GameError(Exception):
     pass
 
+class GameClockMode(enum.Enum):
+    # Synchronized timing. Game events are synchronized to global clock,
+    # on a schedule which is relative to the timezone of the game initiator.
+    # For example, challenges always begin at 9am PST.
+    SYNC = 0,
+
+    # Asyncrhonized timing. Game events are relatively timed. For example
+    # a challenge may always start N minutes after tribal council. This is only
+    # used for test purposes.
+    ASYNC = 1
 
 class ISODayOfWeek(enum.Enum):
     Monday = 1
@@ -162,16 +172,14 @@ class GameOptions(object):
     game_wait_sleep_interval_sec: int = attr.ib(default=30)
     target_team_size: int = attr.ib(default=5)
     target_finalist_count: int = attr.ib(default=2)
-    single_tribe_council_time_sec: int = attr.ib(300)
-    single_team_council_time_sec: int = attr.ib(300)
-    final_tribal_council_time_sec: int = attr.ib(300)
+    tribe_council_time_sec: int = attr.ib(300)
     multi_tribe_min_tribe_size: int = attr.ib(default=10)
     multi_tribe_target_team_size: int = attr.ib(default=5)
-    multi_tribe_council_time_sec: int = attr.ib(300)
     multi_tribe_team_immunity_likelihood: float = attr.ib(0.0)
     merge_tribe_name: Text = attr.ib(default='a$apmob')
     single_tribe_top_k_threshold: float = attr.ib(default=0.5)
-    game_schedule: GameSchedule = attr.ib(default=None)
+    game_schedule: GameSchedule = attr.ib(default=STV_I18N_TABLE['US'])
+    game_clock_mode: GameClockMode = attr.ib(default=GameClockMode.ASYNC)
 
 
 def _isprimitive(value: Any):
