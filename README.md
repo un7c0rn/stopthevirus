@@ -76,6 +76,14 @@ cd backend
 find . -name '*.py' | entr python3 -m unittest test_game.py -v
 ```
 
+## Deploying Cloud Function for SMS
+
+Install the gcloud <a href="https://cloud.google.com/sdk/docs/downloads-interactive">SDK</a>
+```
+cd stopthevirus/backend/functions/sms
+gcloud functions deploy sms_http --runtime python37 --trigger-http --allow-unauthenticated
+```
+
 ## Design
 
 ### Data Model
