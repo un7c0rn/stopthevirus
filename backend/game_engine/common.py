@@ -4,7 +4,6 @@ import sys
 from typing import Union, Any, Dict
 import attr
 import pytz
-from typing import str
 import datetime
 from datetime import date
 import enum
@@ -176,7 +175,7 @@ class GameOptions(object):
     multi_tribe_min_tribe_size: int = attr.ib(default=5)
     multi_tribe_target_team_size: int = attr.ib(default=5)
     multi_tribe_team_immunity_likelihood: float = attr.ib(0.0)
-    merge_tribe_name: str = attr.ib(default='MERGE')
+    merge_tribe_name: str = attr.ib(default='a$apmob')
     single_tribe_top_k_threshold: float = attr.ib(default=0.5)
     game_schedule: GameSchedule = attr.ib(default=STV_I18N_TABLE['US'])
     game_clock_mode: GameClockMode = attr.ib(default=GameClockMode.ASYNC)
