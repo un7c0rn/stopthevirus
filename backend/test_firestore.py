@@ -392,6 +392,6 @@ class FirestoreDBTest(unittest.TestCase):
     def test_find_player(self):
         self.assertEqual(_gamedb.find_player(phone_number='+15551234567').name, "Boston Rob")
 
-        
+
 if __name__ == '__main__':
     unittest.main()

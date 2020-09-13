@@ -7,3 +7,4 @@ twilio==6.5.0
 phonenumbers
 names
 sentry-sdk==0.14.3
+parameterized==0.7.4

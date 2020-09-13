@@ -193,11 +193,7 @@ class MatchmakerService:
                     if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(), 
                         is_test=is_test) and now_utc != game_dict.get("last_checked_date"): # TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
-                            options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30,
-                            single_tribe_council_time_sec=1 if is_test else 300, # is there a way to get the default values from GameOptions?
-                            single_team_council_time_sec=1 if is_test else 300,
-                            final_tribal_council_time_sec=1 if is_test else 300,
-                            multi_tribe_council_time_sec=1 if is_test else 300)
+                            options = GameOptions(game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
                             g = Game(game_id=game_dict["id"], options=options)
                             self._start_game(game=g, game_snap=game_snap, players=players_list, game_dict=game_dict)
                         else:
