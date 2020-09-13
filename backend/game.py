@@ -40,7 +40,6 @@ class Game(object):
     def __init__(self, game_id: Text, options: GameOptions):
         self._options = options
         self._game_id = game_id
-        log_message(f'Game instantiated with id: {game_id}')
         self._stop_event = threading.Event()
         self._wait_for_game_start_event = threading.Event()
         self._wait_for_tribal_council_start_event = threading.Event()
@@ -175,10 +174,6 @@ class Game(object):
             return gamedb.player_from_id(candidates[random.randint(0, num_candidates - 1)])
         else:
             raise GameError("Unable to determine voted out player.")
-
-    def _create_voting_ballots(self, gamedb: Database, players: Iterable[Player]) -> None:
-        # gamedb.ballot(player_id: str, challenge_id: str, options: Dict[str, str])
-        pass
 
     def set_game_start_event(self) -> None:
         self._wait_for_game_start_event.set()
@@ -355,10 +350,8 @@ class Game(object):
         if len(winning_players) > 0:
             winning_player = winning_players[0]
         else:
-            # TODO(brandon): think through how this works in test cases.
-            # raise GameError(
-            #     "Unable to determine a winning player for the challenge.")
-            winning_player = losing_players[0]
+            raise GameError(
+                "Unable to determine a winning player for the challenge. Have any entries been submitted?")
 
         engine.add_event(events.NotifySingleTeamCouncilEvent(game_id=self._game_id, game_options=self._options,
                                                              winning_player=winning_player, losing_players=losing_players))
@@ -644,18 +637,3 @@ class Game(object):
         gamedb.batch_update_tribe(from_tribe=tribe1, to_tribe=new_tribe)
         gamedb.batch_update_tribe(from_tribe=tribe2, to_tribe=new_tribe)
         return new_tribe
-
-
-# if __name__ == '__main__':
-#     options = GameOptions()
-#     game = Game(game_id=str(uuid.uuid4), options=options)
-#     # TODO(brandon) for production each game should instantiate a separate AWS FIFO
-#     # on the fly.
-#     engine = Engine(options=options,
-#                     game_id=self._game_id,
-#                     sqs_config_path=_AMAZON_SQS_PROD_CONF_JSON_PATH)
-#     database = FirestoreDB(json_config_path=_FIRESTORE_PROD_CONF_JSON_PATH)
-#     game.play(tribe1=database.tribe_from_id(_TRIBE_1_ID),
-#               tribe2=database.tribe_from_id(_TRIBE_2_ID),
-#               gamedb=database,
-#               engine=engine)
