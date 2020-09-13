@@ -125,16 +125,21 @@ class AmazonSQS(EventQueue):
             raise EventQueueError('Queue empty.')
 
     def put_fn(self, event: SMSEvent) -> None:
-        # TODO(brandon) add retry logic and error handling.
-        log_message(message="Putting {} on queue {}.".format(
-            event.to_json(), self._url), game_id=self.game_id)
-        response = self._client.send_message(
-            QueueUrl=self._url,
-            MessageBody=event.to_json(),
-            MessageGroupId=event.game_id,
-            MessageDeduplicationId=str(uuid.uuid4())
-        )
-        log_message(message=response, game_id=self.game_id)
+        print('called put_fn!')
+        try:
+            # TODO(brandon) add retry logic and error handling.
+            log_message(message="Putting {} on queue {}.".format(
+                event.to_json(), self._url), game_id=self.game_id)
+            response = self._client.send_message(
+                QueueUrl=self._url,
+                MessageBody=event.to_json(),
+                MessageGroupId=event.game_id,
+                MessageDeduplicationId=str(uuid.uuid4())
+            )
+            log_message(message=response, game_id=self.game_id)
+        except Exception as e:
+            log_message(
+                messages=f'put_fn failed for event {event} with exception {str(e)}.')
 
     def put(self, event: SMSEvent, blocking: bool = False) -> None:
         if blocking:
@@ -232,6 +237,13 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
         count_players = gamedb.count_players(
             from_tribe=gamedb.tribe_from_id(self.winning_player.tribe_id))
         for player in self.losing_players:
+            options_map = messages.players_as_formatted_options_map(
+                players=self.losing_players, exclude_player=player)
+            # NOTE(brandon): we perform this synchronously to guarantee that ballots are
+            # created in the DB before SMS messages go out to users.
+            gamedb.ballot(
+                player_id=player.id, options=options_map.options, challenge_id=None
+            )
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_SINGLE_TEAM_COUNCIL_EVENT_LOSING_MSG_FMT.format(
@@ -241,13 +253,17 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
                         players=count_players,
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_challenge_end_time),
-                        options=messages.players_as_formatted_options_list(
-                            players=self.losing_players, exclude_player=player)
+                        options=options_map.formatted_string
                     ),
                     recipient_phone_numbers=player.phone_number
                 )
             )
 
+        options_map = messages.players_as_formatted_options_map(
+            players=self.losing_players, exclude_player=self.winning_player)
+        gamedb.ballot(
+            player_id=self.winning_player.id, options=options_map.formatted_string, challenge_id=None
+        )
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_SINGLE_TEAM_COUNCIL_EVENT_WINNING_MSG_FMT.format(
@@ -255,8 +271,7 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
                     players=count_players,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_end_time),
-                    options=messages.players_as_formatted_options_list(
-                        players=self.losing_players)
+                    options=options_map.formatted_string
                 ),
                 recipient_phone_numbers=self.winning_player.phone_number
             )
@@ -292,7 +307,15 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
             # as an option to vote out. For MVP this helps with scale because the alternative
             # requires sending a different message to every player (as opposed to every team)
             # which is about a 5x cost increase for SMS.
-            r = [p.phone_number for p in losing_players]
+            recipient_phone_numbers = [p.phone_number for p in losing_players]
+            options_map = messages.players_as_formatted_options_map(
+                players=losing_players)
+            # TODO(brandon): this is slow and expensive. batch the ballot writes to gamedb.
+            for player in losing_players:
+                gamedb.ballot(
+                    player_id=player.id, options=options_map.options, challenge_id=None
+                )
+
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_SINGLE_TRIBE_COUNCIL_EVENT_LOSING_MSG_FMT.format(
@@ -300,13 +323,9 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_tribal_council_end_time
                         ),
-                        options=messages.players_as_formatted_options_list(
-                            # TODO(brandon): exclude the voter from the options list of players
-                            # to vote out.
-                            players=losing_players
-                        )
+                        options=options_map.formatted_string
                     ),
-                    recipient_phone_numbers=r
+                    recipient_phone_numbers=recipient_phone_numbers
                 )
             )
 
@@ -407,6 +426,14 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
             for player in gamedb.list_players(from_team=team):
                 losing_players.append(player)
 
+            options_map = messages.players_as_formatted_options_map(
+                players=losing_players)
+
+            for player in losing_players:
+                gamedb.ballot(
+                    player_id=player.id, options=options_map.options, challenge_id=None
+                )
+
             # NOTE: UX isn't perfect here because we'll show the player's own name
             # as an option to vote out. For MVP this helps with scale because the alternative
             # requires sending a different message to every player (as opposed to every team)
@@ -419,11 +446,7 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_tribal_council_end_time
                         ),
-                        options=messages.players_as_formatted_options_list(
-                            # TODO(brandon): exclude the voter from the options list of players
-                            # to vote out.
-                            players=losing_players
-                        )
+                        options=options_map.formatted_string
                     ),
                     recipient_phone_numbers=[
                         p.phone_number for p in losing_players]
@@ -473,6 +496,16 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
+        options_map = messages.players_as_formatted_options_map(
+            players=self.finalists)
+        # TODO(brandon): this is slow and expensive, but it should work.
+        for player in gamedb.stream_players():
+            gamedb.ballot(
+                player_id=player.id,
+                challenge_id=None,
+                options=options_map.options,
+                is_for_win=True
+            )
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_FINAL_TRIBAL_COUNCIL_EVENT_MSG_FMT.format(
@@ -482,8 +515,7 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_tribal_council_end_time
                     ),
-                    options=messages.players_as_formatted_options_list(
-                        players=self.finalists)
+                    options=options_map.formatted_string
                 ),
                 recipient_phone_numbers=[p.phone_number for p in gamedb.stream_players(
                     active_player_predicate_value=True)]

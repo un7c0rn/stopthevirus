@@ -307,6 +307,7 @@ def _event_messages_as_json(messages):
     return json.dumps([m.to_dict() for m in messages])
 
 
+@mock.patch.object(FirestoreDB, 'ballot', return_value=None)
 class SMSMessageUXTest(unittest.TestCase):
 
     def setUp(self):
@@ -315,8 +316,9 @@ class SMSMessageUXTest(unittest.TestCase):
         self.twilio = TwilioSMSNotifier(
             json_config_path=_TEST_TWILIO_SMS_CONFIG_PATH,
             game_id=_TEST_GAME_ID)
+        self.maxDiff = None
 
-    def test_notify_player_score_event_msg(self):
+    def test_notify_player_score_event_msg(self, *_):
         event = events.NotifyPlayerScoreEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -346,7 +348,7 @@ class SMSMessageUXTest(unittest.TestCase):
             )
         )
 
-    def test_notify_team_reassignment_event_msg(self):
+    def test_notify_team_reassignment_event_msg(self, *_):
         event = events.NotifyTeamReassignmentEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -375,7 +377,7 @@ class SMSMessageUXTest(unittest.TestCase):
             )
         )
 
-    def test_notify_single_team_council_event_msg(self):
+    def test_notify_single_team_council_event_msg(self, ballot_fn):
         losing_players = [p for p in _gamedb.list_players(
             from_team=_gamedb.team_from_id(id="bab66d57-74ad-4c08-b823-65946b160435")) if
             p.id != "5d3deb3a-eced-4cfb-b1b4-cb3aeb718119"]
@@ -439,8 +441,9 @@ class SMSMessageUXTest(unittest.TestCase):
                 ]
             )
         )
+        ballot_fn.assert_called()
 
-    def test_notify_single_tribe_council_event_msg(self):
+    def test_notify_single_tribe_council_event_msg(self, ballot_fn):
         event = events.NotifySingleTribeCouncilEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -490,8 +493,9 @@ class SMSMessageUXTest(unittest.TestCase):
                 ]
             )
         )
+        ballot_fn.assert_called()
 
-    def test_notify_tribal_challenge_event_msg(self):
+    def test_notify_tribal_challenge_event_msg(self, *_):
         event = events.NotifyTribalChallengeEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -529,7 +533,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 ]
             ))
 
-    def test_notify_multi_tribe_council_event_msg(self):
+    def test_notify_multi_tribe_council_event_msg(self, ballot_fn):
         event = events.NotifyMultiTribeCouncilEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -594,8 +598,9 @@ class SMSMessageUXTest(unittest.TestCase):
                 ]
             )
         )
+        ballot_fn.assert_called()
 
-    def test_notify_final_tribal_council_event_msg(self):
+    def test_notify_final_tribal_council_event_msg(self, ballot_fn):
         event = events.NotifyFinalTribalCouncilEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -642,8 +647,9 @@ class SMSMessageUXTest(unittest.TestCase):
                 ]
             )
         )
+        ballot_fn.assert_called()
 
-    def test_notify_player_voted_out_msg(self):
+    def test_notify_player_voted_out_msg(self, *_):
         event = events.NotifyPlayerVotedOutEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -678,7 +684,7 @@ class SMSMessageUXTest(unittest.TestCase):
             )
         )
 
-    def test_notify_tribal_council_completion_event_msg(self):
+    def test_notify_tribal_council_completion_event_msg(self, *_):
         event = events.NotifyTribalCouncilCompletionEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options
@@ -719,7 +725,7 @@ class SMSMessageUXTest(unittest.TestCase):
             )
         )
 
-    def test_notify_winner_announcement_event_winner_msg(self):
+    def test_notify_winner_announcement_event_winner_msg(self, *_):
         event = events.NotifyWinnerAnnouncementEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,
@@ -747,7 +753,7 @@ class SMSMessageUXTest(unittest.TestCase):
             ])
         )
 
-    def test_notify_immunity_awarded_event_msg(self):
+    def test_notify_immunity_awarded_event_msg(self, *_):
         event = events.NotifyImmunityAwardedEvent(
             game_id=_TEST_GAME_ID,
             game_options=self.game_options,

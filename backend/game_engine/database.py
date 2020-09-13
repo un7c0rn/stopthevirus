@@ -7,6 +7,7 @@ from game_engine.common import Serializable
 class Data(ABC, Serializable):
     pass
 
+
 @attr.s
 class Game(Data):
     id: str = attr.ib('')
@@ -33,11 +34,13 @@ class Vote(Data):
     to_id: str = attr.ib('')
     is_for_win: bool = attr.ib(default=False)
 
+
 @attr.s
 class Ballot(Data):
     id: str = attr.ib('')
     challenge_id: str = attr.ib('')
     options: Dict = attr.ib(factory=Dict)
+
 
 @attr.s
 class Team(Data):
@@ -54,6 +57,8 @@ class Tribe(Data):
     name: str = attr.ib('')
     size: int = attr.ib(default=0)
     active: bool = attr.ib(default=True)
+    count_players: int = attr.ib(default=0)
+    count_teams: int = attr.ib(default=0)
 
 
 @attr.s
