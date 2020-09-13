@@ -62,7 +62,11 @@ class _FirestoreDB():
         query = self._client.collection(
             f'games/{self._game_id}/players/{player_id}/ballots').order_by(
                 'timestamp', direction=Query.DESCENDING)
-        return query.get()[0]
+        ballots = query.get()
+        if len(ballots) > 0:
+            return ballots[0]
+        else:
+            return None
 
     def find_player(self, phone_number: str) -> Optional[DocumentReference]:
         query = self._client.collection(
@@ -125,6 +129,9 @@ def sms_http(request):
         if _is_valid_vote_option(message_body):
             # 4. if the message is a valid voting option, lookup the ballot for the vote caster.
             ballot = firestore.find_ballot(player_id=player.get('id'))
+            if not ballot:
+                resp.message("""An internal game error has occured, no ballot available.""")
+                return str(resp)
             selection = _normalize_vote_option(message_body)
             options = ballot.get('options')
             if selection in options:
