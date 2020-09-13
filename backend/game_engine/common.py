@@ -1,10 +1,10 @@
 import json
 import logging
 import sys
-from typing import Text, Union, Any, Dict
+from typing import Union, Any, Dict
 import attr
 import pytz
-from typing import Text
+from typing import str
 import datetime
 from datetime import date
 import enum
@@ -45,8 +45,8 @@ class ISODayOfWeek(enum.Enum):
 
 @attr.s
 class GameSchedule(object):
-    country: Text = attr.ib()
-    country_code: Text = attr.ib()
+    country: str = attr.ib()
+    country_code: str = attr.ib()
     game_time_zone: pytz.timezone = attr.ib()
     game_start_day_of_week: ISODayOfWeek = attr.ib()
     game_start_time: datetime.time = attr.ib()
@@ -56,27 +56,27 @@ class GameSchedule(object):
     daily_tribal_council_end_time: datetime.time = attr.ib()
 
     @property
-    def tomorrow_localized_string(self) -> Text:
+    def tomorrow_localized_string(self) -> str:
         tomorrow_l = self.game_time_zone.localize(
             datetime.datetime.today() + datetime.timedelta(days=1)
         )
         return tomorrow_l.strftime("%B %d, %Y")
 
     @property
-    def nextweek_localized_string(self) -> Text:
+    def nextweek_localized_string(self) -> str:
         nextweek_l = self.game_time_zone.localize(
             datetime.datetime.today() + datetime.timedelta(days=7)
         )
         return nextweek_l.strftime("%B %d, %Y")
 
     @property
-    def today_localized_string(self) -> Text:
+    def today_localized_string(self) -> str:
         today_l = self.game_time_zone.localize(
             datetime.datetime.today()
         )
         return today_l.strftime("%B %d, %Y")
 
-    def localized_time_string(self, time: datetime.time) -> Text:
+    def localized_time_string(self, time: datetime.time) -> str:
         return "{} {}".format(time.strftime("%-I%p"), self.game_time_zone.localize(
             datetime.datetime.now()
         ).tzname())
@@ -176,7 +176,7 @@ class GameOptions(object):
     multi_tribe_min_tribe_size: int = attr.ib(default=5)
     multi_tribe_target_team_size: int = attr.ib(default=5)
     multi_tribe_team_immunity_likelihood: float = attr.ib(0.0)
-    merge_tribe_name: Text = attr.ib(default='MERGE')
+    merge_tribe_name: str = attr.ib(default='MERGE')
     single_tribe_top_k_threshold: float = attr.ib(default=0.5)
     game_schedule: GameSchedule = attr.ib(default=STV_I18N_TABLE['US'])
     game_clock_mode: GameClockMode = attr.ib(default=GameClockMode.ASYNC)
@@ -235,7 +235,7 @@ def init_sentry():
     sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
                     attach_stacktrace=True)
 
-def log_message(message: Text, game_id: Text = None, additional_tags: Dict = None, push_to_sentry = False):
+def log_message(message: str, game_id: str = None, additional_tags: Dict = None, push_to_sentry = False):
     if push_to_sentry:
         # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
         init_sentry()
