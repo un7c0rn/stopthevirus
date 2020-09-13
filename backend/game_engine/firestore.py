@@ -1,6 +1,6 @@
 from game_engine.database import Database, Data
 import attr
-from typing import Dict, Iterable, Text, Tuple, Optional
+from typing import Dict, Iterable, Tuple, Optional
 from game_engine.database import Player, Team, Tribe
 from game_engine.database import Challenge, Entry, Vote, Game, Ballot
 from multiprocessing import Pool
@@ -23,7 +23,6 @@ import time
 _THREAD_POOL_SIZE = 100
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
 
 
 class FirestoreData(Data):
@@ -68,8 +67,10 @@ class FirestoreChallenge(FirestoreData, Challenge):
 class FirestoreEntry(FirestoreData, Entry):
     pass
 
+
 class FirestoreBallot(FirestoreData, Ballot):
     pass
+
 
 class FirestoreDataStream(object):
     def __init__(self, stream: Iterable):
@@ -109,15 +110,15 @@ class FirestoreEntryStream(FirestoreDataStream):
 
 class FirestoreDB(Database):
 
-    def __init__(self, json_config_path: Text, game_id: Text = None):
+    def __init__(self, json_config_path: str, game_id: str = None):
         cred = credentials.Certificate(json_config_path)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(cred)
-        self._game_id = game_id if game_id else self._create_game_id
+        self._game_id = game_id if game_id else self._create_game_id()
         self._client = firestore.client()
         self._thread_pool_size = _THREAD_POOL_SIZE
 
-    def import_collections(self, collections_json: Text) -> None:
+    def import_collections(self, collections_json: str) -> None:
         """Function for restoring test DB data."""
 
         batch = self._client.batch()
@@ -149,11 +150,24 @@ class FirestoreDB(Database):
 
         return json.dumps(dict4json)
 
-    def _create_game_id(self) -> Text:
+    def delete_collection(self, path, batch_size: int = 10):
+        coll_ref = self._client.collection(path)
+        docs = coll_ref.limit(batch_size).stream()
+        deleted = 0
+
+        for doc in docs:
+            print(f'Deleting doc {doc.id} => {doc.to_dict()}')
+            doc.reference.delete()
+            deleted = deleted + 1
+
+        if deleted >= batch_size:
+            return self.delete_collection(path, batch_size)
+            
+    def _create_game_id(self) -> str:
         return ""
 
     @classmethod
-    def add_game(cls, json_config_path: Text, hashtag: Text) -> Text:
+    def add_game(cls, json_config_path: str, hashtag: str) -> str:
         cred = credentials.Certificate(json_config_path)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(cred)
@@ -184,7 +198,7 @@ class FirestoreDB(Database):
 
     def add_challenge(self, challenge: Challenge) -> None:
         challenge_ref = self._client.collection(
-            'games/{}/challenges').document()
+            f'games/{self._game_id}/challenges').document()
         challenge_ref.set({
             'name': challenge.name,
             'message': challenge.message,
@@ -229,12 +243,20 @@ class FirestoreDB(Database):
             'count_teams': Increment(team_count)
         })
 
+        batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
+            'size': Increment(player_count)
+        })
+
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
             'count_players': Increment(-1 * player_count)
         })
 
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
             'count_teams': Increment(-1 * team_count)
+        })
+
+        batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
+            'size': Increment(-1 * player_count)
         })
 
         batch.commit()
@@ -261,7 +283,7 @@ class FirestoreDB(Database):
         if team_size_predicate_value:
             query = query.where('count_players', '==',
                                 team_size_predicate_value)
-        if order_by_size:
+        elif order_by_size:
             query = query.order_by(
                 'count_players', direction=Query.DESCENDING if descending else Query.ASCENDING)
         return FirestoreTeamStream(stream=query.stream())
@@ -291,7 +313,7 @@ class FirestoreDB(Database):
             query = self._client.document('games/{}'.format(self._game_id))
         return query.get().get('count_teams')
 
-    def count_votes(self, from_team: Team = None, is_for_win: bool = False) -> Dict[Text, int]:
+    def count_votes(self, from_team: Team = None, is_for_win: bool = False) -> Dict[str, int]:
         player_counts = {}
 
         query = self._client.collection(
@@ -343,19 +365,19 @@ class FirestoreDB(Database):
                 'active', '==', active_team_predicate_value)
         return FirestoreTeamStream(query.stream())
 
-    def game_from_id(self, id: Text) -> Player:
+    def game_from_id(self, id: str) -> Player:
         return FirestoreGame(self._client.document("games/{}".format(self._game_id)).get())
 
-    def player_from_id(self, id: Text) -> Player:
+    def player_from_id(self, id: str) -> Player:
         return FirestorePlayer(self._client.document("games/{}/players/{}".format(self._game_id, id)).get())
 
-    def team_from_id(self, id: Text) -> Team:
+    def team_from_id(self, id: str) -> Team:
         return FirestoreTeam(self._client.document("games/{}/teams/{}".format(self._game_id, id)).get())
 
-    def tribe_from_id(self, id: Text) -> Tribe:
+    def tribe_from_id(self, id: str) -> Tribe:
         return FirestoreTribe(self._client.document("games/{}/tribes/{}".format(self._game_id, id)).get())
 
-    def challenge_from_id(self, id: Text) -> Challenge:
+    def challenge_from_id(self, id: str) -> Challenge:
         return FirestoreChallenge(self._client.document("games/{}/challenges/{}".format(self._game_id, id)).get())
 
     def deactivate_player(self, player: Player) -> None:
@@ -424,18 +446,25 @@ class FirestoreDB(Database):
             self._client.document("games/{}/tribes/{}".format(self._game_id, data.id)).set(
                 properties_dict
             )
-            
-    def tribe(self, name: Text) -> Tribe:
+        elif isinstance(data, Challenge):
+            self._client.document("games/{}/challenges/{}".format(self._game_id, data.id)).set(
+                properties_dict
+            )
+
+    def tribe(self, name: str) -> Tribe:
         tribe_ref = self._client.collection(
             "games/{}/tribes".format(self._game_id)).document()
         tribe_ref.set({
             'name': name,
             'count_players': 0,
-            'count_teams': 0
+            'count_teams': 0,
+            'size': 0,
+            'active': True,
+            'id': tribe_ref.id
         })
         return FirestoreData(tribe_ref.get())
 
-    def player(self, name: Text, tiktok: Text = None, phone_number: Text = None) -> Player:
+    def player(self, name: str, tiktok: str = None, phone_number: str = None) -> Player:
         batch = self._client.batch()
         player_ref = self._client.collection(
             "games/{}/players".format(self._game_id)).document()
@@ -466,14 +495,16 @@ class FirestoreDB(Database):
         batch.commit()
 
     def clear_votes(self) -> None:
-        votes = self._client.collection(f'games/{self._game_id}/votes').stream()
+        votes = self._client.collection(
+            f'games/{self._game_id}/votes').stream()
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._delete_vote_fn, votes)
 
     def find_matchmaker_games(self, region="US") -> list:
         games_list = []
         db = self._client
-        games = db.collection('games').where('country_code', '==', region).where('game_has_started', '==', False).stream()
+        games = db.collection('games').where('country_code', '==', region).where(
+            'game_has_started', '==', False).stream()
 
         for game in games:
             try:
@@ -484,15 +515,16 @@ class FirestoreDB(Database):
                 pass
         return games_list
 
-    def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str]) -> None:
+    def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str], is_for_win: bool = False) -> None:
         ballot_ref = self._client.collection(
             f'games/{self._game_id}/players/{player_id}/ballots'
         ).document()
         ballot_ref.set(
             {
-                'challenge_id' : challenge_id,
-                'options' : options,
-                'timestamp' : time.time()
+                'challenge_id': challenge_id if challenge_id else '',
+                'options': options,
+                'timestamp': time.time(),
+                'is_for_win': is_for_win
             }
         )
         return FirestoreData(ballot_ref.get())

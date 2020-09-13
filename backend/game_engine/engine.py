@@ -51,7 +51,7 @@ class Engine(object):
                 log_message(
                     message='Engine worker processing event {}'.format(event.to_json()),
                     game_id=self.game_id)
-                notifier.send(sms_event_messages=event.messages)
+                notifier.send(sms_event_messages=event.messages(gamedb=self._gamedb))
             except Exception as e:
                 log_message(
                     message='Engine worker failed with exception {}.'.format(e),

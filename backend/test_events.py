@@ -327,6 +327,8 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winning_tribe": {
                         "class": "Tribe",
+                        "count_players" : 0,
+                        "count_teams" : 0,
                         "id": "id/foo1",
                         "name": "SIDAMA",
                         "size": 1000000.0,
@@ -334,6 +336,8 @@ class AmazonSQSTest(unittest.TestCase):
                     },
                     "losing_tribe": {
                         "class": "Tribe",
+                        "count_players" : 0,
+                        "count_teams" : 0,
                         "id": "id/foo2",
                         "name": "TIGRAWAY",
                         "size": 500000.0,

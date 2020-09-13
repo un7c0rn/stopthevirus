@@ -7,6 +7,7 @@ import phonenumbers
 import re
 import uuid
 import json
+from game_engine.common import log_message
 
 # TODO(brandon) move this into this class and rename SMSNotification
 from game_engine.events import SMSEventMessage
@@ -36,11 +37,13 @@ class TwilioSMSNotifier(SMSNotifier):
     def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
         for m in sms_event_messages:
             if len(m.recipient_phone_numbers) > 1:
+                log_message(message='calling send_bulk_sms')
                 self.send_bulk_sms(
                     message=m.content,
                     recipient_addresses=m.recipient_phone_numbers
                 )
             elif len(m.recipient_phone_numbers) == 1:
+                log_message(message='calling send_sms')
                 self.send_sms(
                     message=m.content,
                     recipient_address=m.recipient_phone_numbers[0]

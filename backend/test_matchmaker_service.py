@@ -61,7 +61,7 @@ class MatchmakerServiceTest(unittest.TestCase):
         else:
             gamedb = FirestoreDB(json_config_path=json_config_path)
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb)
-        service.start_matchmaker_daemon(sleep_seconds=1)
+        service.start_matchmaker_daemon(sleep_seconds=1, is_test=True)
         time.sleep(2)
         service.set_stop()
         service.clear_stop()
@@ -73,7 +73,7 @@ class MatchmakerServiceTest(unittest.TestCase):
             gamedb = FirestoreDB(json_config_path=json_config_path)
             
         service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
-        service.start_matchmaker_daemon(sleep_seconds=1)
+        service.start_matchmaker_daemon(sleep_seconds=1, is_test=True)
         time.sleep(2)
         service.set_stop()
         service.clear_stop()

@@ -1,7 +1,8 @@
 import attr
 import pytz
-from typing import Text, Iterable
+from typing import Iterable, Dict
 import datetime
+from dataclasses import dataclass, field
 from game_engine.database import Database
 from game_engine.database import Player, Challenge, Entry, Team, Tribe
 from game_engine.common import GameError
@@ -19,19 +20,25 @@ _SMS_OPTION_LETTER_TABLE = [
 _SMS_MAX_OPTION_COUNT = 10
 
 
-def _normalize_tiktok_username(username: Text) -> Text:
+@dataclass
+class OptionsMap:
+    formatted_string: str = ''
+    options: Dict[str, str] = field(default_factory=dict)
+
+
+def _normalize_tiktok_username(username: str) -> str:
     return username.replace('@', '')
 
 
-def _short_link_from_tiktok_username(username: Text) -> Text:
+def _short_link_from_tiktok_username(username: str) -> str:
     return "www.tiktok.com/@{}".format(_normalize_tiktok_username(username))
 
 
-def format_tiktok_username(username: Text) -> Text:
+def format_tiktok_username(username: str) -> str:
     return "{} ({})".format(_normalize_tiktok_username(username), _short_link_from_tiktok_username(username))
 
 
-def players_as_formatted_list(players: Iterable[Player]) -> Text:
+def players_as_formatted_list(players: Iterable[Player]) -> str:
     fmt_string = ""
     for player in players:
         fmt_string += "{}\n\n".format(
@@ -39,9 +46,10 @@ def players_as_formatted_list(players: Iterable[Player]) -> Text:
     return fmt_string + "\n"
 
 
-def players_as_formatted_options_list(players: Iterable[Player], exclude_player: Player = None) -> Text:
+def players_as_formatted_options_map(players: Iterable[Player], exclude_player: Player = None) -> OptionsMap:
     fmt_string = ""
     option_index = 0
+    options = {}
 
     for n, player in enumerate(players):
         if exclude_player:
@@ -51,10 +59,12 @@ def players_as_formatted_options_list(players: Iterable[Player], exclude_player:
         if option_index >= (_SMS_MAX_OPTION_COUNT - 1):
             raise GameError('The maximum number of in-game options for SMS is {}.'.format(
                 _SMS_MAX_OPTION_COUNT))
-        fmt_string += "{}: {}\n\n".format(_SMS_OPTION_LETTER_TABLE[option_index],
+        option_letter = _SMS_OPTION_LETTER_TABLE[option_index]
+        fmt_string += "{}: {}\n\n".format(option_letter,
                                           _short_link_from_tiktok_username(player.tiktok))
+        options[option_letter] = player.id
         option_index += 1
-    return fmt_string + "\n"
+    return OptionsMap(formatted_string=f'{fmt_string}\n', options=options)
 
 
 NOTIFY_PLAYER_SCORE_EVENT_MSG_FMT = """

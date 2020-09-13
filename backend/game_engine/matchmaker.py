@@ -186,7 +186,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         if count_players < game_options.target_team_size:
             raise MatchMakerError("Insufficient players for given team size")
         if count_players < game_options.multi_tribe_min_tribe_size * 2:
-            raise MatchMakerError("Insufficient players to make 2 tribes")
+            raise MatchMakerError("Insufficient players to make two tribes")
         # generate tribes
         for tribe_name in [_DEFAULT_TRIBE_NAMES[int(n)] for n in random.sample(range(0, len(_DEFAULT_TRIBE_NAMES)), 2)]:
             tribe = database.Tribe(
