@@ -6,9 +6,9 @@ from game import GameOptions
 from game_engine.engine import Engine
 from game_engine.database import Database, Data
 from game_engine.database import Player, Team, Tribe
-from game_engine.database import Challenge, Entry, Vote
+from game_engine.database import Challenge, Entry, Vote, Ballot
 import attr
-from typing import Any, Iterable, Dict, Text, Tuple, List
+from typing import Any, Iterable, Dict, Text, Tuple, List, Optional
 import uuid
 from mock import Mock
 import time
@@ -585,8 +585,15 @@ class MockDatabase(Database):
             game = TestGame(g_tuple[1])
             games_list.append(game)
         return games_list
-        
 
+    def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str]) -> None:
+        pass
+
+    def find_ballot(self, player: Player) -> Iterable[Ballot]:
+        pass
+
+    def find_player(self, phone_number: str) -> Optional[Player]:
+        pass
 
 
 

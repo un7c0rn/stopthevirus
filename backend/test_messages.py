@@ -362,7 +362,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: You've surved elimination, but your team did not. "
+                        "content": ("\nVIR-US: You've survived elimination, but your team did not. "
                                     "Here's your new team:\n\nwww.tiktok.com/@charles\n\nwww.tiktok.com/@juanita\n\n"
                                     "www.tiktok.com/@donna\n\nwww.tiktok.com/@henry\n\nwww.tiktok.com/@corina\n\n\n\n\n"
                                     "Next challenge begins tomorrow {tomorrow} at 12PM EDT!\n").format(

@@ -1,8 +1,8 @@
 from game_engine.database import Database, Data
 import attr
-from typing import Dict, Iterable, Text, Tuple
+from typing import Dict, Iterable, Text, Tuple, Optional
 from game_engine.database import Player, Team, Tribe
-from game_engine.database import Challenge, Entry, Vote, Game
+from game_engine.database import Challenge, Entry, Vote, Game, Ballot
 from multiprocessing import Pool
 from itertools import product
 import firebase_admin
@@ -16,6 +16,7 @@ import copy
 import json
 import uuid
 import datetime
+import time
 
 # TODO(brandon): change Data interface to use counters instead of size
 # by convention.
@@ -67,6 +68,8 @@ class FirestoreChallenge(FirestoreData, Challenge):
 class FirestoreEntry(FirestoreData, Entry):
     pass
 
+class FirestoreBallot(FirestoreData, Ballot):
+    pass
 
 class FirestoreDataStream(object):
     def __init__(self, stream: Iterable):
@@ -481,7 +484,31 @@ class FirestoreDB(Database):
                 pass
         return games_list
 
+    def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str]) -> None:
+        ballot_ref = self._client.collection(
+            f'games/{self._game_id}/players/{player_id}/ballots'
+        ).document()
+        ballot_ref.set(
+            {
+                'challenge_id' : challenge_id,
+                'options' : options,
+                'timestamp' : time.time()
+            }
+        )
+        return FirestoreData(ballot_ref.get())
 
+    def find_ballot(self, player: Player) -> Iterable[Ballot]:
+        query = self._client.collection(
+            f'games/{self._game_id}/players/{player.id}/ballots').order_by(
+                'timestamp', direction=Query.DESCENDING)
+        return FirestoreBallot(query.get()[0])
 
-
-
+    def find_player(self, phone_number: str) -> Optional[Player]:
+        query = self._client.collection(
+            f'games/{self._game_id}/players'
+        ).where('phone_number', '==', phone_number)
+        players = query.get()
+        if len(players) > 0:
+            return FirestorePlayer(players[0])
+        else:
+            return None
