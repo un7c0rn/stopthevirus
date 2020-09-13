@@ -34,13 +34,16 @@ class TwilioSMSNotifier(SMSNotifier):
             self._game_id = game_id
 
     def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
+        pass
         for m in sms_event_messages:
             if len(m.recipient_phone_numbers) > 1:
+                print('invoking send_bulk_sms')
                 self.send_bulk_sms(
                     message=m.content,
                     recipient_addresses=m.recipient_phone_numbers
                 )
             elif len(m.recipient_phone_numbers) == 1:
+                print('invoking send_sms')
                 self.send_sms(
                     message=m.content,
                     recipient_address=m.recipient_phone_numbers[0]
