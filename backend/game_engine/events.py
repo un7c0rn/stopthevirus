@@ -13,7 +13,6 @@ from concurrent.futures import ThreadPoolExecutor
 import copy
 from typing import Text, Union, Any, Dict
 import uuid
-import pprint
 
 _NOP_SMS_ADDRESS = "555-123-4567"
 
@@ -125,7 +124,6 @@ class AmazonSQS(EventQueue):
             raise EventQueueError('Queue empty.')
 
     def put_fn(self, event: SMSEvent) -> None:
-        print('called put_fn!')
         try:
             # TODO(brandon) add retry logic and error handling.
             log_message(message="Putting {} on queue {}.".format(

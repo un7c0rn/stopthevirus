@@ -31,7 +31,7 @@ class Engine(object):
             self._executor.submit(self._do_work_fn)
 
     def add_event(self, event: SMSEvent) -> None:
-        self._output_events.put(event, blocking=False)
+        self._output_events.put(event, blocking=True)
 
     def stop(self):
         log_message(message='Shutting down all engine workers.', game_id=self.game_id)
@@ -51,7 +51,7 @@ class Engine(object):
                 log_message(
                     message='Engine worker processing event {}'.format(event.to_json()),
                     game_id=self.game_id)
-                notifier.send(sms_event_messages=event.messages)
+                notifier.send(sms_event_messages=event.messages(gamedb=self._gamedb))
             except Exception as e:
                 log_message(
                     message='Engine worker failed with exception {}.'.format(e),

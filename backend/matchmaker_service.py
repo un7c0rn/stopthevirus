@@ -55,12 +55,12 @@ class MatchmakerService:
         recipient_phone_numbers = list(
             map(lambda player: player.to_dict().get("phone_number"), players))
         # filter out players with no phone number
-        # filtered_phone_numbers = list(
-        #     filter(lambda number: not not number, recipient_phone_numbers))
+        filtered_phone_numbers = list(
+            filter(lambda number: not not number, recipient_phone_numbers))
 
         twilio.send_bulk_sms(
             message=message,
-            recipient_addresses=recipient_phone_numbers
+            recipient_addresses=filtered_phone_numbers
         )
         log_message(message="Notified players with message:{}".format(
             message), game_id=game_id)
@@ -107,7 +107,6 @@ class MatchmakerService:
                         game_id=game._game_id)
             self._set_game_has_started(
                 game_snap=game_snap, game=game, value=False)
-            print('notifying')
             self._notify_players(game_id=game._game_id,
                                  players=players, message=message)
 
@@ -160,7 +159,6 @@ class MatchmakerService:
                         schedule.daily_challenge_start_time
                     )
                 )
-                print('notifying')
                 self._notify_players(game_id=game_dict.get(
                     "id"), players=players, message=notif_message)
             except Exception as e:
@@ -206,11 +204,8 @@ class MatchmakerService:
     def _matchmaker_function(self, sleep_seconds: int = 60, is_test: bool = False):
         log_message("Starting matchmaker for region={}".format(self._region))
         while not self._stop.is_set():
-            print('searching')
             games = self._gamedb.find_matchmaker_games(region=self._region)
-            print('done')
             if len(games) >= 1:
-                print('found games')
                 for game_snap in games:
                     game_dict = game_snap.to_dict()
                     players_stream = game_snap.reference.collection(
@@ -218,15 +213,12 @@ class MatchmakerService:
                     players_list = []
                     for player in players_stream:
                         players_list.append(player)
-                        print('player: {}'.format(player))
                     schedule = STV_I18N_TABLE[self._region]
 
                     now_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
-                    if self._check_start_time():
-                        # if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(),
-                        #                           is_test=is_test) and now_utc != game_dict.get("last_checked_date"):  # TODO: Do these checks in query
-                        print('_check_start_time looks good')
+                    if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(),
+                                              is_test=is_test) and now_utc != game_dict.get("last_checked_date"):  # TODO: Do these checks in query
                         if game_dict["count_players"] >= self._min_players:
                             if self._game_options is None:
                                 self._game_options = GameOptions(

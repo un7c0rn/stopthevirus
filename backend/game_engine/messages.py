@@ -194,10 +194,10 @@ that you're invited to or start a new game of your own using this link {link}
 
 VERIFY_START_GAME_MSG_FMT = """
 {header} Verify your phone number by clicking this link {link}. Your game information and invitation link will
-be stred back once your phone number is confirmed.
+be texted back once your phone number is confirmed.
 """
 
 VERIFY_JOIN_GAME_MSG_FMT = """
 {header} Verify your phone number by clicking this link {link}. You will be joined into the {game} game and receive
-a str with instructions after confirmation.
+a text with instructions after confirmation.
 """
