@@ -6,9 +6,9 @@ from game import GameOptions
 from game_engine.engine import Engine
 from game_engine.database import Database, Data
 from game_engine.database import Player, Team, Tribe
-from game_engine.database import Challenge, Entry, Vote
+from game_engine.database import Challenge, Entry, Vote, Ballot
 import attr
-from typing import Any, Iterable, Dict, Text, Tuple, List
+from typing import Any, Iterable, Dict, Text, Tuple, List, Optional
 import uuid
 from mock import Mock
 import time
