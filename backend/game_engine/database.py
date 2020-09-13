@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod, abstractclassmethod
 import attr
-from typing import Any, Iterable, Dict, Tuple
+from typing import Any, Iterable, Dict, Tuple, Optional
 from game_engine.common import Serializable
 
 
@@ -165,4 +165,12 @@ class Database(ABC):
 
     @abstractmethod
     def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str]) -> None:
+        pass
+
+    @abstractmethod
+    def find_ballot(self, player: Player) -> Iterable[Ballot]:
+        pass
+
+    @abstractmethod
+    def find_player(self, phone_number: str) -> Optional[Player]:
         pass
