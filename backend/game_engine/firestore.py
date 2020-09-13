@@ -466,7 +466,7 @@ class FirestoreDB(Database):
         batch.commit()
 
     def clear_votes(self) -> None:
-        votes = self._client.collection('votes').stream()
+        votes = self._client.collection(f'games/{self._game_id}/votes').stream()
         with ThreadPoolExecutor(max_workers=self._thread_pool_size) as executor:
             executor.submit(self._delete_vote_fn, votes)
 
