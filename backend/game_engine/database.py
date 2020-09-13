@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod, abstractclassmethod
 import attr
-from typing import Any, Iterable, Dict, Text, Tuple
+from typing import Any, Iterable, Dict, Tuple
 from game_engine.common import Serializable
 
 
@@ -9,53 +9,58 @@ class Data(ABC, Serializable):
 
 @attr.s
 class Game(Data):
-    id: Text = attr.ib('')
-    name: Text = attr.ib('')
-    hashtag: Text = attr.ib('')
+    id: str = attr.ib('')
+    name: str = attr.ib('')
+    hashtag: str = attr.ib('')
     size: int = attr.ib(default=0)
 
 
 @attr.s
 class Player(Data):
-    id: Text = attr.ib('')
-    tiktok: Text = attr.ib(default='')
-    email: Text = attr.ib(default='')
-    phone_number: Text = attr.ib(default='')
-    tribe_id: Text = attr.ib(default='')
-    team_id: Text = attr.ib(default='')
+    id: str = attr.ib('')
+    tiktok: str = attr.ib(default='')
+    email: str = attr.ib(default='')
+    phone_number: str = attr.ib(default='')
+    tribe_id: str = attr.ib(default='')
+    team_id: str = attr.ib(default='')
     active: bool = attr.ib(default=True)
 
 
 @attr.s
 class Vote(Data):
-    id: Text = attr.ib('')
-    from_id: Text = attr.ib('')
-    to_id: Text = attr.ib('')
+    id: str = attr.ib('')
+    from_id: str = attr.ib('')
+    to_id: str = attr.ib('')
     is_for_win: bool = attr.ib(default=False)
 
+@attr.s
+class Ballot(Data):
+    id: str = attr.ib('')
+    challenge_id: str = attr.ib('')
+    options: Dict = attr.ib(factory=Dict)
 
 @attr.s
 class Team(Data):
-    id: Text = attr.ib('')
-    name: Text = attr.ib('')
+    id: str = attr.ib('')
+    name: str = attr.ib('')
     size: int = attr.ib(default=0)
-    tribe_id: Text = attr.ib('')
+    tribe_id: str = attr.ib('')
     active: bool = attr.ib(default=True)
 
 
 @attr.s
 class Tribe(Data):
-    id: Text = attr.ib('')
-    name: Text = attr.ib('')
+    id: str = attr.ib('')
+    name: str = attr.ib('')
     size: int = attr.ib(default=0)
     active: bool = attr.ib(default=True)
 
 
 @attr.s
 class Challenge(Data):
-    id: Text = attr.ib('')
-    name: Text = attr.ib('')
-    message: Text = attr.ib('')
+    id: str = attr.ib('')
+    name: str = attr.ib('')
+    message: str = attr.ib('')
     # TODO(brandon): game schedules make these timestamps
     # obsolete.
     start_timestamp: int = attr.ib(default=0)
@@ -66,14 +71,14 @@ class Challenge(Data):
 @attr.s
 class Entry(Data):
     # An entry into a game challenge.
-    id: Text = attr.ib('')
+    id: str = attr.ib('')
     likes: int = attr.ib('')
     views: int = attr.ib('')
-    player_id: Text = attr.ib('')
-    tribe_id: Text = attr.ib('')
-    challenge_id: Text = attr.ib('')
-    team_id: Text = attr.ib('')
-    url: Text = attr.ib('')
+    player_id: str = attr.ib('')
+    tribe_id: str = attr.ib('')
+    challenge_id: str = attr.ib('')
+    team_id: str = attr.ib('')
+    url: str = attr.ib('')
 
 
 class Database(ABC):
@@ -131,29 +136,33 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def player(self, name: Text) -> Player:
+    def player(self, name: str) -> Player:
         pass
 
     @abstractmethod
-    def player_from_id(self, id: Text) -> Player:
+    def player_from_id(self, id: str) -> Player:
         pass
 
     @abstractmethod
-    def game_from_id(self, id: Text) -> Game:
+    def game_from_id(self, id: str) -> Game:
         pass
 
     @abstractmethod
-    def tribe(self, name: Text) -> Tribe:
+    def tribe(self, name: str) -> Tribe:
         pass
 
     @abstractmethod
-    def tribe_from_id(self, id: Text) -> Tribe:
+    def tribe_from_id(self, id: str) -> Tribe:
         pass
 
     @abstractmethod
-    def team_from_id(self, id: Text) -> Team:
+    def team_from_id(self, id: str) -> Team:
         pass
 
     @abstractmethod
     def save(self, data: Data) -> None:
+        pass
+
+    @abstractmethod
+    def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str]) -> None:
         pass

@@ -36,7 +36,8 @@ _TEST_DATA_JSON = """
          "team_id":"Q09FeEtoIgjNI57Bnl1E",
          "active":true,
          "name":"Boston Rob",
-         "tribe_id":"cbTgYdPh97K6rRTDdEPL"
+         "tribe_id":"cbTgYdPh97K6rRTDdEPL",
+         "phone_number":"+15551234567"
       },
       "LXHpnrUA65FS25wGfJ00":{
          "active":true,
@@ -380,7 +381,17 @@ class FirestoreDBTest(unittest.TestCase):
         # Should not return games with to_be_deleted flag set
         games = _gamedb.find_matchmaker_games(region="JP")
         self.assertEqual(len(games), 1)
-        
+
+    def test_ballot(self):
+        ballot = _gamedb.ballot(player_id='foo', challenge_id='bar', options={'A' : 1, 'B' : 2, 'C': 3})
+        self.assertEqual(
+            ballot.options,
+            _gamedb.find_ballot(player=_gamedb.player_from_id(id='foo')).options
+        )
+
+    def test_find_player(self):
+        self.assertEqual(_gamedb.find_player(phone_number='+15551234567').name, "Boston Rob")
+
         
 if __name__ == '__main__':
     unittest.main()

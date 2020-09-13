@@ -62,7 +62,7 @@ NOTIFY_PLAYER_SCORE_EVENT_MSG_FMT = """
 """
 
 NOTIFY_TEAM_REASSIGNMENT_EVENT_MSG_FMT = """
-{header} You've surved elimination, but your team did not. Here's your new team:
+{header} You've survived elimination, but your team did not. Here's your new team:
 
 {team}
 
