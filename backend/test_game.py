@@ -562,6 +562,9 @@ class MockDatabase(Database):
         if isinstance(data, Team):
             self._teams[data.id] = data
 
+        if isinstance(data, Challenge):
+            self._challenges[data.id] = data
+
     def find_matchmaker_games(self, region="US") -> list:
         class TestGame(dict):
             class Reference():

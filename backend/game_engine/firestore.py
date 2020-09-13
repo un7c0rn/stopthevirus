@@ -446,6 +446,10 @@ class FirestoreDB(Database):
             self._client.document("games/{}/tribes/{}".format(self._game_id, data.id)).set(
                 properties_dict
             )
+        elif isinstance(data, Challenge):
+            self._client.document("games/{}/challenges/{}".format(self._game_id, data.id)).set(
+                properties_dict
+            )
 
     def tribe(self, name: str) -> Tribe:
         tribe_ref = self._client.collection(

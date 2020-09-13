@@ -45,7 +45,8 @@ _TEST_DATA_JSON = """
                 "B":2,
                 "C":3
             },
-            "timestamp":0
+            "is_for_win": false,
+            "timestamp":1e12
        }
    }
 }
