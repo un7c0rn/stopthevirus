@@ -24,7 +24,7 @@ _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
 _AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
 _TEST_AMAZON_SQS_CONFIG_PATH = '../amazon/stopthevirus.fifo.json'
-#_TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
+# _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 
 
@@ -73,7 +73,8 @@ class MatchmakerService:
             database = MockDatabase()
             engine = MockPlayEngine().CreateEngine(database)
         else:
-            # db needs to have correct game_id
+            # NOTE(brandon): the game DB instance used by the matchmaker is for searching over all games. when we create
+            # a game instance, we also supply new game DB and engine objects that have the specific game ID.
             database = FirestoreDB(
                 json_config_path=json_config_path, game_id=game._game_id)
             engine = Engine(options=game._options,
@@ -109,6 +110,8 @@ class MatchmakerService:
                 game_snap=game_snap, game=game, value=False)
             self._notify_players(game_id=game._game_id,
                                  players=players, message=message)
+            self._reschedule_or_cancel_game(
+                game_snap=game_snap, game_dict=game_dict, players=players)
 
     def _start_game(self, game: Game, game_snap: DocumentSnapshot, players: list, game_dict: dict, is_test: bool = False):
         self._set_game_has_started(game_snap=game_snap, game=game)
@@ -133,6 +136,10 @@ class MatchmakerService:
                     game_id=game_dict.get("id"))
 
         now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        if 'times_rescheduled' not in game_dict:
+            game_dict['times_rescheduled'] = 0
+        if 'max_reschedules' not in game_dict:
+            game_dict['max_reschedules'] = 1
 
         if (game_dict.get("times_rescheduled") if game_dict.get("times_rescheduled") else 0) < game_dict.get("max_reschedules"):
             # Reschedule the game by setting current UTC date to last_checked_date.
@@ -165,25 +172,24 @@ class MatchmakerService:
                 log_message(message="Error rescheduling game: {}".format(
                     e), game_id=game_dict.get("id"))
         else:
-            # Cancel the game
-            field_updates = {
-                'to_be_deleted': True,
-            }
-            try:
-                game_snap.reference.update(field_updates)
-                log_message(
-                    message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
-                notif_message = messages.NOTIFY_GAME_CANCELLED_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
-                    game=game_dict.get("hashtag"),
-                    reason="insufficient players"
-                )
-                self._notify_players(game_id=game_dict.get(
-                    "id"), players=players, message=notif_message)
-            except Exception as e:
-                log_message(message="Error cancelling game: {}".format(
-                    e), game_id=game_dict.get("id"))
-            pass
+            self._cancel_game(game_snap=game_snap, players=players)
+
+    def _cancel_game(self, game_snap: DocumentSnapshot, players: list, reason: str = "insufficient players") -> None:
+        # Cancel the game
+        game_dict = game_snap.to_dict()
+        field_updates = {
+            'to_be_deleted': True,
+        }
+        game_snap.reference.update(field_updates)
+        log_message(
+            message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
+        notif_message = messages.NOTIFY_GAME_CANCELLED_EVENT_MSG_FMT.format(
+            header=messages.VIR_US_SMS_HEADER,
+            game=game_dict.get("hashtag"),
+            reason=reason
+        )
+        self._notify_players(game_id=game_dict.get(
+            "id"), players=players, message=notif_message)
 
     def _check_start_time(self, schedule: GameSchedule,
                           now_dt_with_tz: datetime.datetime,
@@ -213,23 +219,33 @@ class MatchmakerService:
                     players_list = []
                     for player in players_stream:
                         players_list.append(player)
-                    schedule = STV_I18N_TABLE[self._region]
 
-                    now_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+                    if self._region in STV_I18N_TABLE:
+                        schedule = STV_I18N_TABLE[self._region]
+                    else:
+                        schedule = STV_I18N_TABLE['US']
 
-                    if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(),
-                                              is_test=is_test) and now_utc != game_dict.get("last_checked_date"):  # TODO: Do these checks in query
-                        if game_dict["count_players"] >= self._min_players:
-                            if self._game_options is None:
-                                self._game_options = GameOptions(
-                                    game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
-                            g = Game(
-                                game_id=game_dict["id"], options=self._game_options)
-                            self._start_game(
-                                game=g, game_snap=game_snap, players=players_list, game_dict=game_dict, is_test=is_test)
-                        else:
-                            self._reschedule_or_cancel_game(
-                                game_snap=game_snap, game_dict=game_dict, players=players_list)
+                    try:
+                        now_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+                        if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(),
+                                                  is_test=is_test) and now_utc != game_dict.get("last_checked_date"):  # TODO: Do these checks in query
+
+                            if game_dict["count_players"] >= self._min_players:
+                                if self._game_options is None:
+                                    self._game_options = GameOptions(
+                                        game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
+                                g = Game(
+                                    game_id=game_dict["id"], options=self._game_options)
+                                self._start_game(
+                                    game=g, game_snap=game_snap, players=players_list, game_dict=game_dict, is_test=is_test)
+                            else:
+                                self._reschedule_or_cancel_game(
+                                    game_snap=game_snap, game_dict=game_dict, players=players_list)
+                    except Exception as e:
+                        log_message(
+                            f"Game {str(game_dict)} is corrupt. Cancelling.")
+                        self._cancel_game(game_snap=game_snap, players=players_list,
+                                          reason="an internal data corruption error")
 
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))

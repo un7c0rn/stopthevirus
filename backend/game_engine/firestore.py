@@ -162,24 +162,26 @@ class FirestoreDB(Database):
 
         if deleted >= batch_size:
             return self.delete_collection(path, batch_size)
-            
-    def _create_game_id(self) -> str:
-        return ""
 
     @classmethod
-    def add_game(cls, json_config_path: str, hashtag: str) -> str:
+    def add_game(cls, json_config_path: str, hashtag: str, country_code: str = 'US', max_reschedules: int = 5) -> str:
         cred = credentials.Certificate(json_config_path)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(cred)
         client = firestore.client()
-
         game_ref = client.collection('games').document()
         game_ref.set({
             'count_players': 0,
             'count_teams': 0,
             'count_tribes': 0,
+            'country_code': country_code,
+            'game_has_started': False,
+            'max_reschedules': max_reschedules,
+            'times_rescheduled': 0,
+            'last_checked_date': '2020-01-01',
             'game':  hashtag,
-            'hashtag': hashtag
+            'hashtag': hashtag,
+            'id': game_ref.id
         })
         return str(game_ref.id)
 
