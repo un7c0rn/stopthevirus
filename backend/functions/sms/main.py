@@ -14,8 +14,11 @@ class _FirestoreDB():
         cred = credentials.Certificate(json_config_path)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(cred)
-        self._game_id = game_id if game_id else self._create_game_id
+        self._game_id = game_id if game_id else ''
         self._client = firestore.client()
+
+    def set_game_id(self, game_id: str):
+        self._game_id = game_id
 
     def import_collections(self, collections_json: str) -> None:
         """Function for restoring test DB data."""
@@ -93,6 +96,14 @@ class _FirestoreDB():
             }
         )
 
+    def game_id_from_phone_number(self, phone_number: str) -> Optional[str]:
+        query = self._client.collection('users').where(
+            'phone_number', '==', phone_number)
+        users = query.get()
+        if len(users) > 0:
+            return str(users[0].get('game_id'))
+        else:
+            return None
 
 def _normalize_vote_option(message: str) -> str:
     return message.upper().replace(' ', '')
@@ -106,18 +117,15 @@ def _is_quit_message(message: str) -> bool:
     return re.match('^(quit|stop|QUIT|STOP)$', message) is not None
 
 
-def _game_id_for_player(phone_number: str) -> str:
-    # TODO(brandon): fix this.
-    return '7rPwCJaiSkxYgDocGDw1'
-
-
 def sms_http(request):
     # 1. get the message and user phone number
     resp = MessagingResponse()
     number = request.form.get('From')
     message_body = request.form.get('Body')
-    firestore = _FirestoreDB(json_config_path=os.path.join(os.path.dirname(__file__), 'stv-game-db-test-4c0ec2310b2e.json'),
-                             game_id=_game_id_for_player(phone_number=number))
+    firestore = _FirestoreDB(json_config_path=os.path.join(
+        os.path.dirname(__file__), 'stv-game-db-test-4c0ec2310b2e.json'))
+    firestore.set_game_id(
+        firestore.game_id_from_phone_number(phone_number=number))
 
     # 2. lookup the user in firestore by number
     player = firestore.find_player(phone_number=number)
@@ -130,7 +138,8 @@ def sms_http(request):
             # 4. if the message is a valid voting option, lookup the ballot for the vote caster.
             ballot = firestore.find_ballot(player_id=player.get('id'))
             if not ballot:
-                resp.message("""An internal game error has occured, no ballot available.""")
+                resp.message(
+                    """An internal game error has occured, no ballot available.""")
                 return str(resp)
             selection = _normalize_vote_option(message_body)
             options = ballot.get('options')

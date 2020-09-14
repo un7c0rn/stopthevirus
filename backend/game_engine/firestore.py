@@ -120,7 +120,7 @@ class FirestoreDB(Database):
 
     def _create_game_id(self):
         return ""
-        
+
     def import_collections(self, collections_json: str) -> None:
         """Function for restoring test DB data."""
 
@@ -471,11 +471,18 @@ class FirestoreDB(Database):
 
     def player(self, name: str, tiktok: str = None, phone_number: str = None) -> Player:
         batch = self._client.batch()
+        user_ref = self._client.collection("users").document()
         player_ref = self._client.collection(
             "games/{}/players".format(self._game_id)).document()
         batch.set(player_ref, {
             'name': name,
             'active': True,
+            'tiktok': tiktok,
+            'phone_number': phone_number
+        })
+        batch.set(user_ref, {
+            'name': name,
+            'game_id': self._game_id,
             'tiktok': tiktok,
             'phone_number': phone_number
         })

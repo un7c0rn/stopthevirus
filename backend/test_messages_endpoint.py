@@ -21,6 +21,12 @@ _verify_gamedb = FirestoreDB(
 
 _TEST_DATA_JSON = """
 {
+   "users":{
+       "2ZPmDfX9q82KY5PVf1LH":{
+           "game_id":"7rPwCJaiSkxYgDocGDw1",
+           "phone_number":"+15551234567"
+       }
+   },
    "games":{
       "7rPwCJaiSkxYgDocGDw1":{
          "count_teams":6,
@@ -141,12 +147,6 @@ class SMSEndpointTest(unittest.TestCase):
             sms_function._is_quit_message(message), is_quit_message
         )
 
-    def test_game_id_for_player(self):
-        self.assertEqual(
-            sms_function._game_id_for_player(phone_number='+15551234567'),
-            _TEST_GAME_ID
-        )
-
     @parameterized.expand([
         ('+15551234567', 'A', '.+Your vote has been cast. Thanks!.+'),
         ('+1XXXX', 'A', '.+You\'re not in this game.+'),
@@ -164,6 +164,16 @@ class SMSEndpointTest(unittest.TestCase):
         self.assertRegex(
             sms_function.sms_http(request),
             response_pattern
+        )
+
+    def test_game_id_from_phone_number(self):
+        phone_number = '+15555555555'
+        _verify_gamedb.player(name='foo', tiktok='bar',
+                              phone_number=phone_number)
+        self.assertEqual(
+            _functions_gamedb.game_id_from_phone_number(
+                phone_number=phone_number),
+            _TEST_GAME_ID
         )
 
 
