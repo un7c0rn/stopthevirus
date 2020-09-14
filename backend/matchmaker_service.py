@@ -24,7 +24,6 @@ _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
 _AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
 _TEST_AMAZON_SQS_CONFIG_PATH = '../amazon/stopthevirus.fifo.json'
-# _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 
 
