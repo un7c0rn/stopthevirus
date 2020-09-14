@@ -111,7 +111,6 @@ class AmazonSQS(EventQueue):
             ],
             MaxNumberOfMessages=1,
             WaitTimeSeconds=20)
-        log_message(message=str(response), game_id=self.game_id)
 
         if 'Messages' in response:
             message = response['Messages'][0]
@@ -134,7 +133,6 @@ class AmazonSQS(EventQueue):
                 MessageGroupId=event.game_id,
                 MessageDeduplicationId=str(uuid.uuid4())
             )
-            log_message(message=response, game_id=self.game_id)
         except Exception as e:
             log_message(
                 messages=f'put_fn failed for event {event} with exception {str(e)}.')

@@ -350,6 +350,7 @@ class Game(object):
         if len(winning_players) > 0:
             winning_player = winning_players[0]
         else:
+            engine.stop()
             raise GameError(
                 "Unable to determine a winning player for the challenge. Have any entries been submitted?")
 
