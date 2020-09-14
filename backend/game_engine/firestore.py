@@ -118,6 +118,9 @@ class FirestoreDB(Database):
         self._client = firestore.client()
         self._thread_pool_size = _THREAD_POOL_SIZE
 
+    def _create_game_id(self):
+        return ""
+        
     def import_collections(self, collections_json: str) -> None:
         """Function for restoring test DB data."""
 
