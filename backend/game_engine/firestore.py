@@ -209,7 +209,8 @@ class FirestoreDB(Database):
             'message': challenge.message,
             'start_timestamp': challenge.start_timestamp,
             'end_timestamp': challenge.end_timestamp,
-            'complete': challenge.complete
+            'complete': challenge.complete,
+            'id': str(challenge_ref.id)
         })
         return str(challenge_ref.id)
 

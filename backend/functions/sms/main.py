@@ -136,7 +136,7 @@ def sms_http(request):
         # 3. determine whether the message is a valid voting option.
         if _is_valid_vote_option(message_body):
             # 4. if the message is a valid voting option, lookup the ballot for the vote caster.
-            ballot = firestore.find_ballot(player_id=player.get('id'))
+            ballot = firestore.find_ballot(player_id=player.id)
             if not ballot:
                 resp.message(
                     """An internal game error has occured, no ballot available.""")
@@ -146,14 +146,14 @@ def sms_http(request):
             if selection in options:
                 vote_recipient_id = options[selection]
                 firestore.vote(
-                    from_player_id=player.get('id'), to_player_id=options[selection])
+                    from_player_id=player.id, to_player_id=options[selection])
                 resp.message(f'Your vote has been cast. Thanks!')
             else:
                 resp.message(
                     f'\'{message_body}\' not a valid option. Please try again.')
         elif _is_quit_message(message_body):
             firestore.deactivate_player(
-                firestore.player_from_id(id=player.get('id')))
+                firestore.player_from_id(id=player.id))
             resp.message('You have left the game. Thanks for playing!')
         else:
             resp.message(
