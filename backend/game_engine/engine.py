@@ -4,6 +4,7 @@ import time
 from game_engine.events import SMSEvent, EventQueue, AmazonSQS
 from game_engine.database import Database
 from typing import Text
+from game_engine.twilio import SMSNotifier
 from game_engine.twilio import TwilioSMSNotifier
 from multiprocessing import Pool, TimeoutError
 from game_engine.common import GameError
@@ -34,28 +35,37 @@ class Engine(object):
         self._output_events.put(event, blocking=False)
 
     def stop(self):
-        log_message(message='Shutting down all engine workers.', game_id=self.game_id)
+        log_message(message='Shutting down all engine workers.',
+                    game_id=self.game_id)
         self._stop.set()
+
+    def _get_sms_notifier(self) -> SMSNotifier:
+        return TwilioSMSNotifier(json_config_path=self._twilio_config_path, game_id=self.game_id)
 
     def _do_work_fn(self) -> None:
         event = None
-        queue = AmazonSQS(json_config_path=self._sqs_config_path, game_id=self.game_id)
-        notifier = TwilioSMSNotifier(json_config_path=self._twilio_config_path, game_id=self.game_id)
+        notifier = self._get_sms_notifier()
+        queue = AmazonSQS(
+            json_config_path=self._sqs_config_path, game_id=self.game_id)
         while not self._stop.is_set():
             try:
-                log_message(message='Getting event from queue...', game_id=self.game_id)
+                log_message(message='Getting event from queue...',
+                            game_id=self.game_id)
                 event = queue.get()
                 game_id = ""
                 if hasattr(event, "game_id"):
                     game_id = event.game_id
                 log_message(
-                    message='Engine worker processing event {}'.format(event.to_json()),
+                    message='Engine worker processing event {}'.format(
+                        event.to_json()),
                     game_id=self.game_id)
-                notifier.send(sms_event_messages=event.messages(gamedb=self._gamedb))
+                notifier.send(sms_event_messages=event.messages(
+                    gamedb=self._gamedb))
             except Exception as e:
                 log_message(
-                    message='Engine worker failed with exception {}.'.format(e),
+                    message='Engine worker failed with exception {}.'.format(
+                        e),
                     game_id=self.game_id)
         log_message(message='Shutting down workder thread {}.'.format(
             threading.current_thread().ident),
-                    game_id=self.game_id)
+            game_id=self.game_id)
