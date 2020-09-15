@@ -1,7 +1,7 @@
 from twilio.rest import Client
 from abc import ABC, abstractmethod
 from game_engine.common import log_message
-from typing import Union, Any, Dict, Iterable
+from typing import Union, Any, Dict, Iterable, List
 import json
 import phonenumbers
 import re
