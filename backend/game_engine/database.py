@@ -8,7 +8,7 @@ class Data(ABC, Serializable):
     pass
 
 
-@attr.s
+@attr.s(eq=False)
 class Game(Data):
     id: str = attr.ib('')
     name: str = attr.ib('')
@@ -16,7 +16,7 @@ class Game(Data):
     size: int = attr.ib(default=0)
 
 
-@attr.s
+@attr.s(eq=False)
 class Player(Data):
     id: str = attr.ib('')
     tiktok: str = attr.ib(default='')
@@ -27,7 +27,7 @@ class Player(Data):
     active: bool = attr.ib(default=True)
 
 
-@attr.s
+@attr.s(eq=False)
 class Vote(Data):
     id: str = attr.ib('')
     from_id: str = attr.ib('')
@@ -35,23 +35,24 @@ class Vote(Data):
     is_for_win: bool = attr.ib(default=False)
 
 
-@attr.s
+@attr.s(eq=False)
 class Ballot(Data):
     id: str = attr.ib('')
     challenge_id: str = attr.ib('')
     options: Dict = attr.ib(factory=Dict)
 
 
-@attr.s
+@attr.s(eq=False)
 class Team(Data):
     id: str = attr.ib('')
     name: str = attr.ib('')
     size: int = attr.ib(default=0)
     tribe_id: str = attr.ib('')
     active: bool = attr.ib(default=True)
+    count_players: int = attr.ib(default=0)
 
 
-@attr.s
+@attr.s(eq=False)
 class Tribe(Data):
     id: str = attr.ib('')
     name: str = attr.ib('')
@@ -61,7 +62,7 @@ class Tribe(Data):
     count_teams: int = attr.ib(default=0)
 
 
-@attr.s
+@attr.s(eq=False)
 class Challenge(Data):
     id: str = attr.ib('')
     name: str = attr.ib('')
@@ -73,7 +74,7 @@ class Challenge(Data):
     complete: bool = attr.ib(default=False)
 
 
-@attr.s
+@attr.s(eq=False)
 class Entry(Data):
     # An entry into a game challenge.
     id: str = attr.ib('')

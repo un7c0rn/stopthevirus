@@ -20,13 +20,21 @@ _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 
 _TEST_CHALLENGES = [
     Challenge(
-        name='Most creative mask challenge!', message='This challenge is simple. NOP!'
+        name='Most creative mask challenge', message='NOP'
     ),
     Challenge(
-        name='Most creative mask challenge!', message='This challenge is simple. NOP!'
+        name='Most creative living space cleanse', message='NOP'
+    ),
+    Challenge(
+        name='Fastest one mile run', message='NOP'
+    ),
+    Challenge(
+        name='Best waterfront video', message='NOP'
     ),
 ]
 
+# NOTE! Users _must_ be unique. This currently doesn't happen by default.
+# adding users does not overwrite existing.
 _EMULATED_PLAYERS = [
     ('Liam', 'lusttforlife', '+10000000001'),
     ('Noah', 'velvetcanyon', '+10000000002'),
@@ -106,7 +114,12 @@ class IntegrationTest(unittest.TestCase):
         # e.g. twilio should be using the prod service phone number so that it can actually send messages.
         # set the clock mode on (2) to async so that game events happen immediately during testing.
         service = MatchmakerService(
-            matchmaker=MatchMakerRoundRobin(), region=f'US-{test_id}', gamedb=gamedb, game_options=GameOptions(game_clock_mode=GameClockMode.ASYNC, game_wait_sleep_interval_sec=30, multi_tribe_min_tribe_size=2))
+            matchmaker=MatchMakerRoundRobin(), region=f'US-{test_id}', gamedb=gamedb, game_options=GameOptions(
+                game_clock_mode=GameClockMode.ASYNC,
+                game_wait_sleep_interval_sec=30,
+                multi_tribe_min_tribe_size=2,
+                engine_worker_thread_count=1,
+                tribe_council_time_sec=5))
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).
@@ -117,7 +130,8 @@ class IntegrationTest(unittest.TestCase):
             # respond to (6) manually, the SMS endpoint associated with the game instance phone number needs to receive requests and do the right thing with gamedb.
             # currently all user messages will receive response:
             # Sent from your Twilio trial account - Hello +{phone}, you said: {message}
-            time.sleep(120)
+            while True:
+                time.sleep(5)
         finally:
             service.set_stop()
             persisted_test_logs = test_log_stream.persist()

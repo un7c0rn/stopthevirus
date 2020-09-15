@@ -11,6 +11,8 @@ from game_engine.common import GameError
 from game_engine.common import log_message
 from concurrent.futures import ThreadPoolExecutor
 from game_engine.common import GameOptions
+from game_engine.events import EventQueueError
+import traceback
 
 
 class Engine(object):
@@ -49,8 +51,6 @@ class Engine(object):
             json_config_path=self._sqs_config_path, game_id=self.game_id)
         while not self._stop.is_set():
             try:
-                log_message(message='Getting event from queue...',
-                            game_id=self.game_id)
                 event = queue.get()
                 game_id = ""
                 if hasattr(event, "game_id"):
@@ -61,11 +61,15 @@ class Engine(object):
                     game_id=self.game_id)
                 notifier.send(sms_event_messages=event.messages(
                     gamedb=self._gamedb))
+            except EventQueueError:
+                pass
             except Exception as e:
                 log_message(
-                    message='Engine worker failed with exception {}.'.format(
-                        e),
+                    message=f'Engine worker failed with exception {str(e)} {traceback.format_stack()}.',
                     game_id=self.game_id)
+                self.stop()
+                raise
+
         log_message(message='Shutting down workder thread {}.'.format(
             threading.current_thread().ident),
             game_id=self.game_id)

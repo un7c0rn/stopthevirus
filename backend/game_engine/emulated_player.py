@@ -9,6 +9,7 @@ from game_engine.common import GameIntegrationTestLogStream
 from typing import List
 import uuid
 import re
+from game_engine.common import log_message
 
 _VIEWS_LOWER_BOUND = 50
 _VIEWS_UPPER_BOUND = 1e6
@@ -27,6 +28,7 @@ def _is_challenge(message: str) -> bool:
 
 def _parse_voting_options(message: str) -> List[str]:
     return re.findall('^([A-Z]):', message, flags=re.MULTILINE)
+
 
 @dataclass
 class EmulatedPlayer:
@@ -54,19 +56,27 @@ class EmulatedPlayer:
         )
 
     def message_handler(self, message: str) -> None:
-        self.test_stream.add_user_received_sms(message=message)
+        self.test_stream.add_user_received_sms(
+            user_name=self.name, message=message)
         if _is_voting_option(message):
             body = self._select_vote_option(message)
-            sms_request = {
+            sms_request = mock.MagicMock()
+
+            def get_fn(field):
+                if field == 'From':
+                    return self.phone_number
+                if field == 'Body':
+                    return body
+            sms_request.form.get = get_fn
+            sms_endpoint.sms_http(sms_request)
+            self.test_stream.add_user_sent_sms(request={
                 'From': self.phone_number,
                 'Body': body
-            }
-            sms_endpoint.sms_http(sms_request)
-            self.test_stream.add_user_sent_sms(request=sms_request)
+            })
         elif _is_challenge(message):
             challenge_entry = self._entry_for_message(message)
             self.gamedb.add_challenge_entry(challenge_entry)
             self.test_stream.add_user_challenge_entry(challenge_entry)
         else:
-            raise RuntimeError(
-                f'Emulation mode does not support message \'{message}\'')
+            log_message(
+                message=f'Emulator ignoring unsupported message "{message}".')

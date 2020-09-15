@@ -12,7 +12,7 @@ import datetime
 from datetime import date
 import enum
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class GameError(Exception):
@@ -240,8 +240,8 @@ class GameIntegrationTestLogStream:
     def add_user_sent_sms(self, request: Dict) -> None:
         self._inputs.append(json.dumps(request))
 
-    def add_user_received_sms(self, message: str) -> None:
-        self._outputs.append(message)
+    def add_user_received_sms(self, user_name: str, message: str) -> None:
+        self._outputs.append({'name': user_name, 'message': message})
 
     def add_user_challenge_entry(self, entry: Serializable) -> None:
         self._inputs.append(entry.to_json())
@@ -266,7 +266,6 @@ def log_message(message: str, game_id: str = None, additional_tags: Dict = None,
         init_sentry()
     with push_scope() as scope:
         if game_id:
-            logging.info("game_id {}".format(game_id))
             scope.set_tag("game_id", game_id)
 
         logging.info(message)
@@ -277,5 +276,4 @@ def log_message(message: str, game_id: str = None, additional_tags: Dict = None,
                 scope.set_tag(tag, str(value))
 
         if push_to_sentry:
-            logging.info("Pushing to sentry...")
             capture_message(message)

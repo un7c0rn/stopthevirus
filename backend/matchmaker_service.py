@@ -242,7 +242,7 @@ class MatchmakerService:
                                     game_snap=game_snap, game_dict=game_dict, players=players_list)
                     except Exception as e:
                         log_message(
-                            f"Game {str(game_dict)} is corrupt. Cancelling.")
+                            f"Game {str(game_dict)} is corrupt: {str(e)} Cancelling.")
                         self._cancel_game(game_snap=game_snap, players=players_list,
                                           reason="an internal data corruption error")
 

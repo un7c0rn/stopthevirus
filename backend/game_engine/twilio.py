@@ -36,6 +36,7 @@ class TwilioSMSNotifier(SMSNotifier):
             self._game_id = game_id
 
     def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
+        log_message(message='TwilioSMSNotifier send_fn invoked')
         for m in sms_event_messages:
             if len(m.recipient_phone_numbers) > 1:
                 log_message(message='calling send_bulk_sms')
@@ -79,7 +80,8 @@ class TwilioSMSNotifier(SMSNotifier):
 
 
 class FakeTwilioSMSNotifier(TwilioSMSNotifier):
-    def __init__(self, emulated_devices: List[EmulatedPlayer]):
+    def __init__(self, json_config_path: str, game_id: str, emulated_devices: List[EmulatedPlayer]):
+        super().__init__(json_config_path=json_config_path, game_id=game_id)
         self._emulated_devices = emulated_devices
         self._emulated_addresses = [d.phone_number for d in emulated_devices]
         self._emulated_device_map = {}
@@ -87,9 +89,10 @@ class FakeTwilioSMSNotifier(TwilioSMSNotifier):
             self._emulated_device_map[d.phone_number] = d
 
     def send_bulk_sms(self, message: str, recipient_addresses: Iterable[str]) -> None:
-        super().send_bulk_sms(message=message, recipient_addresses=[
-            [address for address in recipient_addresses if address not in self._emulated_addresses]
-        ])
+        physical_addresses = [
+            address for address in recipient_addresses if address not in self._emulated_addresses]
+        if physical_addresses:
+            super().send_bulk_sms(message=message, recipient_addresses=physical_addresses)
         for device in self._emulated_devices:
             device.message_handler(message=message)
 
@@ -99,3 +102,19 @@ class FakeTwilioSMSNotifier(TwilioSMSNotifier):
         else:
             device = self._emulated_device_map[recipient_address]
             device.message_handler(message=message)
+
+    def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
+        log_message(message='FakeTwilioSMSNotifier send_fn invoked')
+        for m in sms_event_messages:
+            if len(m.recipient_phone_numbers) > 1:
+                log_message(message='calling send_bulk_sms')
+                self.send_bulk_sms(
+                    message=m.content,
+                    recipient_addresses=m.recipient_phone_numbers
+                )
+            elif len(m.recipient_phone_numbers) == 1:
+                log_message(message='calling send_sms')
+                self.send_sms(
+                    message=m.content,
+                    recipient_address=m.recipient_phone_numbers[0]
+                )
