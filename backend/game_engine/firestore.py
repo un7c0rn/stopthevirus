@@ -31,16 +31,11 @@ class FirestoreData(Data):
     on every access."""
 
     def __init__(self, document: DocumentReference):
-        self._document = document
         setattr(self, 'id', document.id)
-        for k, v in self._document.to_dict().items():
-            setattr(self, k, v)
-
-    # def __getattr__(self, name):
-    #     if name == 'id':
-    #         return self._document.id
-    #     else:
-    #         return self._document.get(name)
+        document_dict = document.to_dict()
+        if document_dict:
+            for k, v in document_dict.items():
+                setattr(self, k, v)
 
 
 class FirestoreGame(FirestoreData, Game):

@@ -339,6 +339,7 @@ class MockPlayEngine(Mock):
 
 class MockDatabase(Database):
     def __init__(self):
+        self._games = dict()
         self._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
             'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
@@ -535,7 +536,7 @@ class MockDatabase(Database):
         pass
 
     def game_from_id(self, id: Text) -> Game:
-        pass
+        return self._games[id]
 
     def player_from_id(self, id: Text) -> Player:
         return self._players[id]
