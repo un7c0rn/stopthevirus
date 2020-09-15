@@ -5,35 +5,36 @@ from game_engine.database import Entry
 from dataclasses import dataclass
 from functions.sms import main as sms_endpoint
 import random
+from game_engine.common import GameIntegrationTestLogStream
+from typing import List
+import uuid
+import re
 
 _VIEWS_LOWER_BOUND = 50
 _VIEWS_UPPER_BOUND = 1e6
 
 
-def _is_voting_option(self, message: str) -> bool:
-    return "vote" in message.lower()
+def _is_voting_option(message: str) -> bool:
+    return re.search('(Reply by.+with the letter of the player you\'re voting out)'
+                     '|(Reply by.+with the letter of the player you vote to win!)',
+                     message, flags=re.I) is not None
 
 
-def _is_challenge(self, message: str) -> bool:
-    return "challenge" in message.lower()
+def _is_challenge(message: str) -> bool:
+    return re.search('Your challenge today is.+Post a video to your TikTok feed.+',
+                     message, flags=re.I) is not None
 
 
-def _parse_challenge_id(self, message: str) -> str:
-    return ""
-
-
-def _parse_voting_options(self, message: str) -> List[str]:
-    # TODO(brandon): write actual parser.
-    return ['A', 'B', 'C']
-
+def _parse_voting_options(message: str) -> List[str]:
+    return re.findall('^([A-Z]):', message, flags=re.MULTILINE)
 
 @dataclass
 class EmulatedPlayer:
-    id: str,
+    id: str
     name: str
     tiktok: str
     phone_number: str
-    test_stream: TestLogger
+    test_stream: GameIntegrationTestLogStream
     gamedb: FirestoreDB
 
     def _select_vote_option(self, message: str) -> str:
@@ -47,23 +48,21 @@ class EmulatedPlayer:
             views=views,
             player_id=self.id,
             tribe_id=player.tribe_id,
-            challenge_id=self._parse_challenge_id(message)
+            challenge_id=f'emulated_challenge.{str(uuid.uuid4())}',
             team_id=player.team_id,
-            url=f'http://tiktok.com/@{self.tiktok}/{uuid.uuid4()}'
+            url=f'http://tiktok.com/@{self.tiktok}/{str(uuid.uuid4())}'
         )
 
     def message_handler(self, message: str) -> None:
-        self.test_stream.user_received_sms(message=message)
+        self.test_stream.add_user_received_sms(message=message)
         if _is_voting_option(message):
             body = self._select_vote_option(message)
             sms_request = {
-                {
-                    'From': self.phone_number,
-                    'Body': body
-                }
+                'From': self.phone_number,
+                'Body': body
             }
-            sms_endpoint.sms_http(request)
-            test_stream.add_user_sent_sms(request=sms_request)
+            sms_endpoint.sms_http(sms_request)
+            self.test_stream.add_user_sent_sms(request=sms_request)
         elif _is_challenge(message):
             challenge_entry = self._entry_for_message(message)
             self.gamedb.add_challenge_entry(challenge_entry)
