@@ -72,10 +72,10 @@ class Game(object):
         return winner
 
     def _play_multi_tribe(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Tribe:
-        while (tribe1.size > self._options.multi_tribe_min_tribe_size and
-               tribe2.size > self._options.multi_tribe_min_tribe_size):
+        while (tribe1.count_players > self._options.multi_tribe_min_tribe_size and
+               tribe2.count_players > self._options.multi_tribe_min_tribe_size):
             log_message(message="Tribe {} size {} tribe {} size {}.".format(
-                tribe1, tribe1.size, tribe2, tribe2.size), game_id=self._game_id)
+                tribe1, tribe1.count_players, tribe2, tribe2.count_players), game_id=self._game_id)
 
             log_message("Getting new challenge.")
             challenge = self._get_next_challenge(gamedb=gamedb)
@@ -139,7 +139,7 @@ class Game(object):
         return [team for team in gamedb.list_teams(active_team_predicate_value=True)][0]
 
     def _play_single_team(self, team: Team, gamedb: Database, engine: Engine) -> List[Player]:
-        while team.size > self._options.target_finalist_count:
+        while team.count_players > self._options.target_finalist_count:
             challenge = self._get_next_challenge(gamedb=gamedb)
             self._run_challenge(challenge=challenge,
                                 gamedb=gamedb, engine=engine)
@@ -250,24 +250,22 @@ class Game(object):
                     challenge_start_time_sec))
                 time.sleep(self._options.game_wait_sleep_interval_sec)
         elif self._options.game_clock_mode == GameClockMode.ASYNC:
-            while (_unixtime() < challenge.start_timestamp) and not self._stop_event.is_set() and not self._wait_for_challenge_start_event.is_set():
-                log_message("Waiting {}s for challenge to {} to begin.".format(
-                    challenge.start_timestamp - _unixtime(), challenge))
-                time.sleep(self._options.game_wait_sleep_interval_sec)
+            log_message(
+                f"Waiting {self._options.game_wait_sleep_interval_sec}s for challenge to {str(challenge)} to begin...")
+            time.sleep(self._options.game_wait_sleep_interval_sec)
 
     def _wait_for_challenge_end_time(self, challenge: Challenge) -> None:
         if self._options.game_clock_mode == GameClockMode.SYNC:
             challenge_end_time_sec = _unixtime() + self._options.game_schedule.localized_time_delta_sec(
                 end_time=self._options.game_schedule.daily_challenge_end_time)
-            while((_unixtime() < challenge_end_time_sec) and not self._stop_event.is_set() and not self._wait_for_challenge_end_event.is_set()):
+            while not self._stop_event.is_set() and not self._wait_for_challenge_end_event.is_set():
                 log_message("Waiting until {} for daily challenge start.".format(
                     challenge_end_time_sec))
                 time.sleep(self._options.game_wait_sleep_interval_sec)
         elif self._options.game_clock_mode == GameClockMode.ASYNC:
-            while (_unixtime() < challenge.end_timestamp) and not self._stop_event.is_set() and not self._wait_for_challenge_end_event.is_set():
-                log_message("Waiting {}s for challenge to {} to end.".format(
-                    challenge.end_timestamp - _unixtime(), challenge))
-                time.sleep(self._options.game_wait_sleep_interval_sec)
+            log_message(
+                f"Waiting {self._options.game_wait_sleep_interval_sec}s for challenge to {str(challenge)} to end...")
+            time.sleep(self._options.game_wait_sleep_interval_sec)
 
     def _run_multi_tribe_council(self, winning_tribe: Tribe, losing_tribe: Tribe, gamedb: Database, engine: Engine):
         self._wait_for_tribal_council_start_time()
@@ -432,7 +430,7 @@ class Game(object):
                 other_options_available = team.id not in visited
                 visited[team.id] = True
 
-                if (team.size >= target_team_size and other_options_available):
+                if (team.count_players >= target_team_size and other_options_available):
                     log_message(message="Team {} has size >= target {} and other options are available. "
                                 "Continuing search...".format(team, target_team_size), game_id=self._game_id)
                     continue
@@ -444,7 +442,7 @@ class Game(object):
                 log_message(message="Merging player {} from team {} into team {}.".format(
                     player, player.team_id, team.id), game_id=self._game_id)
                 player.team_id = team.id
-                team.size = team.size + 1
+                team.count_players = team.count_players + 1
                 gamedb.save(team)
                 gamedb.save(player)
 
@@ -466,8 +464,6 @@ class Game(object):
             id=challenge.id,
             name=challenge.name,
             message=challenge.message,
-            start_timestamp=challenge.start_timestamp,
-            end_timestamp=challenge.end_timestamp,
             complete=challenge.complete
         )
 

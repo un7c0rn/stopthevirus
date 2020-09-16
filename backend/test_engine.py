@@ -58,24 +58,24 @@ _TEST_ENTRY = Entry(
 _TEST_TEAM1 = Team(
     id='id/foo1',
     name='team/bar',
-    size=5,
+    count_players=5,
     tribe_id='tribe/foo'
 )
 _TEST_TEAM2 = Team(
     id='id/foo2',
     name='team/bar',
-    size=5,
+    count_players=5,
     tribe_id='tribe/foo'
 )
 _TEST_TRIBE1 = Tribe(
     id='id/foo1',
     name='SIDAMA',
-    size=1e6
+    count_players=1e6
 )
 _TEST_TRIBE2 = Tribe(
     id='id/foo2',
     name='TIGRAWAY',
-    size=500e3
+    count_players=500e3
 )
 _TEST_GAME_OPTIONS = GameOptions(
     game_schedule=STV_I18N_TABLE['US']
