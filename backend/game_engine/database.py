@@ -118,7 +118,7 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def count_votes(self, from_team: Team, is_for_win: bool = attr.ib(default=False)) -> Tuple[Player, int]:
+    def count_votes(self, from_team: Team, is_for_win: bool = False) -> Tuple[Player, int]:
         pass
 
     @abstractmethod
