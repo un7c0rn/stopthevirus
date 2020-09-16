@@ -579,3 +579,12 @@ class FirestoreDB(Database):
             return FirestorePlayer(players[0])
         else:
             return None
+
+    def find_user(self, phone_number: str) -> Optional[DocumentReference]:
+        query = self._client.collection('users').where(
+            'phone_number', '==', phone_number)
+        users = query.get()
+        if len(users) > 0:
+            return users[0]
+        else:
+            return None

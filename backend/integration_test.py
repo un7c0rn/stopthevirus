@@ -33,8 +33,6 @@ _TEST_CHALLENGES = [
     ),
 ]
 
-# NOTE! Users _must_ be unique. This currently doesn't happen by default.
-# adding users does not overwrite existing.
 _EMULATED_PLAYERS = [
     ('Liam', 'lusttforlife', '+10000000001'),
     ('Noah', 'velvetcanyon', '+10000000002'),
@@ -81,6 +79,12 @@ class IntegrationTest(unittest.TestCase):
         # add test challenges
         for challenge in _TEST_CHALLENGES:
             gamedb.add_challenge(challenge=challenge)
+
+        # if non-existent, create users associated with players. NOTE: critical for FE code
+        # to create users when players sign up.
+        for player_info in [*_EMULATED_PLAYERS, *_REAL_PLAYERS]:
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, name=player_info[0],
+                                 tiktok=player_info[1], phone_number=player_info[2])
 
         # Inject players into gamedb. set the phone number of the players to a known, or emulated device.
         emulated_players = []

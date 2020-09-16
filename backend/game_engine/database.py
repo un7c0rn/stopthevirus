@@ -176,3 +176,7 @@ class Database(ABC):
     @abstractmethod
     def find_player(self, phone_number: str) -> Optional[Player]:
         pass
+
+    @abstractmethod
+    def find_user(self, phone_number: str) -> Optional[object]:
+        pass
