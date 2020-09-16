@@ -1,3 +1,7 @@
+from sentry_sdk import push_scope
+from sentry_sdk import configure_scope
+from sentry_sdk import capture_message
+import sentry_sdk
 import json
 import logging
 import sys
@@ -8,18 +12,12 @@ import datetime
 from datetime import date
 import enum
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-import sentry_sdk
-from sentry_sdk import capture_message
-from sentry_sdk import configure_scope
-from sentry_sdk import push_scope
-
-
-
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class GameError(Exception):
     pass
+
 
 class GameClockMode(enum.Enum):
     # Synchronized timing. Game events are synchronized to global clock,
@@ -31,6 +29,7 @@ class GameClockMode(enum.Enum):
     # a challenge may always start N minutes after tribal council. This is only
     # used for test purposes.
     ASYNC = 1
+
 
 class ISODayOfWeek(enum.Enum):
     Monday = 1
@@ -230,17 +229,43 @@ class Serializable(object):
     def to_json(self):
         return json.dumps(self.to_dict())
 
+
+class GameIntegrationTestLogStream:
+    def __init__(self, game_id: str, test_id: str):
+        self._game_id = game_id
+        self._test_id = test_id
+        self._inputs = []
+        self._outputs = []
+
+    def add_user_sent_sms(self, request: Dict) -> None:
+        self._inputs.append(json.dumps(request))
+
+    def add_user_received_sms(self, user_name: str, message: str) -> None:
+        self._outputs.append({'name': user_name, 'message': message})
+
+    def add_user_challenge_entry(self, entry: Serializable) -> None:
+        self._inputs.append(entry.to_json())
+
+    def persist(self) -> str:
+        return json.dumps({
+            "game_id": self._game_id,
+            "test_id": self._test_id,
+            "inputs": self._inputs,
+            "outputs": self._outputs
+        })
+
+
 def init_sentry():
     sentry_sdk.init(dsn='https://7ece3e1e345248a19475ea1ed503d28e@o391894.ingest.sentry.io/5238617',
                     attach_stacktrace=True)
 
-def log_message(message: str, game_id: str = None, additional_tags: Dict = None, push_to_sentry = False):
+
+def log_message(message: str, game_id: str = None, additional_tags: Dict = None, push_to_sentry=True):
     if push_to_sentry:
         # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
         init_sentry()
     with push_scope() as scope:
         if game_id:
-            logging.info("game_id {}".format(game_id))
             scope.set_tag("game_id", game_id)
 
         logging.info(message)
@@ -250,8 +275,5 @@ def log_message(message: str, game_id: str = None, additional_tags: Dict = None,
                 logging.info("{} -> {}".format(tag, str(value)))
                 scope.set_tag(tag, str(value))
 
-
         if push_to_sentry:
-            logging.info("pushing to sentry")
             capture_message(message)
-

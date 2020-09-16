@@ -31,13 +31,11 @@ class FirestoreData(Data):
     on every access."""
 
     def __init__(self, document: DocumentReference):
-        self._document = document
-
-    def __getattr__(self, name):
-        if name == 'id':
-            return self._document.id
-        else:
-            return self._document.get(name)
+        setattr(self, 'id', document.id)
+        document_dict = document.to_dict()
+        if document_dict:
+            for k, v in document_dict.items():
+                setattr(self, k, v)
 
 
 class FirestoreGame(FirestoreData, Game):
@@ -371,7 +369,7 @@ class FirestoreDB(Database):
                 'active', '==', active_team_predicate_value)
         return FirestoreTeamStream(query.stream())
 
-    def game_from_id(self, id: str) -> Player:
+    def game_from_id(self, id: str) -> Game:
         return FirestoreGame(self._client.document("games/{}".format(self._game_id)).get())
 
     def player_from_id(self, id: str) -> Player:
@@ -404,8 +402,16 @@ class FirestoreDB(Database):
             'count_players': Increment(-1)
         })
 
+        batch.update(tribe_ref, {
+            'size': Increment(-1)
+        })
+
         batch.update(team_ref, {
             'count_players': Increment(-1)
+        })
+
+        batch.update(team_ref, {
+            'size': Increment(-1)
         })
 
         batch.update(game_ref, {

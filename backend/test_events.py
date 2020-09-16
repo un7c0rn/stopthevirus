@@ -73,7 +73,8 @@ _TEST_TRIBE2 = Tribe(
 
 @contextmanager
 def aws_test_queue() -> AmazonSQS:
-    sqs = AmazonSQS(json_config_path=_TEST_AMAZON_SQS_CONFIG_PATH, game_id=_TEST_GAME_ID)
+    sqs = AmazonSQS(json_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
+                    game_id=_TEST_GAME_ID)
     try:
         queue = sqs._client.create_queue(
             QueueName="{}.fifo".format(str(uuid.uuid4())),
@@ -203,7 +204,7 @@ class AmazonSQSTest(unittest.TestCase):
                         "phone_number": "sms/bar",
                         "tribe_id": "tribe/foo",
                         "team_id": "team/bar",
-                        "active": True
+                        "active": True,
                     },
                     "team": {
                         "class": "Team",
@@ -211,7 +212,8 @@ class AmazonSQSTest(unittest.TestCase):
                         "name": "team/bar",
                         "size": 5,
                         "tribe_id": "tribe/foo",
-                        "active": True
+                        "active": True,
+                        "count_players": 0
                     }
                 })
 
@@ -292,7 +294,8 @@ class AmazonSQSTest(unittest.TestCase):
                             "name": "team/bar",
                             "size": 5,
                             "tribe_id": "tribe/foo",
-                            "active": True
+                            "active": True,
+                            "count_players": 0
                         }
                     ],
                     "losing_teams": [
@@ -302,7 +305,8 @@ class AmazonSQSTest(unittest.TestCase):
                             "name": "team/bar",
                             "size": 5,
                             "tribe_id": "tribe/foo",
-                            "active": True
+                            "active": True,
+                            "count_players": 0
                         }
                     ]
                 })
@@ -327,8 +331,8 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winning_tribe": {
                         "class": "Tribe",
-                        "count_players" : 0,
-                        "count_teams" : 0,
+                        "count_players": 0,
+                        "count_teams": 0,
                         "id": "id/foo1",
                         "name": "SIDAMA",
                         "size": 1000000.0,
@@ -336,8 +340,8 @@ class AmazonSQSTest(unittest.TestCase):
                     },
                     "losing_tribe": {
                         "class": "Tribe",
-                        "count_players" : 0,
-                        "count_teams" : 0,
+                        "count_players": 0,
+                        "count_teams": 0,
                         "id": "id/foo2",
                         "name": "TIGRAWAY",
                         "size": 500000.0,
@@ -485,7 +489,8 @@ class AmazonSQSTest(unittest.TestCase):
                         "name": "team/bar",
                         "size": 5,
                         "tribe_id": "tribe/foo",
-                        "active": True
+                        "active": True,
+                        "count_players": 0
                     }
                 })
 

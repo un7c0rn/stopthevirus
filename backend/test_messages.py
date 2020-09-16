@@ -5,7 +5,6 @@ import uuid
 import game
 from contextlib import contextmanager
 from game_engine.firestore import FirestoreDB
-from game_engine.matchmaker import GameSimulator
 from game_engine import database
 import pprint
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE
