@@ -5,7 +5,8 @@ from game_engine.common import Serializable
 
 
 class Data(ABC, Serializable):
-    pass
+    def get(self, key):
+        return getattr(self, key)
 
 
 @attr.s(eq=False)
@@ -39,12 +40,22 @@ class Team(Data):
 @attr.s(eq=False)
 class Player(Data):
     id: str = attr.ib(default='')
+    name: str = attr.ib(default='')
     tiktok: str = attr.ib(default='')
     email: str = attr.ib(default='')
     phone_number: str = attr.ib(default='')
     tribe_id: str = attr.ib(default='')
     team_id: str = attr.ib(default='')
     active: bool = attr.ib(default=True)
+
+
+@attr.s(eq=False)
+class User(Data):
+    game_id: str = attr.ib(default='')
+    id: str = attr.ib(default='')
+    name: str = attr.ib(default='')
+    phone_number = attr.ib(default='')
+    tiktok = attr.ib(default='')
 
 
 @attr.s(eq=False)
@@ -175,4 +186,8 @@ class Database(ABC):
 
     @abstractmethod
     def find_player(self, phone_number: str) -> Optional[Player]:
+        pass
+
+    @abstractmethod
+    def find_user(self, phone_number: str) -> Optional[User]:
         pass

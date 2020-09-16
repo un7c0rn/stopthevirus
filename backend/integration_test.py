@@ -20,21 +20,55 @@ _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 
 _TEST_CHALLENGES = [
     Challenge(
-        name='Most creative mask challenge', message='NOP'
+        name='Best AAAAAAA cell phone video', message='NOP'
     ),
     Challenge(
-        name='Most creative living space cleanse', message='NOP'
+        name='Most creative one mile run', message='NOP'
     ),
     Challenge(
-        name='Fastest one mile run', message='NOP'
+        name='Dopest hand made AAAAAAA T-Shirt Design', message='NOP'
     ),
     Challenge(
-        name='Best waterfront video', message='NOP'
+        name='Best livestream rant on AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Best AAAAAAA G-Mix', message='NOP'
+    ),
+    Challenge(
+        name='Craziest selfie in AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Best acoustic replay of AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Most creative AAAAAAA video', message='NOP'
+    ),
+    Challenge(
+        name='Most innovative way to get in the AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Most fire video of cracking this code AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Make a video decoding the meaning of AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Best way to social distance at AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Most fire AAAAAAA', message='NOP'
+    ),
+    Challenge(
+        name='Best AAAAAAA Karaoke', message='NOP'
+    ),
+    Challenge(
+        name='Best AAAAAAA dance', message='NOP'
+    ),
+    Challenge(
+        name='Most fire scene reenactment from of AAAAAAA', message='NOP'
     ),
 ]
 
-# NOTE! Users _must_ be unique. This currently doesn't happen by default.
-# adding users does not overwrite existing.
 _EMULATED_PLAYERS = [
     ('Liam', 'lusttforlife', '+10000000001'),
     ('Noah', 'velvetcanyon', '+10000000002'),
@@ -82,6 +116,12 @@ class IntegrationTest(unittest.TestCase):
         for challenge in _TEST_CHALLENGES:
             gamedb.add_challenge(challenge=challenge)
 
+        # if non-existent, create users associated with players. NOTE: critical for FE code
+        # to create users when players sign up.
+        for player_info in [*_EMULATED_PLAYERS, *_REAL_PLAYERS]:
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, name=player_info[0],
+                                 tiktok=player_info[1], phone_number=player_info[2])
+
         # Inject players into gamedb. set the phone number of the players to a known, or emulated device.
         emulated_players = []
         for player_info in _EMULATED_PLAYERS:
@@ -116,10 +156,10 @@ class IntegrationTest(unittest.TestCase):
         service = MatchmakerService(
             matchmaker=MatchMakerRoundRobin(), region=f'US-{test_id}', gamedb=gamedb, game_options=GameOptions(
                 game_clock_mode=GameClockMode.ASYNC,
-                game_wait_sleep_interval_sec=30,
+                game_wait_sleep_interval_sec=10,
                 multi_tribe_min_tribe_size=2,
                 engine_worker_thread_count=1,
-                tribe_council_time_sec=5))
+                tribe_council_time_sec=10))
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).

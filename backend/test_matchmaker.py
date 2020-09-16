@@ -45,7 +45,8 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
                 gamedb._players[player.id] = player
         return players
 
-    def test_generate_teams(self):
+    @mock.patch.object(FirestoreDB, 'find_user', return_value=mock.MagicMock())
+    def test_generate_teams(self, _):
         players = self.generate_players()
         teams = MatchMakerRoundRobin.generate_teams(game_id=_TEST_GAME_ID, players=players,
                                                     team_size=_TEAM_SIZE)
@@ -60,6 +61,7 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
 
     def test_generate_tribes(self):
         gamedb = MockDatabase()
+        gamedb.find_user = mock.MagicMock(return_value=mock.MagicMock())
         gamedb._games[_TEST_GAME_ID] = Game()
         players = self.generate_players(gamedb=gamedb)
         options = GameOptions(target_team_size=_TEAM_SIZE)
@@ -95,13 +97,18 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
         game_id = FirestoreDB.add_game(
             json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, hashtag='hashtag/foo')
         _gamedb._game_id = game_id
-        
+
         # generate mock players with an id attribute and add the players to the game
         players = list()
-        for _ in range(0, number_of_joined_players):
-            mock_player = mock.MagicMock()
-            mock_player.id = mock.MagicMock(return_value=str(uuid.uuid4()))
-            players.append(mock_player)
+        for i in range(0, number_of_joined_players):
+            name = 'name/foo'
+            tiktok = 'tiktok/bar'
+            phone_number = f'+1000000000{i}'
+            player = _gamedb.player(
+                name=name, tiktok=tiktok, phone_number=phone_number)
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH,
+                                 name=name, tiktok=tiktok, phone_number=phone_number)
+            players.append(player)
 
         # read counts for game, all tribes, all teams and verify that they are correct
         game_info_dict = algorithm_type.generate_tribes(

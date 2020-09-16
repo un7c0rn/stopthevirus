@@ -597,6 +597,8 @@ class MockDatabase(Database):
     def find_player(self, phone_number: str) -> Optional[Player]:
         pass
 
+    def find_user(self, phone_number: str) -> Optional[object]:
+        pass
 
 
 class GameTest(unittest.TestCase):

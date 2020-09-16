@@ -438,6 +438,8 @@ class Game(object):
 
                     player = merge_candidates.get()
                     if player.team_id == team.id:
+                        log_message(
+                            message=f"Player {str(player)} already on team {str(team)}. Continuing.")
                         continue
 
                     log_message(message="Merging player {} from team {} into team {}.".format(
