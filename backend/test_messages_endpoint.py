@@ -168,8 +168,8 @@ class SMSEndpointTest(unittest.TestCase):
 
     def test_game_id_from_phone_number(self):
         phone_number = '+15555555555'
-        _verify_gamedb.player(name='foo', tiktok='bar',
-                              phone_number=phone_number)
+        _verify_gamedb.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, name='foo', tiktok='bar',
+                                phone_number=phone_number, game_id=_TEST_GAME_ID)
         self.assertEqual(
             _functions_gamedb.game_id_from_phone_number(
                 phone_number=phone_number),

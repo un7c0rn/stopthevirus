@@ -186,6 +186,27 @@ class FirestoreDB(Database):
         })
         return str(game_ref.id)
 
+    @classmethod
+    def add_user(cls, json_config_path: str, name: str, tiktok: str, phone_number: str, game_id: str = None) -> None:
+        cred = credentials.Certificate(json_config_path)
+        if not firebase_admin._apps:
+            firebase_admin.initialize_app(cred)
+        client = firestore.client()
+        users = client.collection('users').where(
+            'phone_number', '==', phone_number).get()
+        if len(users) == 0:
+            user_ref = client.collection('users').document()
+        else:
+            user_ref = users[0].reference
+        user_ref.set({
+            'name': name,
+            'tiktok': tiktok,
+            'phone_number': phone_number,
+            'id': user_ref.id,
+            'game_id': game_id
+        })
+        return user_ref.id
+
     def add_challenge_entry(self, entry: Entry) -> None:
         entry_ref = self._client.collection('games/{}/entries').document()
         entry_ref.set({
@@ -478,18 +499,11 @@ class FirestoreDB(Database):
 
     def player(self, name: str, tiktok: str = None, phone_number: str = None) -> Player:
         batch = self._client.batch()
-        user_ref = self._client.collection("users").document()
         player_ref = self._client.collection(
             "games/{}/players".format(self._game_id)).document()
         batch.set(player_ref, {
             'name': name,
             'active': True,
-            'tiktok': tiktok,
-            'phone_number': phone_number
-        })
-        batch.set(user_ref, {
-            'name': name,
-            'game_id': self._game_id,
             'tiktok': tiktok,
             'phone_number': phone_number
         })
