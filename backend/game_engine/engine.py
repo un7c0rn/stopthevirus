@@ -13,6 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from game_engine.common import GameOptions
 from game_engine.events import EventQueueError
 import traceback
+from threading import Lock
 
 
 class Engine(object):
@@ -32,6 +33,13 @@ class Engine(object):
             max_workers=options.engine_worker_thread_count)
         for _ in range(options.engine_worker_thread_count):
             self._executor.submit(self._do_work_fn)
+        self._critical_section_lock = Lock()
+
+    def __enter__(self):
+        self._critical_section_lock.acquire()
+
+    def __exit__(self, *_):
+        self._critical_section_lock.release()
 
     def add_event(self, event: SMSEvent) -> None:
         self._output_events.put(event, blocking=False)
@@ -51,16 +59,21 @@ class Engine(object):
             json_config_path=self._sqs_config_path, game_id=self.game_id)
         while not self._stop.is_set():
             try:
-                event = queue.get()
-                game_id = ""
-                if hasattr(event, "game_id"):
-                    game_id = event.game_id
-                log_message(
-                    message='Engine worker processing event {}'.format(
-                        event.to_json()),
-                    game_id=self.game_id)
-                notifier.send(sms_event_messages=event.messages(
-                    gamedb=self._gamedb))
+                # leave events on the queue until the critical section lock
+                # is released. this prevents async workers from acting on event messages
+                # before the database is reconciled by the main game thread. critical
+                # for periods of large mutations like team and tribe merges.
+                if not self._critical_section_lock.locked():
+                    event = queue.get()
+                    game_id = ""
+                    if hasattr(event, "game_id"):
+                        game_id = event.game_id
+                    log_message(
+                        message='Engine worker processing event {}'.format(
+                            event.to_json()),
+                        game_id=self.game_id)
+                    notifier.send(sms_event_messages=event.messages(
+                        gamedb=self._gamedb))
             except EventQueueError:
                 pass
             except Exception as e:
