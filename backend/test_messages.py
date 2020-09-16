@@ -10,6 +10,7 @@ import pprint
 from game_engine.common import GameOptions, GameSchedule, STV_I18N_TABLE
 from game_engine.twilio import TwilioSMSNotifier
 import json
+from game_engine import messages
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
@@ -337,7 +338,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: You scored 100 points with your video! "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} You scored 100 points with your video! "
                                     "Winning teams for the day will be announced by 6PM EDT.\n"),
                         "recipient_phone_numbers": [
                             "751-005-3935"
@@ -363,7 +364,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: You've survived elimination, but your team did not. "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} You've survived elimination, but your team did not. "
                                     "Here's your new team:\n\nwww.tiktok.com/@charles\n\nwww.tiktok.com/@juanita\n\n"
                                     "www.tiktok.com/@donna\n\nwww.tiktok.com/@henry\n\nwww.tiktok.com/@corina\n\n\n\n\n"
                                     "Next challenge begins tomorrow {tomorrow} at 12PM EDT!\n").format(
@@ -394,7 +395,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: bruce (www.tiktok.com/@bruce) has won today's challenge"
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} bruce (www.tiktok.com/@bruce) has won today's challenge"
                                     " and cannot be voted out! There are now 10 players remaining and you must vote"
                                     " a player out of the game!\nReply by 6PM EDT with the letter of the player you're"
                                     " voting OUT. If you do not reply, your vote will count against you.\n\nA: "
@@ -403,7 +404,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: bruce (www.tiktok.com/@bruce) has won today's challenge "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} bruce (www.tiktok.com/@bruce) has won today's challenge "
                                     "and cannot be voted out! There are now 10 players remaining and you must vote "
                                     "a player out of the game!\nReply by 6PM EDT with the letter of the player you're "
                                     "voting OUT. If you do not reply, your vote will count against you.\n\nA: "
@@ -412,7 +413,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: bruce (www.tiktok.com/@bruce) has won today's challenge"
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} bruce (www.tiktok.com/@bruce) has won today's challenge"
                                     " and cannot be voted out! There are now 10 players remaining and you must vote "
                                     "a player out of the game!\nReply by 6PM EDT with the letter of the player you're "
                                     "voting OUT. If you do not reply, your vote will count against you.\n\nA: "
@@ -421,7 +422,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: bruce (www.tiktok.com/@bruce) has won today's challenge "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} bruce (www.tiktok.com/@bruce) has won today's challenge "
                                     "and cannot be voted out! There are now 10 players remaining and you must vote a "
                                     "player out of the game!\nReply by 6PM EDT with the letter of the player you're voting "
                                     "OUT. If you do not reply, your vote will count against you.\n\nA: "
@@ -430,7 +431,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Congratulations you have won today's challenge and can not be voted "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Congratulations you have won today's challenge and can not be voted "
                                     "out!\nThere are now 10 players remaining and you must vote a player out of the game.\n"
                                     "Reply by 6PM EDT with the letter of the player you're voting OUT.\n\nA: "
                                     "www.tiktok.com/@elizabeth\n\nB: www.tiktok.com/@donald\n\nC: "
@@ -462,7 +463,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Your team has lost today's challenge and you must vote "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Your team has lost today's challenge and you must vote "
                                     "a player off of your team!\nReply by 9PM EDT with the letter of the player you're "
                                     "voting OUT. If you do not reply, your vote will count against you. \n\nA: "
                                     "www.tiktok.com/@gary\n\nB: www.tiktok.com/@donna\n\nC: "
@@ -477,7 +478,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Congratulations! Your team is a winner of today's "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Congratulations! Your team is a winner of today's "
                                     "challenge and none of your team members will be eliminated. Other teams "
                                     "will be voting players out of the game tonight at 9PM EDT.\n\nNext challenge "
                                     "begins tomorrow at 12PM EDT!\"\n"),
@@ -511,9 +512,9 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Your challenge today is \"Most creative way to make a "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Your challenge today is \"Most creative way to make a "
                                     "mask.\"! Post a video to your TikTok feed, and use this link to submit it to "
-                                    "the game https://https://vir_us.io/challenge-submission/062496c3-b106-48ce-a498-dba2ec271a1c/f49f0cfd-c93b-4132-8c5b-ebea4bf81eae/\n\nAll "
+                                    f"the game https://{messages.VIR_US_HOSTNAME}/challenge-submission/062496c3-b106-48ce-a498-dba2ec271a1c/f49f0cfd-c93b-4132-8c5b-ebea4bf81eae/\n\nAll "
                                     "entries must be submitted by 6PM EDT. Winning teams stay, losing teams must vote someone out. Good luck!\"\n"),
                         "recipient_phone_numbers": [
                             "751-005-3935"
@@ -521,9 +522,9 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Your challenge today is \"Most creative way to make a "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Your challenge today is \"Most creative way to make a "
                                     "mask.\"! Post a video to your TikTok feed, and use this link to submit it to "
-                                    "the game https://https://vir_us.io/challenge-submission/1a037b16-191c-4890-8c31-9122fe5d6dc1/f49f0cfd-c93b-4132-8c5b-ebea4bf81eae/\n\n"
+                                    f"the game https://{messages.VIR_US_HOSTNAME}/challenge-submission/1a037b16-191c-4890-8c31-9122fe5d6dc1/f49f0cfd-c93b-4132-8c5b-ebea4bf81eae/\n\n"
                                     "All entries must be submitted by 6PM EDT. Winning teams stay, losing teams must vote someone out. Good luck!\"\n"),
                         "recipient_phone_numbers": [
                             "962-582-3407"
@@ -548,7 +549,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Your team's tribe tribe/ASHER has lost today's challenge "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Your team's tribe tribe/ASHER has lost today's challenge "
                                     "and you must vote a player off of your team!\nReply by 9PM EDT with the letter "
                                     "of the player you're voting OUT. If you do not reply, your vote will count against "
                                     "you.\n\nA: www.tiktok.com/@charles\n\nB: www.tiktok.com/@juanita\n\nC: "
@@ -563,7 +564,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Your team's tribe tribe/ASHER has lost today's challenge "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Your team's tribe tribe/ASHER has lost today's challenge "
                                     "and you must vote a player off of your team!\nReply by 9PM EDT with the letter of "
                                     "the player you're voting OUT. If you do not reply, your vote will count against you."
                                     "\n\nA: www.tiktok.com/@gary\n\nB: www.tiktok.com/@donna\n\nC: www.tiktok.com/@kirk\n\nD: "
@@ -578,7 +579,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: Congratulations! Your tribe tribe/MANESSEH has won today's "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Congratulations! Your tribe tribe/MANESSEH has won today's "
                                     "challenge and everyone is safe. tribe/ASHER will be voting players out of the "
                                     "game TONIGHT at 9PM EDT.\n\nNext challenge begins tomorrow at 12PM EDT!\"\n"),
                         "recipient_phone_numbers": [
@@ -617,7 +618,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nhttps://vir_us.io Only 2 players remain and it's your chance to vote for "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} Only 2 players remain and it's your chance to vote for "
                                     "a WINNER of #VIRUSALPHA!\nReply by 9PM EDT with the letter of the player you vote to WIN!"
                                     "\n\nA: www.tiktok.com/@juanita\n\nB: www.tiktok.com/@bruce\n\n\n\n"),
                         "recipient_phone_numbers": [
@@ -662,7 +663,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: The tribe has spoken and donna (www.tiktok.com/@donna) "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} The tribe has spoken and donna (www.tiktok.com/@donna) "
                                     "has been voted out of the game. Next challenge begins tomorrow at 12PM EDT!\n"),
                         "recipient_phone_numbers": [
                             "751-005-3935",
@@ -673,7 +674,7 @@ class SMSMessageUXTest(unittest.TestCase):
                     },
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: The tribe has spoken. You have been voted out of "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} The tribe has spoken. You have been voted out of "
                                     "the game but will still have a chance to help decide the winner!\n"),
                         "recipient_phone_numbers": [
                             "555-259-3255"
@@ -694,7 +695,7 @@ class SMSMessageUXTest(unittest.TestCase):
                 [
                     {
                         "class": "SMSEventMessage",
-                        "content": ("\nVIR-US: You have survived elimination!\nNext "
+                        "content": (f"\n{messages.VIR_US_SMS_HEADER} You have survived elimination!\nNext "
                                     "challenge starts tomorrow {tomorrow} at 12PM EDT.\n").format(
                                         tomorrow=self.game_options.game_schedule.tomorrow_localized_string),
                         "recipient_phone_numbers": [
@@ -737,14 +738,14 @@ class SMSMessageUXTest(unittest.TestCase):
             json.dumps([
                 {
                     "class": "SMSEventMessage",
-                    "content": "\nVIR-US: You are the last survivor and WINNER of #VIRUSALPHA!\n",
+                    "content": f"\n{messages.VIR_US_SMS_HEADER} You are the last survivor and WINNER of #VIRUSALPHA!\n",
                     "recipient_phone_numbers": [
                         "962-582-3407"
                     ]
                 },
                 {
                     "class": "SMSEventMessage",
-                    "content": "\nVIR-US: sarah (www.tiktok.com/@sarah) is the last survivor and WINNER of #VIRUSALPHA!\n",
+                    "content": f"\n{messages.VIR_US_SMS_HEADER} sarah (www.tiktok.com/@sarah) is the last survivor and WINNER of #VIRUSALPHA!\n",
                     "recipient_phone_numbers": [
 
                     ]
@@ -765,7 +766,7 @@ class SMSMessageUXTest(unittest.TestCase):
             json.dumps([
                 {
                     "class": "SMSEventMessage",
-                    "content": ("\nVIR-US: You have received immunity and cannot be voted out "
+                    "content": (f"\n{messages.VIR_US_SMS_HEADER} You have received immunity and cannot be voted out "
                                 "tonight!\nNext challenge starts tomorrow {tomorrow} at 12PM EDT.\n").format(
                                     tomorrow=self.game_options.game_schedule.tomorrow_localized_string
                     ),

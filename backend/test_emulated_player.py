@@ -193,15 +193,17 @@ class EmulatedPlayerTest(unittest.TestCase):
             ['A', 'B', 'C']
         )
 
+    @mock.patch.object(emulated_player, '_challenge_id_from_message', return_value='NOP')
     @mock.patch.object(FirestoreDB, 'player_from_id', return_value=Player(
         id='id/foo',
         tribe_id='tribe/bar',
         team_id='team/ban'
     ))
-    def test_entry_for_message(self, _):
+    def test_entry_for_message(self, *_):
         self.assertTrue(isinstance(
             self._emulated_player._entry_for_message('foo'), Entry))
 
+    @mock.patch.object(emulated_player, '_challenge_id_from_message', return_value='NOP')
     @mock.patch.object(EmulatedPlayer, '_select_vote_option', return_value='NOP')
     @mock.patch.object(FirestoreDB, 'player_from_id', return_value=Player(
         id='id/foo',
@@ -210,7 +212,7 @@ class EmulatedPlayerTest(unittest.TestCase):
     ))
     @mock.patch.object(FirestoreDB, 'add_challenge_entry', return_value=None)
     @mock.patch.object(sms_endpoint, 'sms_http', return_value=None)
-    def test_message_handler(self, sms_http_fn, add_challenge_entry_fn, player_from_id_fn, _):
+    def test_message_handler(self, sms_http_fn, add_challenge_entry_fn, player_from_id_fn, *_):
         self._emulated_player.message_handler(
             message=messages.NOTIFY_TRIBAL_CHALLENGE_EVENT_MSG_FMT
         )
@@ -220,6 +222,17 @@ class EmulatedPlayerTest(unittest.TestCase):
         sms_http_fn.assert_called()
         add_challenge_entry_fn.assert_called()
         player_from_id_fn.assert_called()
+
+    @parameterized.expand([
+        ('AAAA https://vir_us.io/challenge-submission/AAAA/BBBB/CCCC XXXX', 'CCCC'),
+        ('https://vir_us.io/challenge-submission/AAAA/BBBB/CCCC', 'CCCC'),
+        ('https://vir_us.io/challenge-submission/33id7ZdAvaEnCphkfsPg/KVUq87OMs4vkEJI1psxw/GQT2zIojZGup2iT9IoYC', 'GQT2zIojZGup2iT9IoYC')
+    ])
+    def test_challenge_id_from_message(self, message, challenge_id):
+        self.assertEqual(
+            emulated_player._challenge_id_from_message(message=message),
+            challenge_id
+        )
 
 
 if __name__ == '__main__':

@@ -26,6 +26,10 @@ def _is_challenge(message: str) -> bool:
                      message, flags=re.I) is not None
 
 
+def _challenge_id_from_message(message: str) -> str:
+    return re.search('https:\/\/[^\/]+\/challenge-submission\/[^\/]+\/[^\/]+\/([a-zA-Z0-9]+)', message).group(1)
+
+
 def _parse_voting_options(message: str) -> List[str]:
     return re.findall('^([A-Z]):', message, flags=re.MULTILINE)
 
@@ -50,7 +54,7 @@ class EmulatedPlayer:
             views=views,
             player_id=self.id,
             tribe_id=player.tribe_id,
-            challenge_id=f'emulated_challenge.{str(uuid.uuid4())}',
+            challenge_id=_challenge_id_from_message(message=message),
             team_id=player.team_id,
             url=f'http://tiktok.com/@{self.tiktok}/{str(uuid.uuid4())}'
         )

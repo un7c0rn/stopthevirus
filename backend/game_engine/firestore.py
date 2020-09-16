@@ -2,7 +2,7 @@ from game_engine.database import Database, Data
 import attr
 from typing import Dict, Iterable, Tuple, Optional
 from game_engine.database import Player, Team, Tribe
-from game_engine.database import Challenge, Entry, Vote, Game, Ballot
+from game_engine.database import Challenge, Entry, Vote, Game, Ballot, User
 from multiprocessing import Pool
 from itertools import product
 import firebase_admin
@@ -67,6 +67,10 @@ class FirestoreEntry(FirestoreData, Entry):
 
 
 class FirestoreBallot(FirestoreData, Ballot):
+    pass
+
+
+class FirestoreUser(FirestoreData, User):
     pass
 
 
@@ -208,7 +212,8 @@ class FirestoreDB(Database):
         return user_ref.id
 
     def add_challenge_entry(self, entry: Entry) -> None:
-        entry_ref = self._client.collection('games/{}/entries').document()
+        entry_ref = self._client.collection(
+            f'games/{self._game_id}/entries').document()
         entry_ref.set({
             'likes': entry.likes,
             'views': entry.views,
@@ -261,27 +266,15 @@ class FirestoreDB(Database):
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
             'count_players': Increment(player_count)
         })
-
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
             'count_teams': Increment(team_count)
         })
-
-        batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
-            'size': Increment(player_count)
-        })
-
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
             'count_players': Increment(-1 * player_count)
         })
-
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
             'count_teams': Increment(-1 * team_count)
         })
-
-        batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
-            'size': Increment(-1 * player_count)
-        })
-
         batch.commit()
 
     def stream_entries(self, from_tribe: Tribe = None, from_team: Team = None,
@@ -418,14 +411,8 @@ class FirestoreDB(Database):
         batch.update(tribe_ref, {
             'count_players': Increment(-1)
         })
-        batch.update(tribe_ref, {
-            'size': Increment(-1)
-        })
         batch.update(team_ref, {
             'count_players': Increment(-1)
-        })
-        batch.update(team_ref, {
-            'size': Increment(-1)
         })
         batch.update(game_ref, {
             'count_players': Increment(-1)
@@ -465,6 +452,10 @@ class FirestoreDB(Database):
         properties_dict = copy.deepcopy(data.__dict__)
         if '_document' in properties_dict:
             del properties_dict['_document']
+        if isinstance(data, User):
+            self._client.document("users/{}".format(data.id)).set(
+                properties_dict
+            )
         if isinstance(data, Game):
             self._client.document("games/{}".format(data.id)).set(
                 properties_dict
@@ -493,7 +484,6 @@ class FirestoreDB(Database):
             'name': name,
             'count_players': 0,
             'count_teams': 0,
-            'size': 0,
             'active': True,
             'id': tribe_ref.id
         })
@@ -585,6 +575,6 @@ class FirestoreDB(Database):
             'phone_number', '==', phone_number)
         users = query.get()
         if len(users) > 0:
-            return users[0]
+            return FirestoreUser(users[0])
         else:
             return None

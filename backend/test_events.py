@@ -145,6 +145,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -195,6 +196,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -233,6 +235,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winning_player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -244,6 +247,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "losing_players": [
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo1",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -254,6 +258,7 @@ class AmazonSQSTest(unittest.TestCase):
                         },
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo2",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -361,6 +366,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "finalists": [
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo1",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -371,6 +377,7 @@ class AmazonSQSTest(unittest.TestCase):
                         },
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo2",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -401,6 +408,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -448,6 +456,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winner": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo2",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",

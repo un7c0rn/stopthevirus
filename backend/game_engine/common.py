@@ -260,7 +260,7 @@ def init_sentry():
                     attach_stacktrace=True)
 
 
-def log_message(message: str, game_id: str = None, additional_tags: Dict = None, push_to_sentry=True):
+def log_message(message: str, game_id: str = None, additional_tags: Dict = None, push_to_sentry=False):
     if push_to_sentry:
         # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
         init_sentry()

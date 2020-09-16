@@ -11,7 +11,7 @@ import json
 import sys
 from concurrent.futures import ThreadPoolExecutor
 import copy
-from typing import Text, Union, Any, Dict
+from typing import Union, Any, Dict
 import uuid
 
 _NOP_SMS_ADDRESS = "555-123-4567"
@@ -19,13 +19,13 @@ _NOP_SMS_ADDRESS = "555-123-4567"
 
 @attr.s
 class SMSEventMessage(Serializable):
-    content: Text = attr.ib()
-    recipient_phone_numbers: List[Text] = attr.ib(factory=list)
+    content: str = attr.ib()
+    recipient_phone_numbers: List[str] = attr.ib(factory=list)
 
 
 @attr.s
 class SMSEvent(Serializable):
-    game_id: Text = attr.ib()
+    game_id: str = attr.ib()
     game_options: GameOptions = attr.ib()
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -37,7 +37,7 @@ class SMSEvent(Serializable):
         ]
 
     @classmethod
-    def from_json(cls, json_text: Text, game_options: GameOptions) -> Serializable:
+    def from_json(cls, json_text: str, game_options: GameOptions) -> Serializable:
         d = json.loads(json_text)
         d['game_options'] = game_options
         event_type = d['class']
@@ -82,7 +82,7 @@ class EventQueueError(Exception):
 
 
 class AmazonSQS(EventQueue):
-    def __init__(self, json_config_path: Text, game_id: Text, game_options: GameOptions = None) -> None:
+    def __init__(self, json_config_path: str, game_id: str, game_options: GameOptions = None) -> None:
         self.game_id = game_id
         with open(json_config_path, 'r') as f:
             config = json.loads(f.read())
@@ -99,7 +99,7 @@ class AmazonSQS(EventQueue):
             game_schedule=STV_I18N_TABLE['US']
         )
 
-    def _delete_message(self, receipt_handle: Text) -> None:
+    def _delete_message(self, receipt_handle: str) -> None:
         self._client.delete_message(QueueUrl=self._url,
                                     ReceiptHandle=receipt_handle)
 
@@ -353,7 +353,7 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
 class NotifyTribalChallengeEvent(SMSEvent):
     challenge: Challenge = attr.ib()
 
-    def challenge_submission_link(self) -> Text:
+    def challenge_submission_link(self) -> str:
         pass
 
     @classmethod
@@ -407,7 +407,7 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
             losing_tribe=Tribe.from_dict(json_dict['losing_tribe']),
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -488,7 +488,7 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
                        for v in json_dict['finalists']]
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -505,7 +505,7 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_FINAL_TRIBAL_COUNCIL_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_HOSTNAME,
+                    header=messages.VIR_US_SMS_HEADER,
                     players=len(self.finalists),
                     game=gamedb.game_from_id(id=self.game_id).hashtag,
                     time=self.game_options.game_schedule.localized_time_string(
@@ -531,7 +531,7 @@ class NotifyPlayerVotedOutEvent(SMSEvent):
             player=Player.from_dict(json_dict['player'])
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -571,7 +571,7 @@ class NotifyTribalCouncilCompletionEvent(SMSEvent):
             game_id=json_dict['game_id'],
             game_options=json_dict['game_options'])
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -636,7 +636,7 @@ class NotifyImmunityAwardedEvent(SMSEvent):
             team=Team.from_dict(json_dict['team'])
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         return messages.NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT.format(
             header=messages.VIR_US_SMS_HEADER,
             date=self.game_options.game_schedule.tomorrow_localized_string,

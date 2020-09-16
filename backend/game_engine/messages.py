@@ -10,8 +10,8 @@ from game_engine.common import GameError
 # event message spec
 # https://docs.google.com/spreadsheets/d/1sOB5sMfvXaziBMegMmY0I2ANF4Vbu41MNPRwylCr6dY/edit#gid=0
 
-VIR_US_SMS_HEADER = 'VIR-US:'
-VIR_US_HOSTNAME = 'https://vir_us.io'
+VIR_US_SMS_HEADER = 'TRIBE\n\n'
+VIR_US_HOSTNAME = 'stopthevirus-alpha.netlify.app'
 
 _SMS_OPTION_LETTER_TABLE = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'
@@ -147,11 +147,11 @@ Next challenge starts tomorrow {date} at {time}.
 """
 
 NOTIFY_WINNER_ANNOUNCEMENT_EVENT_WINNER_MSG_FMT = """
-VIR-US: You are the last survivor and WINNER of {game}!
+{header} You are the last survivor and WINNER of {game}!
 """
 
 NOTIFY_WINNER_ANNOUNCEMENT_EVENT_GENERAL_MSG_FMT = """
-VIR-US: {player} is the last survivor and WINNER of {game}!
+{header} {player} is the last survivor and WINNER of {game}!
 """
 
 NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT = """
