@@ -413,6 +413,15 @@ class FirestoreDBTest(unittest.TestCase):
         self.assertEqual(_gamedb.find_player(
             phone_number='+15551234567').name, "Boston Rob")
 
+    def test_add_user(self):
+        # assert that the user ID is equivalent across both calls.
+        self.assertEqual(
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH,
+                                 name='user/foo', tiktok='tiktok/bar', phone_number='+10000000000'),
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH,
+                                 name='user/bar', tiktok='tiktok/bar', phone_number='+10000000000')
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -46,7 +46,6 @@ class _FirestoreDB():
         team_ref = self._client.document(
             "games/{}/teams/{}".format(self._game_id, player.get('team_id')))
         game_ref = self._client.document("games/{}".format(self._game_id))
-
         batch.update(player_ref, {
             'active': False
         })
@@ -59,6 +58,13 @@ class _FirestoreDB():
         batch.update(game_ref, {
             'count_players': Increment(-1)
         })
+        users = self._client.collection("users").where(
+            "phone_number", "==", player.get("phone_number")).get()
+        if len(users) > 0:
+            user_ref = users[0].reference
+            batch.update(user_ref, {
+                'game_id': None
+            })
         batch.commit()
 
     def find_ballot(self, player_id: str) -> DocumentReference:
@@ -104,6 +110,7 @@ class _FirestoreDB():
             return str(users[0].get('game_id'))
         else:
             return None
+
 
 def _normalize_vote_option(message: str) -> str:
     return message.upper().replace(' ', '')

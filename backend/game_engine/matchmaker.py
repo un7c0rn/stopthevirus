@@ -85,7 +85,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         for n, player in enumerate(players):
             team = teams[n % count_teams]
             player.team_id = team.id
-            team.size += 1
+            team.count_players += 1
 
         teams_dict = {}
         for team in teams:
@@ -123,7 +123,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         team_to_tribe_map = {}
 
         # randomly assign team, tribe to each player
-        mutable_players = set()
+        set_of_mutable_players = set()
         for n, player in enumerate(players):
             mutable_player = gamedb.player_from_id(player.id)
             tribe = tribes[n % count_tribes]
@@ -134,22 +134,20 @@ class MatchMakerRoundRobin(MatchMakerInterface):
             mutable_player.tribe_id = tribe.id
             mutable_player.team_id = team.id
             team.tribe_id = tribe.id
-            tribe.size += 1
-            team.size += 1
             tribe.count_players += 1
             team.count_players += 1
-            mutable_players.add(mutable_player)
+            set_of_mutable_players.add(mutable_player)
 
         # Save data
         game = gamedb.game_from_id(game_id)
-        game.count_players = count_players
+        game.count_tribes = count_tribes
         game.count_teams = count_teams
-        game.count_tribes = count_teams
+        game.count_players = count_players
         gamedb.save(game)
 
         for tribe in tribes:
             gamedb.save(tribe)
-        for player in mutable_players:
+        for player in set_of_mutable_players:
             gamedb.save(player)
         for team in teams:
             gamedb.save(team)
@@ -158,4 +156,5 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         d['players'] = players
         d['teams'] = teams
         d['tribes'] = tribes
+        d['game'] = game
         return d
