@@ -414,31 +414,31 @@ class FirestoreDB(Database):
         team_ref = self._client.document(
             "games/{}/teams/{}".format(self._game_id, player.team_id))
         game_ref = self._client.document("games/{}".format(self._game_id))
-
         batch.update(player_ref, {
             'active': False
         })
-
         batch.update(tribe_ref, {
             'count_players': Increment(-1)
         })
-
         batch.update(tribe_ref, {
             'size': Increment(-1)
         })
-
         batch.update(team_ref, {
             'count_players': Increment(-1)
         })
-
         batch.update(team_ref, {
             'size': Increment(-1)
         })
-
         batch.update(game_ref, {
             'count_players': Increment(-1)
         })
-
+        users = self._client.collection("users").where(
+            "phone_number", "==", player.phone_number).get()
+        if len(users) > 0:
+            user_ref = users[0].reference
+            batch.update(user_ref, {
+                'game_id': None
+            })
         batch.commit()
 
     def deactivate_team(self, team: Team) -> None:
