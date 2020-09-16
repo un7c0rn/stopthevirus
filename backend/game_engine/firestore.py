@@ -465,6 +465,10 @@ class FirestoreDB(Database):
         properties_dict = copy.deepcopy(data.__dict__)
         if '_document' in properties_dict:
             del properties_dict['_document']
+        if isinstance(data, Game):
+            self._client.document("games/{}".format(data.id)).set(
+                properties_dict
+            )
         if isinstance(data, Player):
             self._client.document("games/{}/players/{}".format(self._game_id, data.id)).set(
                 properties_dict

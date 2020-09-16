@@ -9,6 +9,7 @@ from game_engine.matchmaker import MatchMakerRoundRobin
 from game_engine.database import Player, Team, Game
 from game_engine.firestore import FirestoreDB
 from test_game import MockDatabase
+from parameterized import parameterized
 
 import copy
 
@@ -24,6 +25,10 @@ _TEAM_SIZE = 10
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 json_config_path = _TEST_FIRESTORE_INSTANCE_JSON_PATH
+
+
+_gamedb = FirestoreDB(
+    json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH)
 
 
 class MatchMakerRoundRobinTest(unittest.TestCase):
@@ -68,6 +73,58 @@ class MatchMakerRoundRobinTest(unittest.TestCase):
         self.assertEqual(len(players), 20)
         self.assertEqual(len(teams), 2)
         self.assertEqual(len(tribes), 2)
+
+    @parameterized.expand([
+        (MatchMakerRoundRobin, 10, GameOptions(
+            target_team_size=5), 2, 2, 10, 1, 5, 5),
+        (MatchMakerRoundRobin, 20, GameOptions(
+            target_team_size=5), 2, 4, 20, 2, 10, 5),
+        (MatchMakerRoundRobin, 100, GameOptions(
+            target_team_size=10), 2, 10, 100, 5, 50, 10),
+    ])
+    def test_generate_tribes_count_initialization(self, algorithm_type,
+                                                  number_of_joined_players,
+                                                  game_options,
+                                                  expected_game_count_tribes,
+                                                  expected_game_count_teams,
+                                                  expected_game_count_players,
+                                                  expected_tribe_count_teams,
+                                                  expected_tribe_count_players,
+                                                  expected_team_count_players):
+        # create a game
+        game_id = FirestoreDB.add_game(
+            json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH, hashtag='hashtag/foo')
+        _gamedb._game_id = game_id
+        
+        # generate mock players with an id attribute and add the players to the game
+        players = list()
+        for _ in range(0, number_of_joined_players):
+            mock_player = mock.MagicMock()
+            mock_player.id = mock.MagicMock(return_value=str(uuid.uuid4()))
+            players.append(mock_player)
+
+        # read counts for game, all tribes, all teams and verify that they are correct
+        game_info_dict = algorithm_type.generate_tribes(
+            game_id=game_id,
+            players=players,
+            game_options=game_options,
+            gamedb=_gamedb
+        )
+
+        game = _gamedb.game_from_id(game_id)
+        self.assertEqual(game.count_tribes, expected_game_count_tribes)
+        self.assertEqual(game.count_teams, expected_game_count_teams)
+        self.assertEqual(game.count_players, expected_game_count_players)
+
+        for tribe in game_info_dict['tribes']:
+            tribe_ref = _gamedb.tribe_from_id(
+                tribe.id)
+            self.assertEqual(tribe_ref.count_teams, expected_tribe_count_teams)
+            self.assertEqual(tribe_ref.count_players,
+                             expected_tribe_count_players)
+        for team in game_info_dict['teams']:
+            self.assertEqual(_gamedb.team_from_id(
+                team.id).count_players, expected_team_count_players)
 
 
 if __name__ == '__main__':
