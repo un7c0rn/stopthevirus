@@ -83,7 +83,7 @@ _EMULATED_PLAYERS = [
 ]
 
 _REAL_PLAYERS = [
-    ('Brandon', 'un7c0rn', '+17742593288'),
+    # ('Brandon', 'un7c0rn', '+17742593288'),
 ]
 
 
@@ -156,10 +156,10 @@ class IntegrationTest(unittest.TestCase):
         service = MatchmakerService(
             matchmaker=MatchMakerRoundRobin(), region=f'US-{test_id}', gamedb=gamedb, game_options=GameOptions(
                 game_clock_mode=GameClockMode.ASYNC,
-                game_wait_sleep_interval_sec=10,
+                game_wait_sleep_interval_sec=4,
                 multi_tribe_min_tribe_size=2,
                 engine_worker_thread_count=1,
-                tribe_council_time_sec=10))
+                tribe_council_time_sec=3))
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).

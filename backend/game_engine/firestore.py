@@ -264,16 +264,14 @@ class FirestoreDB(Database):
 
         batch = self._client.batch()
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
-            'count_players': Increment(player_count)
-        })
-        batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
-            'count_teams': Increment(team_count)
-        })
-        batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
-            'count_players': Increment(-1 * player_count)
+            'count_players': Increment(player_count),
+            'count_teams': Increment(team_count),
+            'active' : False
         })
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
-            'count_teams': Increment(-1 * team_count)
+            'count_players': 0,
+            'count_teams': 0,
+            'active' : False
         })
         batch.commit()
 
@@ -433,19 +431,16 @@ class FirestoreDB(Database):
         tribe_ref = self._client.document(
             "games/{}/tribes/{}".format(self._game_id, team.tribe_id))
         game_ref = self._client.document("games/{}".format(self._game_id))
-
         batch.update(team_ref, {
-            'active': False
+            'active': False,
+            'count_players': 0
         })
-
         batch.update(tribe_ref, {
             'count_teams': Increment(-1)
         })
-
         batch.update(game_ref, {
             'count_teams': Increment(-1)
         })
-
         batch.commit()
 
     def save(self, data: Data) -> None:
