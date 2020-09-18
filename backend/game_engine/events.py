@@ -13,9 +13,11 @@ from concurrent.futures import ThreadPoolExecutor
 import copy
 from typing import Union, Any, Dict
 import uuid
+import time
+import botocore
 
 _NOP_SMS_ADDRESS = "555-123-4567"
-
+_AWS_SQS_INIT_TIME_SEC = 2
 
 @attr.s
 class SMSEventMessage(Serializable):
@@ -85,14 +87,24 @@ class AmazonSQS(EventQueue):
     def __init__(self, json_config_path: str, game_id: str, game_options: GameOptions = None) -> None:
         self.game_id = game_id
         with open(json_config_path, 'r') as f:
+            name = f'VIRUS-{game_id}-{str(uuid.uuid4())}.fifo'
             config = json.loads(f.read())
-            self._url = config['url']
             self._client = boto3.client(
                 'sqs',
                 aws_access_key_id=config['aws_access_key_id'],
                 aws_secret_access_key=config['aws_secret_access_key'],
                 region_name='us-east-2'
             )
+            self._client.create_queue(
+                QueueName=name,
+                Attributes={
+                    'FifoQueue': 'true'
+                }
+            )
+            # After you create a queue, you must wait at least one second after the queue
+            # is created to be able to use the queue.
+            time.sleep(_AWS_SQS_INIT_TIME_SEC)
+            self._url = self._client.get_queue_url(QueueName=name)['QueueUrl']
         # store a reference to game options for timezone specific
         # event deserialization from the AWS queue.
         self._game_options = game_options if game_options else GameOptions(
@@ -143,6 +155,14 @@ class AmazonSQS(EventQueue):
         else:
             with ThreadPoolExecutor(max_workers=1) as executor:
                 executor.submit(self.put_fn, event)
+
+    def __del__(self):
+        try:
+            self._client.delete_queue(
+                QueueUrl=self._url
+            )
+        except:
+            pass
 
 
 @attr.s

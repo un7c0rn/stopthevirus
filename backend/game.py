@@ -11,7 +11,7 @@ from game_engine import events
 import time
 import logging
 import sys
-from queue import Queue
+from queue import Queue, Empty
 import random
 import pprint
 import heapq
@@ -22,6 +22,7 @@ from game_engine.common import GameClockMode
 from game_engine.common import GameOptions
 from game_engine.common import log_message
 import uuid
+import itertools
 
 
 def _unixtime():
@@ -72,6 +73,7 @@ class Game(object):
         return winner
 
     def _play_multi_tribe(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Tribe:
+        merged_tribe = None
         while (tribe1.count_players > self._options.multi_tribe_min_tribe_size and
                tribe2.count_players > self._options.multi_tribe_min_tribe_size):
             log_message(message="Tribe {} size {} tribe {} size {}.".format(
@@ -397,22 +399,25 @@ class Game(object):
     def _merge_teams(self, target_team_size: int, tribe: Tribe, gamedb: Database, engine: Engine):
         with engine:
             # team merging is only necessary when the size of the team == 2
-            # once a team size == 2, it should be merged with another team. the optimal
+            # once a team size == 2, it should be merged with another team, because
+            # a self preservation vote lands in a deadlock. in general, the optimal
             # choice is to keep team sizes as close to the intended size as possible
+            # up until a merge becomes necessary.
 
-            # find all teams with size = 2, these players need to be merged
+            # find all teams with size == 2, these players need to be merged
             small_teams = gamedb.stream_teams(
                 from_tribe=tribe, team_size_predicate_value=2)
             merge_candidates = Queue()
 
             for team in small_teams:
-                log_message(message="Found team of 2. Deacticating team {}.".format(
-                    team), game_id=self._game_id)
-
                 # do not deactivate the last active team in the tribe
-                if gamedb.count_teams(from_tribe=tribe, active_team_predicate_value=True) > 1:
+                count_teams = gamedb.count_teams(
+                    from_tribe=tribe, active_team_predicate_value=True)
+                if count_teams > 1:
+                    log_message(message="Found team of 2. Deactivating team {}.".format(
+                        team), game_id=self._game_id)
                     gamedb.deactivate_team(team)
-
+                    
                 for player in gamedb.list_players(from_team=team):
                     log_message(message="Adding merge candidate {}.".format(
                         player), game_id=self._game_id)
@@ -427,7 +432,7 @@ class Game(object):
             # simplest case, could use more thought.
             visited = {}
             while not merge_candidates.empty() and sorted_teams:
-                for team in sorted_teams:
+                for team in itertools.cycle(sorted_teams):
                     other_options_available = team.id not in visited
                     visited[team.id] = True
 
@@ -436,7 +441,13 @@ class Game(object):
                                     "Continuing search...".format(team, target_team_size), game_id=self._game_id)
                         continue
 
-                    player = merge_candidates.get()
+                    player = None
+                    try:
+                        player = merge_candidates.get_nowait()
+                    except Empty:
+                        log_message(message="Merge candidates empty.")
+                        return
+
                     if player.team_id == team.id:
                         log_message(
                             message=f"Player {str(player)} already on team {str(team)}. Continuing.")
@@ -445,7 +456,7 @@ class Game(object):
                     log_message(message="Merging player {} from team {} into team {}.".format(
                         player, player.team_id, team.id), game_id=self._game_id)
                     player.team_id = team.id
-                    team.count_players = team.count_players + 1
+                    team.count_players += 1
                     gamedb.save(team)
                     gamedb.save(player)
 
@@ -516,7 +527,10 @@ class Game(object):
         # tribe score = avg score of all tribe members
         log_message(message="_score_entries_tribe_agg = {}.".format(
             score_dict['score']), game_id=self._game_id)
-        return score_dict['score'] / players
+
+        if players > 0:
+            return score_dict['score'] / players
+        return 0
 
     def _score_entries_top_k_teams_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
         entries_iter = iter(entries)

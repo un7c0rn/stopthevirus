@@ -31,9 +31,9 @@ class Engine(object):
         self._gamedb = gamedb
         self._executor = ThreadPoolExecutor(
             max_workers=options.engine_worker_thread_count)
+        self._critical_section_lock = Lock()
         for _ in range(options.engine_worker_thread_count):
             self._executor.submit(self._do_work_fn)
-        self._critical_section_lock = Lock()
 
     def __enter__(self):
         self._critical_section_lock.acquire()
@@ -55,8 +55,7 @@ class Engine(object):
     def _do_work_fn(self) -> None:
         event = None
         notifier = self._get_sms_notifier()
-        queue = AmazonSQS(
-            json_config_path=self._sqs_config_path, game_id=self.game_id)
+        queue = self._output_events
         while not self._stop.is_set():
             try:
                 # leave events on the queue until the critical section lock
@@ -86,3 +85,6 @@ class Engine(object):
         log_message(message='Shutting down workder thread {}.'.format(
             threading.current_thread().ident),
             game_id=self.game_id)
+
+    def __del__(self):
+        self._output_events = None
