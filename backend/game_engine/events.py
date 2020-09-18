@@ -17,7 +17,7 @@ import time
 import botocore
 
 _NOP_SMS_ADDRESS = "555-123-4567"
-
+_AWS_SQS_INIT_TIME_SEC = 2
 
 @attr.s
 class SMSEventMessage(Serializable):
@@ -103,7 +103,7 @@ class AmazonSQS(EventQueue):
             )
             # After you create a queue, you must wait at least one second after the queue
             # is created to be able to use the queue.
-            time.sleep(2)
+            time.sleep(_AWS_SQS_INIT_TIME_SEC)
             self._url = self._client.get_queue_url(QueueName=name)['QueueUrl']
         # store a reference to game options for timezone specific
         # event deserialization from the AWS queue.

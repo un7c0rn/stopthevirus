@@ -396,7 +396,7 @@ class Game(object):
             game_id=self._game_id, game_options=self._options, winner=winner))
         return winner
 
-    def _merge_teams(self, target_team_size: int, tribe: Tribe, gamedb: Database, engine: Engine) -> Optional[Tribe]:
+    def _merge_teams(self, target_team_size: int, tribe: Tribe, gamedb: Database, engine: Engine):
         with engine:
             # team merging is only necessary when the size of the team == 2
             # once a team size == 2, it should be merged with another team, because
@@ -417,36 +417,7 @@ class Game(object):
                     log_message(message="Found team of 2. Deactivating team {}.".format(
                         team), game_id=self._game_id)
                     gamedb.deactivate_team(team)
-                # else:
-                #     # if we've reached this point, then there's a team with a size of 2, and
-                #     # it's the last team in the tribe. the tribes must merge.
-                #     # NOTE(brandon): except it's actually not necessarily the last team in the tribe. there are two cases here.
-                #     # A) a tribe actually has one team left and that team is size two, e.g. count_teams == 1 && count_players == 2
-                #     # B) a tribe has multiple teams left (though they've been deactivated), all of size two, which can merge together without breaking up the tribe
-                #     # in this case, what we really care about is not that the count_teams > 1, but that the count_players in the
-                #     # tribe > T, where T is the minimum tribe size prior to a merge trigger.
-
-                #     # so in general the rule of do not deactivate the last team in the tribe is OK, but the trigger to merge tribes
-                #     # is not simply that the tribe has only 1 team remaining with size 2. the tribe merge trigger is when the count of
-                #     # players in the tribe < T (merge threshold). this can be reached _before_ anticipated in the V1 algorithm because of
-                #     # tribe dominance, i.e. tribe A wins so often that tribe B hits a small number of players. if this is the case then
-                #     # why wouldn't the original algorithm stand, where we check for the tribe size on every iteration and merge when necessary?
-
-                #     log_message(
-                #         message="Found team of 2 which is the last team in the tribe. Merging tribes.")
-                #     if winning_tribe:
-                #         merged_tribe = self._merge_tribes(tribe1=tribe, tribe2=winning_tribe,
-                #                                           new_tribe_name=self._options.merge_tribe_name, gamedb=gamedb, engine=engine)
-
-                #         # subsequently, the since there is now a large tribe with at least one
-                #         # team of size == 2, the teams must merge.
-                #         self._merge_teams(target_team_size=target_team_size,
-                #                           tribe=merged_tribe, gamedb=gamedb, engine=engine)
-                #         return merged_tribe
-                #     else:
-                #         raise GameError(
-                #             'Attempt to merge teams within single tribe of size 2. No teams available for merge.')
-
+                    
                 for player in gamedb.list_players(from_team=team):
                     log_message(message="Adding merge candidate {}.".format(
                         player), game_id=self._game_id)
