@@ -238,9 +238,11 @@ class GameIntegrationTestLogStream:
         self._outputs = []
 
     def add_user_sent_sms(self, request: Dict) -> None:
+        log_message(f'User sent SMS {request}')
         self._inputs.append(json.dumps(request))
 
     def add_user_received_sms(self, user_name: str, message: str) -> None:
+        log_message(f'User {user_name} received SMS {message}')
         self._outputs.append({'name': user_name, 'message': message})
 
     def add_user_challenge_entry(self, entry: Serializable) -> None:

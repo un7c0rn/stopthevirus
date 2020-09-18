@@ -29,15 +29,17 @@ def _unixtime():
     return time.time()
 
 
-# TODO(brandon): update these values for production
-_TRIBE_1_ID = ''
-_TRIBE_2_ID = ''
-_FIRESTORE_PROD_CONF_JSON_PATH = ''
-_AMAZON_SQS_PROD_CONF_JSON_PATH = '../amazon/stopthevirus.fifo.json'
+def _tribe_count_players(tribe: Tribe, gamedb: Database) -> int:
+    tribe = gamedb.tribe_from_id(tribe.id)
+    return tribe.count_players
 
 
-class Game(object):
+def _team_count_players(team: Team, gamedb: Database) -> int:
+    team = gamedb.team_from_id(team.id)
+    return team.count_players
 
+
+class Game:
     def __init__(self, game_id: Text, options: GameOptions):
         self._options = options
         self._game_id = game_id
@@ -74,11 +76,8 @@ class Game(object):
 
     def _play_multi_tribe(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Tribe:
         merged_tribe = None
-        while (tribe1.count_players > self._options.multi_tribe_min_tribe_size and
-               tribe2.count_players > self._options.multi_tribe_min_tribe_size):
-            log_message(message="Tribe {} size {} tribe {} size {}.".format(
-                tribe1, tribe1.count_players, tribe2, tribe2.count_players), game_id=self._game_id)
-
+        while (_tribe_count_players(tribe1, gamedb) > self._options.multi_tribe_min_tribe_size and
+               _tribe_count_players(tribe2, gamedb) > self._options.multi_tribe_min_tribe_size):
             log_message("Getting new challenge.")
             challenge = self._get_next_challenge(gamedb=gamedb)
 
@@ -141,7 +140,7 @@ class Game(object):
         return [team for team in gamedb.list_teams(active_team_predicate_value=True)][0]
 
     def _play_single_team(self, team: Team, gamedb: Database, engine: Engine) -> List[Player]:
-        while team.count_players > self._options.target_finalist_count:
+        while _team_count_players(team, gamedb) > self._options.target_finalist_count:
             challenge = self._get_next_challenge(gamedb=gamedb)
             self._run_challenge(challenge=challenge,
                                 gamedb=gamedb, engine=engine)
@@ -417,7 +416,6 @@ class Game(object):
                     log_message(message="Found team of 2. Deactivating team {}.".format(
                         team), game_id=self._game_id)
                     gamedb.deactivate_team(team)
-                    
                 for player in gamedb.list_players(from_team=team):
                     log_message(message="Adding merge candidate {}.".format(
                         player), game_id=self._game_id)
@@ -433,6 +431,7 @@ class Game(object):
             visited = {}
             while not merge_candidates.empty() and sorted_teams:
                 for team in itertools.cycle(sorted_teams):
+                    team.count_players = _team_count_players(team, gamedb)
                     other_options_available = team.id not in visited
                     visited[team.id] = True
 
@@ -643,12 +642,18 @@ class Game(object):
                 # all but the highest scorer lose
                 if rank < (num_scores - 1):
                     losing_players.append(gamedb.player_from_id(player_id))
-
         return losing_players
 
     def _merge_tribes(self, tribe1: Tribe, tribe2: Tribe, new_tribe_name: Text, gamedb: Database, engine: Engine) -> Tribe:
+        log_message(message=f"Merging tribes into {new_tribe_name}.")
         with engine:
             new_tribe = gamedb.tribe(name=new_tribe_name)
             gamedb.batch_update_tribe(from_tribe=tribe1, to_tribe=new_tribe)
             gamedb.batch_update_tribe(from_tribe=tribe2, to_tribe=new_tribe)
+            # after tribes merge, sweep the teams to ensure no size of 2
+            self._merge_teams(target_team_size=self._options.target_team_size, tribe=new_tribe,
+                              gamedb=gamedb, engine=engine)
+            game = gamedb.game_from_id(gamedb.get_game_id())
+            game.count_tribes = 1
+            gamedb.save(game)
             return new_tribe

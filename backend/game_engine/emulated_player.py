@@ -81,6 +81,3 @@ class EmulatedPlayer:
             challenge_entry = self._entry_for_message(message)
             self.gamedb.add_challenge_entry(challenge_entry)
             self.test_stream.add_user_challenge_entry(challenge_entry)
-        else:
-            log_message(
-                message=f'Emulator ignoring unsupported message "{message}".')

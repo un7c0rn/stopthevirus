@@ -252,6 +252,7 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
         player_messages = []
         count_players = gamedb.count_players(
             from_tribe=gamedb.tribe_from_id(self.winning_player.tribe_id))
+        # TODO(brandon): unclear why this can't be done in a single bulk message.
         for player in self.losing_players:
             options_map = messages.players_as_formatted_options_map(
                 players=self.losing_players, exclude_player=player)
@@ -271,14 +272,14 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
                             self.game_options.game_schedule.daily_challenge_end_time),
                         options=options_map.formatted_string
                     ),
-                    recipient_phone_numbers=player.phone_number
+                    recipient_phone_numbers=[player.phone_number]
                 )
             )
 
         options_map = messages.players_as_formatted_options_map(
             players=self.losing_players, exclude_player=self.winning_player)
         gamedb.ballot(
-            player_id=self.winning_player.id, options=options_map.formatted_string, challenge_id=None
+            player_id=self.winning_player.id, options=options_map.options, challenge_id=None
         )
         player_messages.append(
             SMSEventMessage(
@@ -289,7 +290,7 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
                         self.game_options.game_schedule.daily_challenge_end_time),
                     options=options_map.formatted_string
                 ),
-                recipient_phone_numbers=self.winning_player.phone_number
+                recipient_phone_numbers=[self.winning_player.phone_number]
             )
         )
 
