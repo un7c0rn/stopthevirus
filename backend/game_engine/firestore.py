@@ -266,12 +266,12 @@ class FirestoreDB(Database):
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, to_tribe.id)), {
             'count_players': Increment(player_count),
             'count_teams': Increment(team_count),
-            'active' : False
+            'active': True
         })
         batch.update(self._client.document('games/{}/tribes/{}'.format(self._game_id, from_tribe.id)), {
             'count_players': 0,
             'count_teams': 0,
-            'active' : False
+            'active': False
         })
         batch.commit()
 
@@ -290,7 +290,8 @@ class FirestoreDB(Database):
     def stream_teams(self, from_tribe: Tribe,
                      team_size_predicate_value: [int, None] = None,
                      order_by_size=True,
-                     descending=False
+                     descending=False,
+                     active=True
                      ) -> Iterable[Team]:
         query = self._client.collection('games/{}/teams'.format(self._game_id)).where(
             'tribe_id', '==', from_tribe.id)
@@ -300,7 +301,7 @@ class FirestoreDB(Database):
         elif order_by_size:
             query = query.order_by(
                 'count_players', direction=Query.DESCENDING if descending else Query.ASCENDING)
-        return FirestoreTeamStream(stream=query.stream())
+        return FirestoreTeamStream(stream=query.where('active', '==', active).stream())
 
     def stream_players(self, active_player_predicate_value=True) -> Iterable[Player]:
         query = self._client.collection('games/{}/players'.format(self._game_id)).where(
@@ -371,13 +372,21 @@ class FirestoreDB(Database):
         query = self._client.collection(
             'games/{}/players'.format(self._game_id)).where('team_id', '==', from_team.id).where(
                 'active', '==', active_player_predicate_value)
-        return FirestorePlayerStream(query.stream())
+        stream = FirestorePlayerStream(query.stream())
+        players = list()
+        for player in stream:
+            players.append(player)
+        return players
 
     def list_teams(self, active_team_predicate_value=True) -> Iterable[Team]:
         query = self._client.collection(
             'games/{}/teams'.format(self._game_id)).where(
                 'active', '==', active_team_predicate_value)
-        return FirestoreTeamStream(query.stream())
+        stream = FirestoreTeamStream(query.stream())
+        teams = list()
+        for team in stream:
+            teams.append(team)
+        return teams
 
     def game_from_id(self, id: str) -> Game:
         return FirestoreGame(self._client.document("games/{}".format(self._game_id)).get())
@@ -395,6 +404,8 @@ class FirestoreDB(Database):
         return FirestoreChallenge(self._client.document("games/{}/challenges/{}".format(self._game_id, id)).get())
 
     def deactivate_player(self, player: Player) -> None:
+        team = self.team_from_id(player.team_id)
+        team_player_count = self.count_players(from_team=team)
         batch = self._client.batch()
         player_ref = self._client.document(
             "games/{}/players/{}".format(self._game_id, player.id))
@@ -423,6 +434,10 @@ class FirestoreDB(Database):
                 'game_id': None
             })
         batch.commit()
+        # NOTE(brandon): we use LTE to here since the count
+        # was retrieved prior to the decrement commit.
+        if team_player_count <= 1:
+            self.deactivate_team(team=team)
 
     def deactivate_team(self, team: Team) -> None:
         batch = self._client.batch()
@@ -573,3 +588,6 @@ class FirestoreDB(Database):
             return FirestoreUser(users[0])
         else:
             return None
+
+    def get_game_id(self) -> str:
+        return self._game_id

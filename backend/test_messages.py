@@ -400,7 +400,7 @@ class SMSMessageUXTest(unittest.TestCase):
                                     " a player out of the game!\nReply by 6PM EDT with the letter of the player you're"
                                     " voting OUT. If you do not reply, your vote will count against you.\n\nA: "
                                     "www.tiktok.com/@donald\n\nB: www.tiktok.com/@denise\n\nC: www.tiktok.com/@stacy\n\n\n\n"),
-                        "recipient_phone_numbers": "388-685-3212"
+                        "recipient_phone_numbers": ["388-685-3212"]
                     },
                     {
                         "class": "SMSEventMessage",
@@ -409,7 +409,7 @@ class SMSMessageUXTest(unittest.TestCase):
                                     "a player out of the game!\nReply by 6PM EDT with the letter of the player you're "
                                     "voting OUT. If you do not reply, your vote will count against you.\n\nA: "
                                     "www.tiktok.com/@elizabeth\n\nB: www.tiktok.com/@denise\n\nC: www.tiktok.com/@stacy\n\n\n\n"),
-                        "recipient_phone_numbers": "802-722-8425"
+                        "recipient_phone_numbers": ["802-722-8425"]
                     },
                     {
                         "class": "SMSEventMessage",
@@ -418,7 +418,7 @@ class SMSMessageUXTest(unittest.TestCase):
                                     "a player out of the game!\nReply by 6PM EDT with the letter of the player you're "
                                     "voting OUT. If you do not reply, your vote will count against you.\n\nA: "
                                     "www.tiktok.com/@elizabeth\n\nB: www.tiktok.com/@donald\n\nC: www.tiktok.com/@stacy\n\n\n\n"),
-                        "recipient_phone_numbers": "704-425-0095"
+                        "recipient_phone_numbers": ["704-425-0095"]
                     },
                     {
                         "class": "SMSEventMessage",
@@ -427,7 +427,7 @@ class SMSMessageUXTest(unittest.TestCase):
                                     "player out of the game!\nReply by 6PM EDT with the letter of the player you're voting "
                                     "OUT. If you do not reply, your vote will count against you.\n\nA: "
                                     "www.tiktok.com/@elizabeth\n\nB: www.tiktok.com/@donald\n\nC: www.tiktok.com/@denise\n\n\n\n"),
-                        "recipient_phone_numbers": "514-721-1531"
+                        "recipient_phone_numbers": ["514-721-1531"]
                     },
                     {
                         "class": "SMSEventMessage",
@@ -436,7 +436,7 @@ class SMSMessageUXTest(unittest.TestCase):
                                     "Reply by 6PM EDT with the letter of the player you're voting OUT.\n\nA: "
                                     "www.tiktok.com/@elizabeth\n\nB: www.tiktok.com/@donald\n\nC: "
                                     "www.tiktok.com/@denise\n\nD: www.tiktok.com/@stacy\n\n\n\n"),
-                        "recipient_phone_numbers": "436-038-5365"
+                        "recipient_phone_numbers": ["436-038-5365"]
                     }
                 ]
             )

@@ -153,7 +153,7 @@ def sms_http(request):
             if selection in options:
                 vote_recipient_id = options[selection]
                 firestore.vote(
-                    from_player_id=player.id, to_player_id=options[selection])
+                    from_player_id=player.id, to_player_id=options[selection], is_for_win=ballot.get('is_for_win'))
                 resp.message(f'Your vote has been cast. Thanks!')
             else:
                 resp.message(

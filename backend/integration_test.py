@@ -159,7 +159,7 @@ class IntegrationTest(unittest.TestCase):
                 game_wait_sleep_interval_sec=4,
                 multi_tribe_min_tribe_size=2,
                 engine_worker_thread_count=1,
-                tribe_council_time_sec=3))
+                tribe_council_time_sec=5))
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).

@@ -419,6 +419,9 @@ class MockDatabase(Database):
 
         self._votes = {}
 
+    def get_game_id(self) -> str:
+        pass
+
     def batch_update_tribe(self, from_tribe: Tribe, to_tribe: Tribe) -> None:
         new_active_players_count = 0
         new_active_teams_count = 0
@@ -537,7 +540,7 @@ class MockDatabase(Database):
         pass
 
     def game_from_id(self, id: Text) -> Game:
-        return self._games[id]
+        return Game(game_id='', options=None)
 
     def player_from_id(self, id: Text) -> Player:
         return self._players[id]

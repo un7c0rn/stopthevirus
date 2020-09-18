@@ -108,7 +108,8 @@ class Database(ABC):
     def stream_teams(self, from_tribe: Tribe,
                      team_size_predicate_value: [int, None] = None,
                      order_by_size=True,
-                     descending=False
+                     descending=False,
+                     active=True
                      ) -> Iterable[Team]:
         pass
 
@@ -190,4 +191,8 @@ class Database(ABC):
 
     @abstractmethod
     def find_user(self, phone_number: str) -> Optional[User]:
+        pass
+
+    @abstractmethod
+    def get_game_id(self) -> str:
         pass
