@@ -19,6 +19,7 @@ import botocore
 _NOP_SMS_ADDRESS = "555-123-4567"
 _AWS_SQS_INIT_TIME_SEC = 2
 
+
 @attr.s
 class SMSEventMessage(Serializable):
     content: str = attr.ib()
@@ -187,7 +188,7 @@ class NotifyPlayerScoreEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_PLAYER_SCORE_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     points=self.points,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_end_time
@@ -219,7 +220,7 @@ class NotifyTeamReassignmentEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_TEAM_REASSIGNMENT_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     team=messages.players_as_formatted_list(
                         players=team_players),
                     date=self.game_options.game_schedule.tomorrow_localized_string,
@@ -264,7 +265,7 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_SINGLE_TEAM_COUNCIL_EVENT_LOSING_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         winner=messages.format_tiktok_username(
                             self.winning_player.tiktok),
                         players=count_players,
@@ -284,7 +285,7 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_SINGLE_TEAM_COUNCIL_EVENT_WINNING_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     players=count_players,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_end_time),
@@ -336,7 +337,7 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_SINGLE_TRIBE_COUNCIL_EVENT_LOSING_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_tribal_council_end_time
                         ),
@@ -356,7 +357,7 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_SINGLE_TRIBE_COUNCIL_EVENT_WINNING_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_tribal_council_end_time
                     ),
@@ -396,10 +397,10 @@ class NotifyTribalChallengeEvent(SMSEvent):
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_TRIBAL_CHALLENGE_EVENT_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         challenge=self.challenge.name,
                         # TODO(brandon) refactor into common routes location
-                        link="https://{hostname}/challenge-submission/{player_id}/{game_id}/{challenge_id}".format(
+                        link="{hostname}/challenge-submission/{player_id}/{game_id}/{challenge_id}".format(
                             hostname=messages.VIR_US_HOSTNAME,
                             game_id=self.game_id,
                             player_id=player.id,
@@ -458,7 +459,7 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_MULTI_TRIBE_COUNCIL_EVENT_LOSING_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         tribe=self.losing_tribe.name,
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_tribal_council_end_time
@@ -480,7 +481,7 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_MULTI_TRIBE_COUNCIL_EVENT_WINNING_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     winning_tribe=self.winning_tribe.name,
                     losing_tribe=self.losing_tribe.name,
                     time=self.game_options.game_schedule.localized_time_string(
@@ -526,7 +527,7 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_FINAL_TRIBAL_COUNCIL_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     players=len(self.finalists),
                     game=gamedb.game_from_id(id=self.game_id).hashtag,
                     time=self.game_options.game_schedule.localized_time_string(
@@ -534,8 +535,8 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
                     ),
                     options=options_map.formatted_string
                 ),
-                recipient_phone_numbers=[p.phone_number for p in gamedb.stream_players(
-                    active_player_predicate_value=True)]
+                recipient_phone_numbers=[
+                    p.phone_number for p in gamedb.stream_players()]
             )
         ]
 
@@ -563,7 +564,7 @@ class NotifyPlayerVotedOutEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_PLAYER_VOTED_OUT_TEAM_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     player=messages.format_tiktok_username(
                         self.player.tiktok),
                     time=self.game_options.game_schedule.localized_time_string(
@@ -575,7 +576,7 @@ class NotifyPlayerVotedOutEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_PLAYER_VOTED_OUT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER
+                    header=messages.game_sms_header(gamedb=gamedb)
                 ),
                 recipient_phone_numbers=[self.player.phone_number]
             )
@@ -599,7 +600,7 @@ class NotifyTribalCouncilCompletionEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_TRIBAL_COUNCIL_COMPLETION_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     date=self.game_options.game_schedule.tomorrow_localized_string,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_start_time
@@ -628,14 +629,14 @@ class NotifyWinnerAnnouncementEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_WINNER_ANNOUNCEMENT_EVENT_WINNER_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     game=game_hashtag
                 ),
                 recipient_phone_numbers=[self.winner.phone_number]
             ),
             SMSEventMessage(
                 content=messages.NOTIFY_WINNER_ANNOUNCEMENT_EVENT_GENERAL_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     player=messages.format_tiktok_username(self.winner.tiktok),
                     game=game_hashtag
                 ),
@@ -659,7 +660,7 @@ class NotifyImmunityAwardedEvent(SMSEvent):
 
     def message_content(self, gamedb: Database) -> str:
         return messages.NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT.format(
-            header=messages.VIR_US_SMS_HEADER,
+            header=messages.game_sms_header(gamedb=gamedb),
             date=self.game_options.game_schedule.tomorrow_localized_string,
             time=self.game_options.game_schedule.localized_time_string(
                 self.game_options.game_schedule.daily_challenge_start_time
@@ -670,7 +671,7 @@ class NotifyImmunityAwardedEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     date=self.game_options.game_schedule.tomorrow_localized_string,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_start_time

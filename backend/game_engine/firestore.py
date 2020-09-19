@@ -304,9 +304,12 @@ class FirestoreDB(Database):
         return FirestoreTeamStream(stream=query.where('active', '==', active).stream())
 
     def stream_players(self, active_player_predicate_value=True) -> Iterable[Player]:
-        query = self._client.collection('games/{}/players'.format(self._game_id)).where(
-            'active', '==', active_player_predicate_value
-        )
+        query = self._client.collection(
+            'games/{}/players'.format(self._game_id))
+        if active_player_predicate_value:
+            query = query.where(
+                'active', '==', active_player_predicate_value
+            )
         return FirestorePlayerStream(stream=query.stream())
 
     def count_players(self, from_tribe: Tribe = None, from_team: Team = None) -> int:

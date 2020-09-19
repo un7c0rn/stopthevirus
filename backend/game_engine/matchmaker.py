@@ -13,22 +13,15 @@ from queue import Queue
 import json
 from abc import ABC, abstractmethod
 from typing import List
+from game_engine import messages
 
-_VIR_US_FE_HOSTNAME = 'https://localhost:3000'
-_VIR_US_BE_CALLBACK_HOSTNAME = 'https://localhost:3001'
+
+_VIR_US_FE_HOSTNAME = messages.VIR_US_HOSTNAME
+_VIR_US_BE_CALLBACK_HOSTNAME = _VIR_US_FE_HOSTNAME
+
 _DEFAULT_TRIBE_NAMES = [
-    "JUDAH",
-    "ISSACHAR",
-    "ZEBULUN",
-    "REUBEN",
-    "SIMEON",
-    "GAD",
-    "EPHRAIM",
-    "MANESSEH",
-    "BENJAMIN",
-    "DAN",
-    "ASHER",
-    "NAPHTALI"
+    'FLYKNIT',
+    'SWISH-CITY'
 ]
 
 
@@ -106,7 +99,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         for tribe_name in [_DEFAULT_TRIBE_NAMES[int(n)] for n in random.sample(range(0, len(_DEFAULT_TRIBE_NAMES)), 2)]:
             tribe = database.Tribe(
                 id=str(uuid.uuid4()),
-                name="tribe/{}".format(tribe_name)
+                name="{}".format(tribe_name)
             )
             tribes.append(tribe)
 
@@ -114,7 +107,7 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         for n in range(0, math.floor(count_players / game_options.target_team_size)):
             team = database.Team(
                 id=str(uuid.uuid4()),
-                name="team/{}".format(n),
+                name="{}".format(n),
             )
             teams.append(team)
 
@@ -126,7 +119,8 @@ class MatchMakerRoundRobin(MatchMakerInterface):
         set_of_mutable_players = set()
         set_of_mutable_users = set()
         for n, player in enumerate(players):
-            mutable_user = gamedb.find_user(phone_number=player.get('phone_number'))
+            mutable_user = gamedb.find_user(
+                phone_number=player.get('phone_number'))
             mutable_user.game_id = game_id
             mutable_player = gamedb.player_from_id(player.id)
             tribe = tribes[n % count_tribes]

@@ -36,20 +36,23 @@ class TwilioSMSNotifier(SMSNotifier):
             self._game_id = game_id
 
     def send(self, sms_event_messages: Iterable[SMSEventMessage]) -> None:
-        log_message(message='TwilioSMSNotifier send_fn invoked')
-        for m in sms_event_messages:
-            if len(m.recipient_phone_numbers) > 1:
-                log_message(message='calling send_bulk_sms')
-                self.send_bulk_sms(
-                    message=m.content,
-                    recipient_addresses=m.recipient_phone_numbers
-                )
-            elif len(m.recipient_phone_numbers) == 1:
-                log_message(message='calling send_sms')
-                self.send_sms(
-                    message=m.content,
-                    recipient_address=m.recipient_phone_numbers[0]
-                )
+        try:
+            log_message(message='TwilioSMSNotifier send_fn invoked')
+            for m in sms_event_messages:
+                if len(m.recipient_phone_numbers) > 1:
+                    log_message(message='calling send_bulk_sms')
+                    self.send_bulk_sms(
+                        message=m.content,
+                        recipient_addresses=m.recipient_phone_numbers
+                    )
+                elif len(m.recipient_phone_numbers) == 1:
+                    log_message(message='calling send_sms')
+                    self.send_sms(
+                        message=m.content,
+                        recipient_address=m.recipient_phone_numbers[0]
+                    )
+        except Exception as e:
+            log_message(message=f"send SMS failed with exception {str(e)}")
 
     def _normalize_sms_address(self, sms_phone_number: str) -> str:
         number = phonenumbers.parse(sms_phone_number, 'US')

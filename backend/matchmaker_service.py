@@ -87,14 +87,14 @@ class MatchmakerService:
                 game_id=game._game_id, players=players, game_options=game._options, gamedb=database)
             tribes = game_data['tribes']
             message = messages.NOTIFY_GAME_STARTED_EVENT_MSG_FMT.format(
-                header=messages.VIR_US_SMS_HEADER,
+                header=messages.game_sms_header(hashtag=game_dict.get('hashtag')),
                 game=game_dict.get('hashtag')
             )
             self._notify_players(game_id=game._game_id,
                                  players=players, message=message)
             if self._is_mvp:
                 # NOTE(brandon): changing to thread for now. can't pickle non-primitive engine object.
-                game_thread = threading.Thread(target=game.play, args=(
+                game_thread=threading.Thread(target=game.play, args=(
                     tribes[0], tribes[1], database, engine))
                 game_thread.start()
             else:
@@ -102,7 +102,7 @@ class MatchmakerService:
                 pass
         except MatchMakerError as e:
             # Catches error from matchmaker algorithm
-            message = "Matchmaker Error: {}".format(e)
+            message="Matchmaker Error: {}".format(e)
             log_message(message=message,
                         game_id=game._game_id)
             self._set_game_has_started(
@@ -112,13 +112,13 @@ class MatchmakerService:
             self._reschedule_or_cancel_game(
                 game_snap=game_snap, game_dict=game_dict, players=players)
 
-    def _start_game(self, game: Game, game_snap: DocumentSnapshot, players: list, game_dict: dict, is_test: bool = False):
+    def _start_game(self, game: Game, game_snap: DocumentSnapshot, players: list, game_dict: dict, is_test: bool=False):
         self._set_game_has_started(game_snap=game_snap, game=game)
         self._play_game(game=game, game_snap=game_snap,
                         players=players, game_dict=game_dict, is_test=is_test)
 
-    def _set_game_has_started(self, game_snap: DocumentSnapshot, game: Game, value: bool = True):
-        field_updates = {
+    def _set_game_has_started(self, game_snap: DocumentSnapshot, game: Game, value: bool=True):
+        field_updates={
             'game_has_started': value
         }
         try:
@@ -134,19 +134,19 @@ class MatchmakerService:
         log_message(message="Rescheduling or cancelling game",
                     game_id=game_dict.get("id"))
 
-        now_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        now_date=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         if 'times_rescheduled' not in game_dict:
-            game_dict['times_rescheduled'] = 0
+            game_dict['times_rescheduled']=0
         if 'max_reschedules' not in game_dict:
-            game_dict['max_reschedules'] = 1
+            game_dict['max_reschedules']=1
 
         if (game_dict.get("times_rescheduled") if game_dict.get("times_rescheduled") else 0) < game_dict.get("max_reschedules"):
             # Reschedule the game by setting current UTC date to last_checked_date.
             # Server will then not check the game until following week
             # Assume times_rescheduled is optional and max_reschedules is True
-            times_rescheduled = game_dict["times_rescheduled"] + \
+            times_rescheduled=game_dict["times_rescheduled"] + \
                 1 if game_dict.get("times_rescheduled") else 1
-            field_updates = {
+            field_updates={
                 'last_checked_date': now_date,
                 'times_rescheduled': times_rescheduled
             }
@@ -155,9 +155,9 @@ class MatchmakerService:
                 log_message(message="Game successfully rescheduled",
                             game_id=game_dict.get("id"))
 
-                schedule = STV_I18N_TABLE[self._region]
-                notif_message = messages.NOTIFY_GAME_RESCHEDULED_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                schedule=STV_I18N_TABLE[self._region]
+                notif_message=messages.NOTIFY_GAME_RESCHEDULED_EVENT_MSG_FMT.format(
+                    header=messages.game_sms_header(hashtag=game_dict.get('hashtag')),
                     game=game_dict.get("hashtag"),
                     reason="insufficient players",
                     date=schedule.nextweek_localized_string,
@@ -173,17 +173,17 @@ class MatchmakerService:
         else:
             self._cancel_game(game_snap=game_snap, players=players)
 
-    def _cancel_game(self, game_snap: DocumentSnapshot, players: list, reason: str = "insufficient players") -> None:
+    def _cancel_game(self, game_snap: DocumentSnapshot, players: list, reason: str="insufficient players") -> None:
         # Cancel the game
-        game_dict = game_snap.to_dict()
-        field_updates = {
+        game_dict=game_snap.to_dict()
+        field_updates={
             'to_be_deleted': True,
         }
         game_snap.reference.update(field_updates)
         log_message(
             message="Cancelled the game (set to_be_deleted flag)", game_id=game_dict.get("id"))
-        notif_message = messages.NOTIFY_GAME_CANCELLED_EVENT_MSG_FMT.format(
-            header=messages.VIR_US_SMS_HEADER,
+        notif_message=messages.NOTIFY_GAME_CANCELLED_EVENT_MSG_FMT.format(
+            header=messages.game_sms_header(hashtag=game_dict.get('hashtag')),
             game=game_dict.get("hashtag"),
             reason=reason
         )
@@ -192,48 +192,48 @@ class MatchmakerService:
 
     def _check_start_time(self, schedule: GameSchedule,
                           now_dt_with_tz: datetime.datetime,
-                          is_test: bool = False):
-        start_day = schedule.game_start_day_of_week.value
-        start_time = schedule.game_start_time
+                          is_test: bool=False):
+        start_day=schedule.game_start_day_of_week.value
+        start_time=schedule.game_start_time
 
-        localized_time = now_dt_with_tz.astimezone(schedule.game_time_zone)
-        now_day = localized_time.isoweekday()
-        now_time = localized_time.time()
+        localized_time=now_dt_with_tz.astimezone(schedule.game_time_zone)
+        now_day=localized_time.isoweekday()
+        now_time=localized_time.time()
 
         if is_test:
-            now_day = start_day
-            now_time = start_time
+            now_day=start_day
+            now_time=start_time
 
         return now_day == start_day and now_time >= start_time
 
-    def _matchmaker_function(self, sleep_seconds: int = 60, is_test: bool = False):
+    def _matchmaker_function(self, sleep_seconds: int=60, is_test: bool=False):
         log_message("Starting matchmaker for region={}".format(self._region))
         while not self._stop.is_set():
-            games = self._gamedb.find_matchmaker_games(region=self._region)
+            games=self._gamedb.find_matchmaker_games(region=self._region)
             if len(games) >= 1:
                 for game_snap in games:
-                    game_dict = game_snap.to_dict()
-                    players_stream = game_snap.reference.collection(
+                    game_dict=game_snap.to_dict()
+                    players_stream=game_snap.reference.collection(
                         "players").stream()
-                    players_list = []
+                    players_list=[]
                     for player in players_stream:
                         players_list.append(player)
 
                     if self._region in STV_I18N_TABLE:
-                        schedule = STV_I18N_TABLE[self._region]
+                        schedule=STV_I18N_TABLE[self._region]
                     else:
-                        schedule = STV_I18N_TABLE['US']
+                        schedule=STV_I18N_TABLE['US']
 
                     try:
-                        now_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+                        now_utc=datetime.datetime.utcnow().strftime('%Y-%m-%d')
                         if self._check_start_time(schedule=schedule, now_dt_with_tz=datetime.datetime.now().astimezone(),
                                                   is_test=is_test) and now_utc != game_dict.get("last_checked_date"):  # TODO: Do these checks in query
 
                             if game_dict["count_players"] >= self._min_players:
                                 if self._game_options is None:
-                                    self._game_options = GameOptions(
+                                    self._game_options=GameOptions(
                                         game_schedule=schedule, game_wait_sleep_interval_sec=1 if is_test else 30)
-                                g = Game(
+                                g=Game(
                                     game_id=game_dict["id"], options=self._game_options)
                                 self._start_game(
                                     game=g, game_snap=game_snap, players=players_list, game_dict=game_dict, is_test=is_test)
@@ -249,11 +249,11 @@ class MatchmakerService:
             time.sleep(sleep_seconds)
         log_message("Stopped matchmaker for region={}".format(self._region))
 
-    def start_matchmaker_daemon(self, sleep_seconds: int = 60, is_test: bool = False):
+    def start_matchmaker_daemon(self, sleep_seconds: int=60, is_test: bool=False):
         if not self._daemon_started and not self._stop.is_set():
-            self._thread = threading.Thread(
+            self._thread=threading.Thread(
                 target=self._matchmaker_function, args=(sleep_seconds, is_test))
-            self._daemon_started = True
+            self._daemon_started=True
             self._thread.start()
         else:
             log_message(
@@ -265,7 +265,7 @@ class MatchmakerService:
         self._stop.set()
         # Wait for thread to finish executing/sleeping. This may take a long time
         self._thread.join()
-        self._daemon_started = False
+        self._daemon_started=False
 
     def clear_stop(self):
         self._stop.clear()
