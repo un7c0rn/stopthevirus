@@ -253,12 +253,15 @@ class GameIntegrationTestLogStream:
         self._inputs.append(entry.to_json())
 
     def persist(self) -> str:
-        return json.dumps({
+        return json.dumps(self.to_dict())
+
+    def to_dict(self) -> Dict:
+        return {
             "game_id": self._game_id,
             "test_id": self._test_id,
             "inputs": self._inputs,
             "outputs": self._outputs
-        })
+        }
 
 
 def init_sentry():

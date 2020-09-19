@@ -44,6 +44,7 @@ _TEST_DATA_MATCHMAKER_JSON = """
 }
 """
 
+
 @patch.object(MatchmakerService, '_set_game_has_started', return_value=None)
 @patch.object(MatchmakerService, '_play_game', return_value=None)
 @patch.object(MatchmakerService, '_reschedule_or_cancel_game', return_value=None)
@@ -53,14 +54,14 @@ class MatchmakerServiceTest(unittest.TestCase):
         _gamedb.import_collections(_TEST_DATA_MATCHMAKER_JSON)
         pass
 
-
     def test_matchmaker_daemon_happy(self, use_mock=False, *_):
         # Test happy path
         if use_mock:
             gamedb = MockDatabase()
         else:
             gamedb = FirestoreDB(json_config_path=json_config_path)
-        service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb)
+        service = MatchmakerService(
+            matchmaker=MatchMakerRoundRobin(), gamedb=gamedb)
         service.start_matchmaker_daemon(sleep_seconds=1, is_test=True)
         time.sleep(2)
         service.set_stop()
@@ -71,8 +72,9 @@ class MatchmakerServiceTest(unittest.TestCase):
             gamedb = MockDatabase()
         else:
             gamedb = FirestoreDB(json_config_path=json_config_path)
-            
-        service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
+
+        service = MatchmakerService(
+            matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
         service.start_matchmaker_daemon(sleep_seconds=1, is_test=True)
         time.sleep(2)
         service.set_stop()
@@ -80,7 +82,8 @@ class MatchmakerServiceTest(unittest.TestCase):
 
     def test_check_start_time(self, *_):
         gamedb = FirestoreDB(json_config_path=json_config_path)
-        service = MatchmakerService(matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
+        service = MatchmakerService(
+            matchmaker=MatchMakerRoundRobin(), gamedb=gamedb, min_players=9000)
 
         mock_schedule = GameSchedule(
             country='United States',
@@ -95,44 +98,54 @@ class MatchmakerServiceTest(unittest.TestCase):
         )
 
         # Case 1: before start_time
-        time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour-1)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour-1)
+        result = service._check_start_time(
+            schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(mock_time))
         self.assertEqual(result, False)
 
         # Case 1.5: after start_time, but on a previous day
 
-        time = datetime.datetime(year=2020, month=7, day=9, hour=mock_schedule.game_start_time.hour)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=9, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(
+            schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(mock_time))
         self.assertEqual(result, False)
 
         # Case 2: On same day as start_day and after start_time
-        time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
+        result = service._check_start_time(
+            schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(mock_time))
         self.assertEqual(result, True)
 
         # Case 2.5: On same day as start_day and after start_time, but in different timezone
-        time = datetime.datetime(year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=pytz.timezone("Asia/Tokyo").localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=10, hour=mock_schedule.game_start_time.hour+5)
+        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=pytz.timezone(
+            "Asia/Tokyo").localize(mock_time))
         self.assertEqual(result, False)
 
         # Case 3: Day following start_day and after start_time
-        time = datetime.datetime(year=2020, month=7, day=11, hour=mock_schedule.game_start_time.hour)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=11, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(
+            schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(mock_time))
         self.assertEqual(result, False)
 
-        time = datetime.datetime(year=2020, month=7, day=13, hour=mock_schedule.game_start_time.hour)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=13, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(
+            schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(mock_time))
         self.assertEqual(result, False)
 
         # Case 4: 1 Week after, on the right time/date
-        time = datetime.datetime(year=2020, month=7, day=17, hour=mock_schedule.game_start_time.hour)
-        result = service._check_start_time(schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(time))
+        mock_time = datetime.datetime(
+            year=2020, month=7, day=17, hour=mock_schedule.game_start_time.hour)
+        result = service._check_start_time(
+            schedule=mock_schedule, now_dt_with_tz=mock_schedule.game_time_zone.localize(mock_time))
         self.assertEqual(result, True)
 
 
-
-
-        
-        
 if __name__ == '__main__':
     unittest.main()

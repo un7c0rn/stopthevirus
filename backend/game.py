@@ -23,7 +23,7 @@ from game_engine.common import GameOptions
 from game_engine.common import log_message
 import uuid
 import itertools
-
+import math
 
 def _unixtime():
     return time.time()
@@ -54,7 +54,7 @@ class Game:
         self._wait_for_game_start_time()
 
         last_tribe_standing = self._play_multi_tribe(tribe1=tribe1, tribe2=tribe2,
-                                                     gamedb=gamedb, engine=engine)
+                                                    gamedb=gamedb, engine=engine)
         log_message(message="Last tribe standing is {}.".format(
             last_tribe_standing), game_id=self._game_id)
         last_team_standing = self._play_single_tribe(
@@ -72,6 +72,8 @@ class Game:
 
         log_message(message="Winner is {}.".format(
             winner), game_id=self._game_id)
+        
+        engine.stop()
         return winner
 
     def _play_multi_tribe(self, tribe1: Tribe, tribe2: Tribe, gamedb: Database, engine: Engine) -> Tribe:
@@ -390,6 +392,10 @@ class Game:
                 max_votes = votes
                 winner = gamedb.player_from_id(id=player_id)
 
+        for player in gamedb.stream_players(active_player_predicate_value=True):
+            if player.id != winner.id:
+                gamedb.deactivate_player(player=player)
+
         # announce winner
         engine.add_event(events.NotifyWinnerAnnouncementEvent(
             game_id=self._game_id, game_options=self._options, winner=winner))
@@ -494,6 +500,9 @@ class Game:
         challenge.complete = True
         gamedb.save(challenge)
 
+    def _score_entry(self, entry: Entry) -> int:
+        return math.ceil((entry.likes / entry.views) * 100)
+
     def _score_entries_tribe_aggregate_fn(self, entries: Iterable, challenge: Challenge, score_dict: Dict, gamedb: Database, engine: Engine):
         """Note that all built-ins are thread safe in python, meaning we can
         atomically increment the score int held in score_dict."""
@@ -503,7 +512,7 @@ class Game:
             try:
                 entry = next(entries_iter)
                 pprint.pprint(entry)
-                points = entry.likes / entry.views
+                points = self._score_entry(entry=entry)
                 player = gamedb.player_from_id(entry.player_id)
                 engine.add_event(events.NotifyPlayerScoreEvent(
                     game_id=self._game_id, game_options=self._options,
@@ -538,7 +547,7 @@ class Game:
                 entry = next(entries_iter)
                 log_message(message="Entry {}.".format(
                     entry), game_id=self._game_id)
-                points = entry.likes / entry.views
+                points = self._score_entry(entry=entry)
                 player = gamedb.player_from_id(entry.player_id)
                 engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id, game_options=self._options,
                                                                player=player, challenge=challenge,
@@ -604,7 +613,7 @@ class Game:
                 entry = next(entries_iter)
                 log_message(message="Entry {}.".format(
                     entry), game_id=self._game_id)
-                points = entry.likes / entry.views
+                points = self._score_entry(entry=entry)
                 player = gamedb.player_from_id(entry.player_id)
                 engine.add_event(events.NotifyPlayerScoreEvent(game_id=self._game_id, game_options=self._options,
                                                                player=player, challenge=challenge,
