@@ -41,6 +41,10 @@ class ISODayOfWeek(enum.Enum):
     Sunday = 7
 
 
+def _normalize_am_pm_annotation(timestring: str) -> str:
+    return timestring.replace('AM', 'am').replace('PM', 'pm')
+
+
 @attr.s
 class GameSchedule(object):
     country: str = attr.ib()
@@ -58,24 +62,24 @@ class GameSchedule(object):
         tomorrow_l = self.game_time_zone.localize(
             datetime.datetime.today() + datetime.timedelta(days=1)
         )
-        return tomorrow_l.strftime("%B %d, %Y")
+        return tomorrow_l.strftime("%-m/%d")
 
     @property
     def nextweek_localized_string(self) -> str:
         nextweek_l = self.game_time_zone.localize(
             datetime.datetime.today() + datetime.timedelta(days=7)
         )
-        return nextweek_l.strftime("%B %d, %Y")
+        return nextweek_l.strftime("%-m/%d")
 
     @property
     def today_localized_string(self) -> str:
         today_l = self.game_time_zone.localize(
             datetime.datetime.today()
         )
-        return today_l.strftime("%B %d, %Y")
+        return today_l.strftime("%-m/%d")
 
     def localized_time_string(self, time: datetime.time) -> str:
-        return "{} {}".format(time.strftime("%-I%p"), self.game_time_zone.localize(
+        return "{} {}".format(_normalize_am_pm_annotation(time.strftime("%-I%p")), self.game_time_zone.localize(
             datetime.datetime.now()
         ).tzname())
 

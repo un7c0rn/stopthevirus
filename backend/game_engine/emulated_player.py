@@ -17,21 +17,21 @@ _VIEWS_UPPER_BOUND = 1e6
 
 def _is_voting_option(message: str) -> bool:
     return re.search('(Reply by.+with the letter of the player you\'re voting out)'
-                     '|(Reply by.+with the letter of the player you vote to win!)',
+                     '|(Reply by.+with the letter of the player you\'re voting to WIN!)',
                      message, flags=re.I) is not None
 
 
 def _is_challenge(message: str) -> bool:
-    return re.search('Your challenge today is.+Post a video to your TikTok feed.+',
+    return re.search('Post a video to your TikTok feed.+',
                      message, flags=re.I) is not None
 
 
 def _challenge_id_from_message(message: str) -> str:
-    return re.search('https:\/\/[^\/]+\/challenge-submission\/[^\/]+\/[^\/]+\/([a-zA-Z0-9]+)', message).group(1)
+    return re.search('[^\/]+\/challenge-submission\/[^\/]+\/[^\/]+\/([a-zA-Z0-9]+)', message).group(1)
 
 
 def _parse_voting_options(message: str) -> List[str]:
-    return re.findall('^([A-Z]):', message, flags=re.MULTILINE)
+    return re.findall('^([A-Z])\.', message, flags=re.MULTILINE)
 
 
 @dataclass

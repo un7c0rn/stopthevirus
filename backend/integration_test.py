@@ -17,55 +17,55 @@ from game_engine.common import GameIntegrationTestLogStream
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
-
+_TEST_GAME_HASHTAG = '#NikeFit2020'
 _TEST_CHALLENGES = [
     Challenge(
-        name='Best AAAAAAA cell phone video', message='NOP'
+        name='Fastest 10K bike time. Bonus points for the view :)', message='NOP'
     ),
     Challenge(
-        name='Most creative one mile run', message='NOP'
+        name='Creative 1 mile run with friends.', message='NOP'
     ),
     Challenge(
-        name='Dopest hand made AAAAAAA T-Shirt Design', message='NOP'
+        name='Make an at home jump rope video!', message='NOP'
     ),
     Challenge(
-        name='Best livestream rant on AAAAAAA', message='NOP'
+        name='Make video and tell us why cardio is important to you.', message='NOP'
     ),
     Challenge(
-        name='Best AAAAAAA G-Mix', message='NOP'
+        name='Stand on a parked car and sing your favorite running song.', message='NOP'
     ),
     Challenge(
-        name='Craziest selfie in AAAAAAA', message='NOP'
+        name='Post a selfie in your new Nike running shoes.', message='NOP'
     ),
     Challenge(
-        name='Best acoustic replay of AAAAAAA', message='NOP'
+        name='Most creative breathable home made mask for COVID-19.', message='NOP'
     ),
     Challenge(
-        name='Most creative AAAAAAA video', message='NOP'
+        name='Crunches! How many can you do?', message='NOP'
     ),
     Challenge(
-        name='Most innovative way to get in the AAAAAAA', message='NOP'
+        name='Team push ups! Make a video doing pushups with a friend.', message='NOP'
     ),
     Challenge(
-        name='Most fire video of cracking this code AAAAAAA', message='NOP'
+        name='Waterproof video swim. Post your water workout from the beach or pool.', message='NOP'
     ),
     Challenge(
-        name='Make a video decoding the meaning of AAAAAAA', message='NOP'
+        name='Make a video and tell us what being fit means to you.', message='NOP'
     ),
     Challenge(
-        name='Best way to social distance at AAAAAAA', message='NOP'
+        name='Make a video about your goals while sprinting at full speed.', message='NOP'
     ),
     Challenge(
-        name='Most fire AAAAAAA', message='NOP'
+        name='Shadow box! Make a video shadow boxing with a friend.', message='NOP'
     ),
     Challenge(
-        name='Best AAAAAAA Karaoke', message='NOP'
+        name='Post highlights from your best 2 mile run time today.', message='NOP'
     ),
     Challenge(
-        name='Best AAAAAAA dance', message='NOP'
+        name='Find a Nike store with a purple pair of sneakers.', message='NOP'
     ),
     Challenge(
-        name='Most fire scene reenactment from of AAAAAAA', message='NOP'
+        name='Post your best, and safest, Just Do It video!', message='NOP'
     ),
 ]
 
@@ -83,7 +83,7 @@ _EMULATED_PLAYERS = [
 ]
 
 _REAL_PLAYERS = [
-    # ('Brandon', 'un7c0rn', '+17742593288'),
+    ('Brandon', 'un7c0rn', '+17742593288'),
 ]
 
 
@@ -98,7 +98,7 @@ class IntegrationTest(unittest.TestCase):
         # that only this game gets scheduled.
         game_id = FirestoreDB.add_game(
             json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH,
-            hashtag=f'VIRUS.integration_test.{test_id}',
+            hashtag=_TEST_GAME_HASHTAG,
             country_code=f'US-{test_id}'
         )
         gamedb = FirestoreDB(
@@ -156,10 +156,10 @@ class IntegrationTest(unittest.TestCase):
         service = MatchmakerService(
             matchmaker=MatchMakerRoundRobin(), region=f'US-{test_id}', gamedb=gamedb, game_options=GameOptions(
                 game_clock_mode=GameClockMode.ASYNC,
-                game_wait_sleep_interval_sec=4,
+                game_wait_sleep_interval_sec=5,
                 multi_tribe_min_tribe_size=2,
                 engine_worker_thread_count=1,
-                tribe_council_time_sec=5))
+                tribe_council_time_sec=10))
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).

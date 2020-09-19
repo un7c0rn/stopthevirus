@@ -617,6 +617,7 @@ class Game:
         player_scores = {}
         top_scores = list()
         losing_players = list()
+        winning_player_ids = set()
         entries = gamedb.stream_entries(
             from_team=team, from_challenge=challenge)
 
@@ -642,6 +643,14 @@ class Game:
                 # all but the highest scorer lose
                 if rank < (num_scores - 1):
                     losing_players.append(gamedb.player_from_id(player_id))
+                else:
+                    winning_player_ids.add(player_id)
+
+        # players that did not score also lose.
+        losing_player_ids = set([p.id for p in losing_players])
+        for player in gamedb.list_players(from_team=team):
+            if (player.id not in losing_player_ids) and (player.id not in winning_player_ids):
+                losing_players.append(player)
         return losing_players
 
     def _merge_tribes(self, tribe1: Tribe, tribe2: Tribe, new_tribe_name: Text, gamedb: Database, engine: Engine) -> Tribe:
