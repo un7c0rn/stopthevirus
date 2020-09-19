@@ -467,7 +467,7 @@ class MockDatabase(Database):
                           key=lambda team: team.count_players, reverse=True)
 
     def stream_players(self, active_player_predicate_value: bool = True) -> Iterable[Player]:
-        pass
+        return self._players.values()
 
     def count_players(self, from_tribe: Tribe = None, from_team: Team = None) -> int:
         count = 0
@@ -1698,7 +1698,7 @@ class GameTest(unittest.TestCase):
         tribe = gamedb.tribe_from_id('tribe/1')
         challenge = gamedb.challenge_from_id('challenge/1')
         self.assertEqual(self._game._score_entries_tribe_aggregate(
-            tribe=tribe, challenge=challenge, gamedb=gamedb, engine=engine), 0.5)
+            tribe=tribe, challenge=challenge, gamedb=gamedb, engine=engine), 50)
         engine.add_event.assert_called()
 
     def test_score_entries_top_k_teams(self):

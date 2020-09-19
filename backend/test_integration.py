@@ -15,9 +15,11 @@ import uuid
 from game_engine.common import log_message
 from game_engine.common import GameIntegrationTestLogStream
 
+_SAVE_TEST_LOGS = True
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 _TEST_GAME_HASHTAG = '#NikeFit2020'
+_TEST_SLEEP_INTERVAL = 3
 _TEST_CHALLENGES = [
     Challenge(
         name='Fastest 10K bike time. Bonus points for the view :)', message='NOP'
@@ -83,7 +85,6 @@ _EMULATED_PLAYERS = [
 ]
 
 _REAL_PLAYERS = [
-    ('Brandon', 'un7c0rn', '+17742593288'),
 ]
 
 
@@ -137,6 +138,7 @@ class IntegrationTest(unittest.TestCase):
 
         # mock the scheduling method in MM service so that we can force schedule
         # after initialization.
+        save_check_start_time_fn = MatchmakerService._check_start_time
         check_start_time_fn = mock.MagicMock()
         check_start_time_fn.return_value = False
         MatchmakerService._check_start_time = check_start_time_fn
@@ -156,28 +158,37 @@ class IntegrationTest(unittest.TestCase):
         service = MatchmakerService(
             matchmaker=MatchMakerRoundRobin(), region=f'US-{test_id}', gamedb=gamedb, game_options=GameOptions(
                 game_clock_mode=GameClockMode.ASYNC,
-                game_wait_sleep_interval_sec=5,
+                game_wait_sleep_interval_sec=_TEST_SLEEP_INTERVAL,
                 multi_tribe_min_tribe_size=2,
-                engine_worker_thread_count=1,
-                tribe_council_time_sec=10))
+                engine_worker_thread_count=5,
+                tribe_council_time_sec=_TEST_SLEEP_INTERVAL))
+        # mock the MM Twilio client
+        service._get_sms_notifier = mock.MagicMock(return_value=notification_emulator)
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).
             check_start_time_fn.return_value = True
             MatchmakerService._check_start_time = check_start_time_fn
-
-            # at this point text messages should start streaming into the device(s) asynchronously.
-            # respond to (6) manually, the SMS endpoint associated with the game instance phone number needs to receive requests and do the right thing with gamedb.
-            # currently all user messages will receive response:
-            # Sent from your Twilio trial account - Hello +{phone}, you said: {message}
-            while True:
-                time.sleep(5)
+            while gamedb.game_from_id(game_id).count_players > 1:
+                time.sleep(_TEST_SLEEP_INTERVAL)
         finally:
+            MatchmakerService._check_start_time = save_check_start_time_fn
             service.set_stop()
-            persisted_test_logs = test_log_stream.persist()
-            log_message(persisted_test_logs)
-            with open(f'test_log_stream.{test_id}.json', 'w+') as f:
-                f.write(persisted_test_logs)
+            test_dict = test_log_stream.to_dict()
+            if _SAVE_TEST_LOGS:
+                persisted_test_logs = test_log_stream.persist()
+                log_message(persisted_test_logs)
+                with open(f'game_logs/stream.{test_id}.json', 'w+') as f:
+                    f.write(persisted_test_logs)
+            active_players = list()
+            for player in gamedb.stream_players(active_player_predicate_value=True):
+                active_players.append(player)
+            winner = active_players[0]
+            found_winner_message = False
+            for output in test_dict['outputs']:
+                if 'You are the last survivor and WINNER' in output['message'] and output['name'] == winner.name:
+                    found_winner_message = True
+            self.assertTrue(found_winner_message)
 
 
 if __name__ == '__main__':
