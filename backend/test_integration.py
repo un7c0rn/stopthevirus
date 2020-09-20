@@ -72,21 +72,20 @@ _TEST_CHALLENGES = [
 ]
 
 _EMULATED_PLAYERS = [
-    ('Liam', 'lusttforlife', '+10000000001'),
-    ('Noah', 'velvetcanyon', '+10000000002'),
-    ('Oliver', 'satiregram', '+10000000003'),
-    ('William', 'everydaypursuits', '+10000000004'),
-    ('Elijah', 'apartmenttherapy', '+10000000005'),
-    ('James', 'doyoutravel', '+10000000006'),
-    ('Benjamin', 'workparty', '+10000000007'),
-    ('Lucas', 'plantifulsoul', '+10000000008'),
-    ('Mason', 'therow', '+10000000009'),
-    ('Ethan', 'whats_ur_sign', '+10000000000'),
+    ('Loren Gray', 'lorengray', '+10000000001'),
+    ('Zach King', 'zachking', '+10000000002'),
+    ('Charli D\'Amelio', 'charlidamelio', '+10000000003'),
+    ('Baby Ariel', 'babyariel', '+10000000004'),
+    ('Riyaz Afreen', 'riyaz.14', '+10000000005'),
+    ('Kristen Hancher', 'kristenhancher', '+10000000006'),
+    ('Gilmher Croes', 'gilmhercroes', '+10000000007'),
+    ('Spencer Knight', 'spencerx', '+10000000008'),
+    ('Awez Darbar', 'awezdarbar', '+10000000009'),
+    ('Jacob Sartorius', 'jacobsartorius', '+10000000000'),
 ]
 
 _REAL_PLAYERS = [
 ]
-
 
 class IntegrationTest(unittest.TestCase):
 
@@ -163,7 +162,8 @@ class IntegrationTest(unittest.TestCase):
                 engine_worker_thread_count=5,
                 tribe_council_time_sec=_TEST_SLEEP_INTERVAL))
         # mock the MM Twilio client
-        service._get_sms_notifier = mock.MagicMock(return_value=notification_emulator)
+        service._get_sms_notifier = mock.MagicMock(
+            return_value=notification_emulator)
         try:
             service.start_matchmaker_daemon(sleep_seconds=1)
             # force schedule the game in MM (1).

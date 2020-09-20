@@ -9,6 +9,7 @@ from game_engine.database import Entry, Player
 from functions.sms import main as sms_endpoint
 from game_engine.firestore import FirestoreDB
 import unittest
+from game_engine import database
 
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _PLAYERS = [
@@ -224,13 +225,14 @@ class EmulatedPlayerTest(unittest.TestCase):
         player_from_id_fn.assert_called()
 
     @parameterized.expand([
-        ('AAAA https://vir_us.io/challenge-submission/AAAA/BBBB/CCCC XXXX', 'CCCC'),
-        ('https://vir_us.io/challenge-submission/AAAA/BBBB/CCCC', 'CCCC'),
-        ('https://vir_us.io/challenge-submission/33id7ZdAvaEnCphkfsPg/KVUq87OMs4vkEJI1psxw/GQT2zIojZGup2iT9IoYC', 'GQT2zIojZGup2iT9IoYC')
+        ('tksubmit.page.link/AAAAAAB', 'LLLLLLL'),
+        ('tksubmit.page.link/AAAAAAA', 'NNNNNNN'),
+        ('tksubmit.page.link/ZZZZZZZ', 'YYYYYYY')
     ])
-    def test_challenge_id_from_message(self, message, challenge_id):
+    def test_challenge_id_from_message(self, key, challenge_id):
+        database.local_set(key=f'https://{key}', value=challenge_id)
         self.assertEqual(
-            emulated_player._challenge_id_from_message(message=message),
+            emulated_player._challenge_id_from_message(message=key),
             challenge_id
         )
 

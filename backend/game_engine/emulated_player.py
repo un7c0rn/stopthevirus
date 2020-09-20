@@ -1,7 +1,7 @@
 import unittest
 import mock
 from game_engine.firestore import FirestoreDB
-from game_engine.database import Entry
+from game_engine.database import Entry, Database
 from dataclasses import dataclass
 from functions.sms import main as sms_endpoint
 import random
@@ -10,6 +10,8 @@ from typing import List
 import uuid
 import re
 from game_engine.common import log_message
+from game_engine import messages
+from game_engine import database
 
 _VIEWS_LOWER_BOUND = 50
 _VIEWS_UPPER_BOUND = 1e6
@@ -27,7 +29,10 @@ def _is_challenge(message: str) -> bool:
 
 
 def _challenge_id_from_message(message: str) -> str:
-    return re.search('[^\/]+\/challenge-submission\/[^\/]+\/[^\/]+\/([a-zA-Z0-9]+)', message).group(1)
+    dynamic_shortlink = re.search(
+        f'{messages.DYNAMIC_SHORTLINK_PREFIX}/([a-zA-Z0-9]+)', message).group(0)
+    result = database.local_get(f'https://{dynamic_shortlink}')
+    return result
 
 
 def _parse_voting_options(message: str) -> List[str]:
@@ -54,7 +59,8 @@ class EmulatedPlayer:
             views=views,
             player_id=self.id,
             tribe_id=player.tribe_id,
-            challenge_id=_challenge_id_from_message(message=message),
+            challenge_id=_challenge_id_from_message(
+                message=message),
             team_id=player.team_id,
             url=f'http://tiktok.com/@{self.tiktok}/{str(uuid.uuid4())}'
         )

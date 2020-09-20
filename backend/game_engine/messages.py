@@ -6,25 +6,20 @@ from dataclasses import dataclass, field
 from game_engine.database import Database
 from game_engine.database import Player, Challenge, Entry, Team, Tribe
 from game_engine.common import GameError
+import requests
 
 # event message spec
 # https://docs.google.com/spreadsheets/d/1sOB5sMfvXaziBMegMmY0I2ANF4Vbu41MNPRwylCr6dY/edit#gid=0
 
 VIR_US_SMS_HEADER = 'TRIBE'
 VIR_US_HOSTNAME = 'stopthevirus-alpha.netlify.app'
+DYNAMIC_SHORTLINK_PREFIX = 'tksubmit.page.link'
 
 _SMS_OPTION_LETTER_TABLE = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'
 ]
-
 _SMS_MAX_OPTION_COUNT = 16
-
-
-def game_sms_header(gamedb: Database = None, hashtag: str = None) -> str:
-    if gamedb:
-        game = gamedb.game_from_id(gamedb.get_game_id())
-        hashtag = game.hashtag
-    return f'{hashtag}\ntiktok.com/tag/{hashtag}'
+_FBWK = 'AIzaSyA9SDYzjtocqWPZsqf6mv9tIEa5VbiVJIE'
 
 
 @dataclass
@@ -33,12 +28,32 @@ class OptionsMap:
     options: Dict[str, str] = field(default_factory=dict)
 
 
+def _normalize_tiktok_hashtag(hashtag: str) -> str:
+    return hashtag.replace('#', '')
+
+
 def _normalize_tiktok_username(username: str) -> str:
     return username.replace('@', '')
 
 
 def _short_link_from_tiktok_username(username: str) -> str:
     return "tiktok.com/@{}".format(_normalize_tiktok_username(username))
+
+
+def dynamic_shortlink(physical_link: str) -> str:
+    payload = {
+        "longDynamicLink": f"https://{DYNAMIC_SHORTLINK_PREFIX}/?link=https://{physical_link}"}
+    resp = requests.post(
+        f"https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key={_FBWK}", data=payload)
+    return resp.json()['shortLink']
+
+
+def game_sms_header(gamedb: Database = None, hashtag: str = None) -> str:
+    if gamedb:
+        game = gamedb.game_from_id(gamedb.get_game_id())
+        hashtag = game.hashtag
+    normalized_hashtag = _normalize_tiktok_hashtag(hashtag)
+    return f'#{normalized_hashtag}\ntiktok.com/tag/{normalized_hashtag}'
 
 
 def format_tiktok_username(username: str) -> str:
@@ -60,7 +75,8 @@ def players_as_formatted_options_map(players: Iterable[Player], exclude_player: 
     option_index = 0
     options = {}
 
-    last_player_index = len(players) - 1
+    last_player_index = len(players) - \
+        1 if not exclude_player else len(players) - 2
     for n, player in enumerate(players):
         if exclude_player:
             if player.id == exclude_player.id:

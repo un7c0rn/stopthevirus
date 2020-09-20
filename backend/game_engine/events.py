@@ -4,6 +4,7 @@ from game_engine.common import Serializable, GameError, GameOptions
 from game_engine.common import log_message
 from game_engine.common import STV_I18N_TABLE
 from game_engine.database import Database
+from game_engine import database
 from game_engine import messages
 from typing import Iterable, List
 import boto3
@@ -394,18 +395,24 @@ class NotifyTribalChallengeEvent(SMSEvent):
         # every player in the game, which costs 1 API call / player within Twilio. If we can make these links
         # standard then a single Notify API call can address all users in a single game. Non-critical for MVP.
         for player in players:
+            physical_challenge_link = "{hostname}/challenge-submission/{player_id}/{game_id}/{challenge_id}".format(
+                hostname=messages.VIR_US_HOSTNAME,
+                game_id=self.game_id,
+                player_id=player.id,
+                challenge_id=self.challenge.id
+            )
+            dynamic_shortlink = messages.dynamic_shortlink(
+                physical_challenge_link)
+            database.local_set(
+                key=dynamic_shortlink,
+                value=self.challenge.id
+            )
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_TRIBAL_CHALLENGE_EVENT_MSG_FMT.format(
                         header=messages.game_sms_header(gamedb=gamedb),
                         challenge=self.challenge.name,
-                        # TODO(brandon) refactor into common routes location
-                        link="{hostname}/challenge-submission/{player_id}/{game_id}/{challenge_id}".format(
-                            hostname=messages.VIR_US_HOSTNAME,
-                            game_id=self.game_id,
-                            player_id=player.id,
-                            challenge_id=self.challenge.id
-                        ),
+                        link=dynamic_shortlink.replace('https://', ''),
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_challenge_end_time
                         )

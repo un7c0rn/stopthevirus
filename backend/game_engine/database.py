@@ -3,6 +3,19 @@ import attr
 from typing import Any, Iterable, Dict, Tuple, Optional
 from game_engine.common import Serializable
 
+_LOCAL_CACHE = dict()
+
+
+def local_get(key: str) -> Optional[str]:
+    if key in _LOCAL_CACHE:
+        return _LOCAL_CACHE[key]
+    else:
+        return None
+
+
+def local_set(key: str, value: str) -> None:
+    _LOCAL_CACHE[key] = value
+
 
 class Data(ABC, Serializable):
     def get(self, key):
@@ -95,7 +108,6 @@ class Entry(Data):
 
 
 class Database(ABC):
-
     @abstractmethod
     def batch_update_tribe(self, from_tribe: Tribe, to_tribe: Tribe) -> None:
         pass
