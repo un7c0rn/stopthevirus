@@ -19,7 +19,7 @@ _SAVE_TEST_LOGS = True
 _TEST_FIRESTORE_INSTANCE_JSON_PATH = '../firebase/stv-game-db-test-4c0ec2310b2e.json'
 _TEST_TWILIO_SMS_CONFIG_PATH = '../twilio/stv-twilio-service-test.json'
 _TEST_GAME_HASHTAG = '#NikeFit2020'
-_TEST_SLEEP_INTERVAL = 3
+_TEST_SLEEP_INTERVAL = 12
 _TEST_CHALLENGES = [
     Challenge(
         name='Fastest 10K bike time. Bonus points for the view :)', message='NOP'
@@ -34,7 +34,7 @@ _TEST_CHALLENGES = [
         name='Make video and tell us why cardio is important to you.', message='NOP'
     ),
     Challenge(
-        name='Stand on a parked car and sing your favorite running song.', message='NOP'
+        name='Sing your favorite running song.', message='NOP'
     ),
     Challenge(
         name='Post a selfie in your new Nike running shoes.', message='NOP'
@@ -49,7 +49,7 @@ _TEST_CHALLENGES = [
         name='Team push ups! Make a video doing pushups with a friend.', message='NOP'
     ),
     Challenge(
-        name='Waterproof video swim. Post your water workout from the beach or pool.', message='NOP'
+        name='Waterproof video swim. Post your water workout from the pool.', message='NOP'
     ),
     Challenge(
         name='Make a video and tell us what being fit means to you.', message='NOP'
