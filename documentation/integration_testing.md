@@ -1,8 +1,8 @@
-Demo
+# VIR-US Integration Testing
+
+## Demo
 
 https://vimeo.com/459956989/744ca1febd
-
-# VIR-US Integration Testing
 
 VIR-US offers end-to-end integration testing by simulating an entire game, from matchmaking, through each round of challenges until a winner is announced. The only difference between the integration test and a live real world game is that in a real game, players self-join using the website. In the integration test, we add players directly to the database in code. Simulated games include:
 
