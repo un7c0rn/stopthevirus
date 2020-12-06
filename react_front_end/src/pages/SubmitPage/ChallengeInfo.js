@@ -5,7 +5,6 @@ import fetch from "node-fetch";
 import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../../App";
-import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { GameName } from "../common/GameName";
 

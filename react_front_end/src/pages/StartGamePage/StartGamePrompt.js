@@ -23,10 +23,7 @@ export default function StartGamePrompt() {
   return (
     <div className={classes.root}>
       <Paper square style={{ maxWidth: maxButtonWidth }}>
-        <Typography
-          gutterBottom
-          className="page-information page-information-animation"
-        >
+        <Typography gutterBottom className="page-information ">
           Can a global high stakes social media game help inspire millions of
           Gen-Z and Millennial individuals to engage in social distancing and
           stop the spread of COVID-19?

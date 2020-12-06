@@ -78,7 +78,7 @@ export default function StartGameInputs() {
       phone: phone
         .replace(/\+/, "")
         .replace(/ /g, "")
-        .replace(/\(|\)|\-/g, ""),
+        .replace(/\(|\)|-/g, ""),
       hashtag: gameNameRef.current.value,
     };
 

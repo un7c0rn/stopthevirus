@@ -22,6 +22,16 @@ from sentry_sdk import push_scope
 class GameError(Exception):
     pass
 
+class GameClockMode(enum.Enum):
+    # Synchronized timing. Game events are synchronized to global clock,
+    # on a schedule which is relative to the timezone of the game initiator.
+    # For example, challenges always begin at 9am PST.
+    SYNC = 0,
+
+    # Asyncrhonized timing. Game events are relatively timed. For example
+    # a challenge may always start N minutes after tribal council. This is only
+    # used for test purposes.
+    ASYNC = 1
 
 class ISODayOfWeek(enum.Enum):
     Monday = 1
@@ -51,6 +61,13 @@ class GameSchedule(object):
             datetime.datetime.today() + datetime.timedelta(days=1)
         )
         return tomorrow_l.strftime("%B %d, %Y")
+
+    @property
+    def nextweek_localized_string(self) -> Text:
+        nextweek_l = self.game_time_zone.localize(
+            datetime.datetime.today() + datetime.timedelta(days=7)
+        )
+        return nextweek_l.strftime("%B %d, %Y")
 
     @property
     def today_localized_string(self) -> Text:
@@ -155,16 +172,14 @@ class GameOptions(object):
     game_wait_sleep_interval_sec: int = attr.ib(default=30)
     target_team_size: int = attr.ib(default=5)
     target_finalist_count: int = attr.ib(default=2)
-    single_tribe_council_time_sec: int = attr.ib(300)
-    single_team_council_time_sec: int = attr.ib(300)
-    final_tribal_council_time_sec: int = attr.ib(300)
+    tribe_council_time_sec: int = attr.ib(300)
     multi_tribe_min_tribe_size: int = attr.ib(default=10)
     multi_tribe_target_team_size: int = attr.ib(default=5)
-    multi_tribe_council_time_sec: int = attr.ib(300)
     multi_tribe_team_immunity_likelihood: float = attr.ib(0.0)
     merge_tribe_name: Text = attr.ib(default='a$apmob')
     single_tribe_top_k_threshold: float = attr.ib(default=0.5)
-    game_schedule: GameSchedule = attr.ib(default=None)
+    game_schedule: GameSchedule = attr.ib(default=STV_I18N_TABLE['US'])
+    game_clock_mode: GameClockMode = attr.ib(default=GameClockMode.ASYNC)
 
 
 def _isprimitive(value: Any):
@@ -225,17 +240,19 @@ def log_message(message: Text, game_id: Text = None, additional_tags: Dict = Non
         # Sentry automatically pushes exceptions. To avoid this in local env, only init sentry when needed
         init_sentry()
     with push_scope() as scope:
+        if game_id:
+            logging.info("game_id {}".format(game_id))
+            scope.set_tag("game_id", game_id)
+
+        logging.info(message)
+
         if additional_tags:
             for tag, value in additional_tags.items():
-                logging.info(tag +  '->' + value)
-                scope.set_tag(tag, value)
+                logging.info("{} -> {}".format(tag, str(value)))
+                scope.set_tag(tag, str(value))
 
-        if game_id:
-            logging.info("game_id " + game_id)
-            scope.set_tag("game_id", game_id)
 
         if push_to_sentry:
             logging.info("pushing to sentry")
             capture_message(message)
 
-        logging.info(message)
