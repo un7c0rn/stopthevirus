@@ -11,14 +11,14 @@ class CommonTest(unittest.TestCase):
         schedule = STV_I18N_TABLE['US']
         self.assertRegex(
             schedule.today_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_us_tomorrow_localized_string(self):
         schedule = STV_I18N_TABLE['US']
         self.assertRegex(
             schedule.tomorrow_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_us_localized_time_string(self):
@@ -27,31 +27,31 @@ class CommonTest(unittest.TestCase):
             schedule.localized_time_string(
                 time=schedule.game_start_time
             ),
-            "12PM (EST|EDT)"
+            "12pm (EST|EDT)"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_start_time
             ),
-            "12PM (EST|EDT)"
+            "12pm (EST|EDT)"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_end_time
             ),
-            "6PM (EST|EDT)"
+            "6pm (EST|EDT)"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_start_time
             ),
-            "7PM (EST|EDT)"
+            "7pm (EST|EDT)"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_end_time
             ),
-            "9PM (EST|EDT)"
+            "9pm (EST|EDT)"
         )
 
     def test_us_localized_time_delta_sec(self):
@@ -68,14 +68,14 @@ class CommonTest(unittest.TestCase):
         schedule = STV_I18N_TABLE['UK']
         self.assertRegex(
             schedule.today_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_uk_tomorrow_localized_string(self):
         schedule = STV_I18N_TABLE['UK']
         self.assertRegex(
             schedule.tomorrow_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_uk_localized_time_string(self):
@@ -84,31 +84,31 @@ class CommonTest(unittest.TestCase):
             schedule.localized_time_string(
                 time=schedule.game_start_time
             ),
-            "12PM BST"
+            "12pm BST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_start_time
             ),
-            "12PM BST"
+            "12pm BST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_end_time
             ),
-            "6PM BST"
+            "6pm BST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_start_time
             ),
-            "7PM BST"
+            "7pm BST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_end_time
             ),
-            "9PM BST"
+            "9pm BST"
         )
 
     def test_uk_localized_time_delta_sec(self):
@@ -125,14 +125,14 @@ class CommonTest(unittest.TestCase):
         schedule = STV_I18N_TABLE['JP']
         self.assertRegex(
             schedule.today_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_jp_tomorrow_localized_string(self):
         schedule = STV_I18N_TABLE['JP']
         self.assertRegex(
             schedule.tomorrow_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_jp_localized_time_string(self):
@@ -141,31 +141,31 @@ class CommonTest(unittest.TestCase):
             schedule.localized_time_string(
                 time=schedule.game_start_time
             ),
-            "12PM JST"
+            "12pm JST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_start_time
             ),
-            "12PM JST"
+            "12pm JST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_end_time
             ),
-            "6PM JST"
+            "6pm JST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_start_time
             ),
-            "7PM JST"
+            "7pm JST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_end_time
             ),
-            "9PM JST"
+            "9pm JST"
         )
 
     def test_jp_localized_time_delta_sec(self):
@@ -182,14 +182,14 @@ class CommonTest(unittest.TestCase):
         schedule = STV_I18N_TABLE['IT']
         self.assertRegex(
             schedule.today_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_it_tomorrow_localized_string(self):
         schedule = STV_I18N_TABLE['IT']
         self.assertRegex(
             schedule.tomorrow_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_it_localized_time_string(self):
@@ -198,31 +198,31 @@ class CommonTest(unittest.TestCase):
             schedule.localized_time_string(
                 time=schedule.game_start_time
             ),
-            "12PM CEST"
+            "12pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_start_time
             ),
-            "12PM CEST"
+            "12pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_end_time
             ),
-            "6PM CEST"
+            "6pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_start_time
             ),
-            "7PM CEST"
+            "7pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_end_time
             ),
-            "9PM CEST"
+            "9pm CEST"
         )
 
     def test_it_localized_time_delta_sec(self):
@@ -239,14 +239,14 @@ class CommonTest(unittest.TestCase):
         schedule = STV_I18N_TABLE['DE']
         self.assertRegex(
             schedule.today_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_de_tomorrow_localized_string(self):
         schedule = STV_I18N_TABLE['DE']
         self.assertRegex(
             schedule.tomorrow_localized_string,
-            "[A-Za-z]+ [0-9]?[0-9]?, 20[0-9][0-9]"
+            "[0-9]+/[0-9]+"
         )
 
     def test_de_localized_time_string(self):
@@ -255,31 +255,31 @@ class CommonTest(unittest.TestCase):
             schedule.localized_time_string(
                 time=schedule.game_start_time
             ),
-            "12PM CEST"
+            "12pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_start_time
             ),
-            "12PM CEST"
+            "12pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_challenge_end_time
             ),
-            "6PM CEST"
+            "6pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_start_time
             ),
-            "7PM CEST"
+            "7pm CEST"
         )
         self.assertRegex(
             schedule.localized_time_string(
                 time=schedule.daily_tribal_council_end_time
             ),
-            "9PM CEST"
+            "9pm CEST"
         )
 
     def test_de_localized_time_delta_sec(self):

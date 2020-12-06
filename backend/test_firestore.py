@@ -1,6 +1,7 @@
 import unittest
 import mock
 from game_engine.firestore import FirestoreDB
+from game_engine.database import Challenge
 import pprint
 import json
 import datetime
@@ -36,7 +37,8 @@ _TEST_DATA_JSON = """
          "team_id":"Q09FeEtoIgjNI57Bnl1E",
          "active":true,
          "name":"Boston Rob",
-         "tribe_id":"cbTgYdPh97K6rRTDdEPL"
+         "tribe_id":"cbTgYdPh97K6rRTDdEPL",
+         "phone_number":"+15551234567"
       },
       "LXHpnrUA65FS25wGfJ00":{
          "active":true,
@@ -150,7 +152,7 @@ _TEST_DATA_MATCHMAKER_JSON = """
          "count_teams":6,
          "count_players":8,
          "name":"test_game1",
-         "country_code":"US",
+         "country_code":"TEST-US",
          "game_has_started": false,
          "to_be_deleted": false
       },
@@ -158,7 +160,7 @@ _TEST_DATA_MATCHMAKER_JSON = """
          "count_teams":6,
          "count_players":8,
          "name":"test_game1",
-         "country_code":"JP",
+         "country_code":"TEST-JP",
          "game_has_started": false,
          "to_be_deleted": true
       },
@@ -166,7 +168,7 @@ _TEST_DATA_MATCHMAKER_JSON = """
          "count_teams":6,
          "count_players":8,
          "name":"test_game1",
-         "country_code":"JP",
+         "country_code":"TEST-JP",
          "game_has_started": false,
          "to_be_deleted": false
       },
@@ -174,7 +176,7 @@ _TEST_DATA_MATCHMAKER_JSON = """
          "count_teams":6,
          "count_players":5,
          "name":"test_game2",
-         "country_code":"EU",
+         "country_code":"TEST-EU",
          "game_has_started": true,
          "to_be_deleted": false
       }
@@ -251,14 +253,31 @@ class FirestoreDBTest(unittest.TestCase):
     def test_list_challenges(self):
         challenges = _gamedb.list_challenges(
             challenge_completed_predicate_value=False)
-        self.assertListEqual([challenge.name for challenge in challenges], [
-            'KARAOKE',
-            'MOST CREATIVE HOME CLEAN'
-        ])
+        self.assertTrue(
+            {
+                'KARAOKE',
+                'MOST CREATIVE HOME CLEAN'}.issubset(
+                {challenge.name for challenge in challenges}
+            ))
 
         challenges = _gamedb.list_challenges(
             challenge_completed_predicate_value=True)
         self.assertListEqual([challenge.name for challenge in challenges], [])
+
+    def test_add_challenge(self):
+        _gamedb.add_challenge(
+            Challenge(
+                name='CHALLENGE/FOO',
+                message='MESSAGE/BAR',
+                complete=False
+            )
+        )
+        challenges = _gamedb.list_challenges(
+            challenge_completed_predicate_value=False)
+        self.assertIn(
+            'CHALLENGE/FOO',
+            [c.name for c in challenges]
+        )
 
     def test_list_players(self):
         players = _gamedb.list_players(
@@ -370,17 +389,39 @@ class FirestoreDBTest(unittest.TestCase):
 
     def test_find_matchmaker_games(self):
         _gamedb.import_collections(_TEST_DATA_MATCHMAKER_JSON)
-        games = _gamedb.find_matchmaker_games(region="US")
+        games = _gamedb.find_matchmaker_games(region="TEST-US")
         self.assertEqual(len(games), 1)
 
         # EU game has already started
-        games = _gamedb.find_matchmaker_games(region="EU")
+        games = _gamedb.find_matchmaker_games(region="TEST-EU")
         self.assertEqual(len(games), 0)
 
         # Should not return games with to_be_deleted flag set
-        games = _gamedb.find_matchmaker_games(region="JP")
+        games = _gamedb.find_matchmaker_games(region="TEST-JP")
         self.assertEqual(len(games), 1)
-        
-        
+
+    def test_ballot(self):
+        ballot = _gamedb.ballot(player_id='foo', challenge_id='bar', options={
+                                'A': 1, 'B': 2, 'C': 3})
+        self.assertEqual(
+            ballot.options,
+            _gamedb.find_ballot(
+                player=_gamedb.player_from_id(id='foo')).options
+        )
+
+    def test_find_player(self):
+        self.assertEqual(_gamedb.find_player(
+            phone_number='+15551234567').name, "Boston Rob")
+
+    def test_add_user(self):
+        # assert that the user ID is equivalent across both calls.
+        self.assertEqual(
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH,
+                                 name='user/foo', tiktok='tiktok/bar', phone_number='+10000000000'),
+            FirestoreDB.add_user(json_config_path=_TEST_FIRESTORE_INSTANCE_JSON_PATH,
+                                 name='user/bar', tiktok='tiktok/bar', phone_number='+10000000000')
+        )
+
+
 if __name__ == '__main__':
     unittest.main()
