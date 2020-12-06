@@ -22,24 +22,26 @@ When prompted, enter *stopthevirus-develop*
 TODO(frontend): Create a single test Netlify account and site-name for all testers.
 
 6. ```yarn build```
-7. ```netlify deploy --prod --open --message "STV-FE-ATP" --json --dir="./build"```
+7. ```netlify build``` 
+8. ```netlify deploy --prod --open --message "STV-FE-ATP" --json --dir="./build"```
 
 *This may take several minutes*
 
-8. Download and install ngrok https://ngrok.com/download
-9. ```sudo mv ~/Downloads/ngrok /usr/bin/ngrok```
+9. Download and install ngrok https://ngrok.com/download
+10. ```sudo mv ~/Downloads/ngrok /usr/bin/ngrok```
 
 **The following command will occupy the entire window and should therefore be run in a dedicated terminal:**
 
-10. ```ngrok http 8888```
-11. copy the URL from ngrok output https://[identifier].ngrok.io
-12. ```export WEBHOOK_CODE_VERIFY=https://[identifier].ngrok.io```
+11. ```ngrok http 8888```
+12. copy the URL from ngrok output https://[identifier].ngrok.io
+13. ```export WEBHOOK_CODE_VERIFY=https://[identifier].ngrok.io```
 
 **The following command will occupy the entire window and should therefore be run in a dedicated terminal:**
 
-13. ```pkill netlify && netlify dev```
-14. Using Chrome with developer tools enabled and visible, navigate to http://localhost:8888
-15. Select iPhone X form factor
+14. ```pkill netlify```
+15. ```netlify dev```
+16. Using Chrome with developer tools enabled and visible, navigate to http://localhost:8888
+17. Select iPhone X form factor
 
 ### Starting a game
 
