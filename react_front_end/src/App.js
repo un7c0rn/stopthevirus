@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import React, { createContext, lazy, Suspense, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import useErrorBoundary from "use-error-boundary";
 import "./App.scss";
 import Preloader from "./pages/common/Preloader";
@@ -36,7 +36,7 @@ const theme = createMuiTheme({
 
 export const AppContext = createContext();
 
-function App() {
+const App = () => {
   // eslint-disable-next-line
   const [gameInfo, setGameInfo] = useState(false);
 
@@ -59,28 +59,37 @@ function App() {
         >
           <Suspense fallback={<Preloader />}>
             <ThemeProvider theme={theme}>
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/start-game" element={<StartGamePage />} />
-                  <Route path="/join-game/:gameId" element={<JoinGamePage />} />
-                  <Route path="/game-info/:gameId" element={<GameInfoPage />} />
-                  <Route
-                    path="/challenge-submission/:phone/:game/:challenge"
-                    element={<SubmitPage />}
-                  />
-                  <Route
-                    path="/create-challenge/:phone/:game"
-                    element={<CreateChallengePage />}
-                  />
-                  <Route
-                    path="/verify/:phone/:code/:game"
-                    element={<VerifyPlayerPage />}
-                  />
-                  <Route path="/verified" element={<VerifiedPlayerPage />} />
-                  <Route path="/advert" element={<AdvertPage />} />
-                  <Route path="/*" element={<LandingPage />} />
-                </Routes>
-              </BrowserRouter>
+              <Router>
+                <Switch>
+                  <Route path="/start-game">
+                    <StartGamePage />
+                  </Route>
+                  <Route path="/join-game/:gameId">
+                    <JoinGamePage />
+                  </Route>
+                  <Route path="/game-info/:gameId">
+                    <GameInfoPage />
+                  </Route>
+                  <Route path="/challenge-submission/:phone/:game/:challenge">
+                    <SubmitPage />
+                  </Route>
+                  <Route path="/create-challenge/:phone/:game">
+                    <CreateChallengePage />
+                  </Route>
+                  <Route path="/verify/:phone/:code/:game">
+                    <VerifyPlayerPage />
+                  </Route>
+                  <Route path="/verified">
+                    <VerifiedPlayerPage />
+                  </Route>
+                  <Route path="/advert">
+                    <AdvertPage />
+                  </Route>
+                  <Route path="/*">
+                    <LandingPage />
+                  </Route>
+                </Switch>
+              </Router>
             </ThemeProvider>
           </Suspense>
         </AppContext.Provider>
@@ -88,5 +97,5 @@ function App() {
       renderError={({ error }) => <CustomUiError error={error} type="app" />}
     />
   );
-}
+};
 export default App;
