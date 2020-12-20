@@ -15,3 +15,15 @@
   animation: effect-scale 1s ease 1, effect-fade-in 1s ease 1;
   animation-fill-mode: forwards;
 }
+
+.map-background {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  height: 100%;
+  width: 100%;
+  filter: invert(20%);
+}
