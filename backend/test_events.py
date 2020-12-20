@@ -50,30 +50,31 @@ _TEST_ENTRY = Entry(
 _TEST_TEAM1 = Team(
     id='id/foo1',
     name='team/bar',
-    size=5,
+    count_players=5,
     tribe_id='tribe/foo'
 )
 _TEST_TEAM2 = Team(
     id='id/foo2',
     name='team/bar',
-    size=5,
+    count_players=5,
     tribe_id='tribe/foo'
 )
 _TEST_TRIBE1 = Tribe(
     id='id/foo1',
     name='SIDAMA',
-    size=1e6
+    count_players=1e6
 )
 _TEST_TRIBE2 = Tribe(
     id='id/foo2',
     name='TIGRAWAY',
-    size=500e3
+    count_players=500e3
 )
 
 
 @contextmanager
 def aws_test_queue() -> AmazonSQS:
-    sqs = AmazonSQS(json_config_path=_TEST_AMAZON_SQS_CONFIG_PATH, game_id=_TEST_GAME_ID)
+    sqs = AmazonSQS(json_config_path=_TEST_AMAZON_SQS_CONFIG_PATH,
+                    game_id=_TEST_GAME_ID)
     try:
         queue = sqs._client.create_queue(
             QueueName="{}.fifo".format(str(uuid.uuid4())),
@@ -90,6 +91,7 @@ def aws_test_queue() -> AmazonSQS:
 class AmazonSQSTest(unittest.TestCase):
 
     def setUp(self):
+        self.maxDiff = None
         self._game_options = GameOptions()
         self._game_options.game_schedule = STV_I18N_TABLE['US']
 
@@ -116,8 +118,6 @@ class AmazonSQSTest(unittest.TestCase):
                         "id": "foo",
                         "name": "bar",
                         "message": "",
-                        "start_timestamp": 0,
-                        "end_timestamp": 0,
                         "complete": False
                     }
                 }
@@ -145,6 +145,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -158,8 +159,6 @@ class AmazonSQSTest(unittest.TestCase):
                         "id": "foo",
                         "name": "bar",
                         "message": "",
-                        "start_timestamp": 0,
-                        "end_timestamp": 0,
                         "complete": False
                     },
                     "entry": {
@@ -197,21 +196,22 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
                         "phone_number": "sms/bar",
                         "tribe_id": "tribe/foo",
                         "team_id": "team/bar",
-                        "active": True
+                        "active": True,
                     },
                     "team": {
                         "class": "Team",
                         "id": "id/foo1",
                         "name": "team/bar",
-                        "size": 5,
                         "tribe_id": "tribe/foo",
-                        "active": True
+                        "active": True,
+                        "count_players": 5
                     }
                 })
 
@@ -235,6 +235,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winning_player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -246,6 +247,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "losing_players": [
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo1",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -256,6 +258,7 @@ class AmazonSQSTest(unittest.TestCase):
                         },
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo2",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -290,9 +293,9 @@ class AmazonSQSTest(unittest.TestCase):
                             "class": "Team",
                             "id": "id/foo1",
                             "name": "team/bar",
-                            "size": 5,
                             "tribe_id": "tribe/foo",
-                            "active": True
+                            "active": True,
+                            "count_players": 5
                         }
                     ],
                     "losing_teams": [
@@ -300,9 +303,9 @@ class AmazonSQSTest(unittest.TestCase):
                             "class": "Team",
                             "id": "id/foo2",
                             "name": "team/bar",
-                            "size": 5,
                             "tribe_id": "tribe/foo",
-                            "active": True
+                            "active": True,
+                            "count_players": 5
                         }
                     ]
                 })
@@ -327,16 +330,18 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winning_tribe": {
                         "class": "Tribe",
+                        "count_players": 1000000.0,
+                        "count_teams": 0,
                         "id": "id/foo1",
                         "name": "SIDAMA",
-                        "size": 1000000.0,
                         "active": True
                     },
                     "losing_tribe": {
                         "class": "Tribe",
+                        "count_players": 500000.0,
+                        "count_teams": 0,
                         "id": "id/foo2",
                         "name": "TIGRAWAY",
-                        "size": 500000.0,
                         "active": True
                     }
                 })
@@ -361,6 +366,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "finalists": [
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo1",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -371,6 +377,7 @@ class AmazonSQSTest(unittest.TestCase):
                         },
                         {
                             "class": "Player",
+                            "name": "",
                             "id": "id/foo2",
                             "tiktok": "tiktok/bar",
                             "email": "email/foo",
@@ -401,6 +408,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "player": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo1",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -448,6 +456,7 @@ class AmazonSQSTest(unittest.TestCase):
                     "game_options": None,
                     "winner": {
                         "class": "Player",
+                        "name": "",
                         "id": "id/foo2",
                         "tiktok": "tiktok/bar",
                         "email": "email/foo",
@@ -479,9 +488,9 @@ class AmazonSQSTest(unittest.TestCase):
                         "class": "Team",
                         "id": "id/foo2",
                         "name": "team/bar",
-                        "size": 5,
                         "tribe_id": "tribe/foo",
-                        "active": True
+                        "active": True,
+                        "count_players": 5
                     }
                 })
 

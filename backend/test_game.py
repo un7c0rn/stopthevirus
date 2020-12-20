@@ -6,9 +6,9 @@ from game import GameOptions
 from game_engine.engine import Engine
 from game_engine.database import Database, Data
 from game_engine.database import Player, Team, Tribe
-from game_engine.database import Challenge, Entry, Vote
+from game_engine.database import Challenge, Entry, Vote, Ballot
 import attr
-from typing import Any, Iterable, Dict, Text, Tuple, List
+from typing import Any, Iterable, Dict, Text, Tuple, List, Optional
 import uuid
 from mock import Mock
 import time
@@ -17,8 +17,6 @@ from multiprocessing import Process
 from game_engine import events
 from queue import Queue
 
-_TEST_CHALLENGE_START_OFFSET_SEC = .1
-_TEST_CHALLENGE_END_OFFSET_SEC = .1
 
 class MockPlayEngine(Mock):
     def CreateEngine(self, mygamedb):
@@ -233,11 +231,11 @@ class MockPlayEngine(Mock):
             tribe_id = [tribe for tribe in gamedb._tribes.values()
                         if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
-                'entry/1': Entry(id='entry/1', likes=5, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/2': Entry(id='entry/2', likes=4, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/4': Entry(id='entry/4', likes=2, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/5': Entry(id='entry/5', likes=1, views=1, player_id='k1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/1': Entry(id='entry/1', likes=5, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/2': Entry(id='entry/2', likes=4, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/4': Entry(id='entry/4', likes=2, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/5': Entry(id='entry/5', likes=1, views=1, player_id='k1', tribe_id=tribe_id, challenge_id='challenge/10'),
             }
 
         def council10_worker(gamedb):
@@ -256,10 +254,10 @@ class MockPlayEngine(Mock):
             tribe_id = [tribe for tribe in gamedb._tribes.values()
                         if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
-                'entry/1': Entry(id='entry/1', likes=4, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/2': Entry(id='entry/2', likes=3, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/3': Entry(id='entry/3', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/4': Entry(id='entry/4', likes=1, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/1': Entry(id='entry/1', likes=4, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/11'),
+                'entry/2': Entry(id='entry/2', likes=3, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/11'),
+                'entry/3': Entry(id='entry/3', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/11'),
+                'entry/4': Entry(id='entry/4', likes=1, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/11'),
             }
 
         def council11_worker(gamedb):
@@ -277,9 +275,9 @@ class MockPlayEngine(Mock):
             tribe_id = [tribe for tribe in gamedb._tribes.values()
                         if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
-                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/12'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/12'),
+                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/12'),
             }
 
         def council12_worker(gamedb):
@@ -331,14 +329,14 @@ class MockPlayEngine(Mock):
             elif isinstance(event, events.NotifyFinalTribalCouncilEvent) and not council_worker_queue.empty():
                 council_worker = council_worker_queue.get_nowait()
                 council_worker(mygamedb)
-        eng = Mock()
+        eng = mock.MagicMock()
         eng.add_event = event_fn
         return eng
 
 
-
 class MockDatabase(Database):
     def __init__(self):
+        self._games = dict()
         self._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
             'player/02': Player(id='player/02', tribe_id='tribe/1', team_id='team/1'),
@@ -366,18 +364,18 @@ class MockDatabase(Database):
         }
 
         self._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=4, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=4, tribe_id='tribe/1'),
-            'team/3': Team(id='team/3', name='name/team3', size=4, tribe_id='tribe/2'),
-            'team/4': Team(id='team/4', name='name/team4', size=4, tribe_id='tribe/2'),
-            'team/5': Team(id='team/5', name='name/team5', size=2, tribe_id='tribe/2'),
-            'team/6': Team(id='team/6', name='name/team6', size=2, tribe_id='tribe/2'),
-            'team/7': Team(id='team/7', name='name/team7', size=3, tribe_id='tribe/2')
+            'team/1': Team(id='team/1', name='name/team1', count_players=4, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=4, tribe_id='tribe/1'),
+            'team/3': Team(id='team/3', name='name/team3', count_players=4, tribe_id='tribe/2'),
+            'team/4': Team(id='team/4', name='name/team4', count_players=4, tribe_id='tribe/2'),
+            'team/5': Team(id='team/5', name='name/team5', count_players=2, tribe_id='tribe/2'),
+            'team/6': Team(id='team/6', name='name/team6', count_players=2, tribe_id='tribe/2'),
+            'team/7': Team(id='team/7', name='name/team7', count_players=3, tribe_id='tribe/2')
         }
 
         self._tribes = {
-            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', size=8),
-            'tribe/2': Tribe(id='tribe/2', name='name/tribe2', size=15)
+            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', count_players=8),
+            'tribe/2': Tribe(id='tribe/2', name='name/tribe2', count_players=15)
         }
 
         self._challenges = {
@@ -401,19 +399,19 @@ class MockDatabase(Database):
         }
 
         self._games = {
-            "7rPwCJaiSkxYgDocGDw1":{
-                "count_teams":6,
-                "count_players":8,
-                "name":"test_game1",
-                "country_code":"US",
+            "7rPwCJaiSkxYgDocGDw1": {
+                "count_teams": 6,
+                "count_players": 8,
+                "name": "test_game1",
+                "country_code": "US",
                 "game_has_started": False,
                 "id": "7rPwCJaiSkxYgDocGDw1"
             },
-            "FFFFFFFFFFFFFFFFFFFF":{
-                "count_teams":6,
-                "count_players":5,
-                "name":"test_game2",
-                "country_code":"EU",
+            "FFFFFFFFFFFFFFFFFFFF": {
+                "count_teams": 6,
+                "count_players": 5,
+                "name": "test_game2",
+                "country_code": "EU",
                 "game_has_started": True,
                 "id": "FFFFFFFFFFFFFFFFFFFF"
             }
@@ -421,20 +419,27 @@ class MockDatabase(Database):
 
         self._votes = {}
 
+    def get_game_id(self) -> str:
+        pass
+
     def batch_update_tribe(self, from_tribe: Tribe, to_tribe: Tribe) -> None:
         new_active_players_count = 0
+        new_active_teams_count = 0
 
         for key in self._teams:
             if self._teams[key].tribe_id == from_tribe.id:
                 self._teams[key].tribe_id = to_tribe.id
+                new_active_teams_count += 1
 
         for key in self._players:
             if self._players[key].tribe_id == from_tribe.id:
                 self._players[key].tribe_id = to_tribe.id
                 if self._players[key].active:
                     new_active_players_count = new_active_players_count + 1
-        self._tribes[to_tribe.id].size = self._tribes[to_tribe.id].size + \
-            new_active_players_count
+        self._tribes[to_tribe.id].count_players += new_active_players_count
+        self._tribes[to_tribe.id].count_teams += new_active_teams_count
+        self._tribes[from_tribe.id].count_players = 0
+        self._tribes[from_tribe.id].active = False
 
     def stream_entries(self, from_tribe: Tribe = None, from_team: Team = None, from_challenge: Challenge = None) -> Iterable[Entry]:
         if from_tribe:
@@ -453,16 +458,16 @@ class MockDatabase(Database):
                      descending=False
                      ) -> Iterable[Team]:
         if team_size_predicate_value:
-            return sorted([team for team in self._teams.values() if (team.size == team_size_predicate_value
+            return sorted([team for team in self._teams.values() if (team.count_players == team_size_predicate_value
                                                                      and team.active
                                                                      and team.tribe_id == from_tribe.id)],
-                          key=lambda team: team.size, reverse=True)
+                          key=lambda team: team.count_players, reverse=True)
         else:
             return sorted([team for team in self._teams.values() if (team.active and team.tribe_id == from_tribe.id)],
-                          key=lambda team: team.size, reverse=True)
+                          key=lambda team: team.count_players, reverse=True)
 
     def stream_players(self, active_player_predicate_value: bool = True) -> Iterable[Player]:
-        pass
+        return self._players.values()
 
     def count_players(self, from_tribe: Tribe = None, from_team: Team = None) -> int:
         count = 0
@@ -484,8 +489,8 @@ class MockDatabase(Database):
     def deactivate_player(self, player: Player) -> None:
         player.active = False
         self._players[player.id].active = False
-        self._teams[player.team_id].size = self._teams[player.team_id].size - 1
-        self._tribes[player.tribe_id].size = self._tribes[player.tribe_id].size - 1
+        self._teams[player.team_id].count_players -= 1
+        self._tribes[player.tribe_id].count_players -= 1
 
     def deactivate_team(self, team: Team) -> None:
         team.active = False
@@ -535,7 +540,7 @@ class MockDatabase(Database):
         pass
 
     def game_from_id(self, id: Text) -> Game:
-        pass
+        return Game(game_id='', options=None)
 
     def player_from_id(self, id: Text) -> Player:
         return self._players[id]
@@ -562,6 +567,9 @@ class MockDatabase(Database):
         if isinstance(data, Team):
             self._teams[data.id] = data
 
+        if isinstance(data, Challenge):
+            self._challenges[data.id] = data
+
     def find_matchmaker_games(self, region="US") -> list:
         class TestGame(dict):
             class Reference():
@@ -572,22 +580,34 @@ class MockDatabase(Database):
                         for key, val in players_dict.items():
                             players_list.append(val)
                         return players_list
+
                 def collection(self2, inp):
-                    if inp =="players":
+                    if inp == "players":
                         return self2.Stream()
             reference = Reference()
+
             def to_dict(self):
                 return self
-        filtered = filter(lambda elem: elem[1]['country_code'] == region and not elem[1]['game_has_started'], self._games.items())
+        filtered = filter(lambda elem: elem[1]['country_code'] ==
+                          region and not elem[1]['game_has_started'], self._games.items())
         games = list(filtered)
         games_list = []
         for g_tuple in games:
             game = TestGame(g_tuple[1])
             games_list.append(game)
         return games_list
-        
 
+    def ballot(self, player_id: str, challenge_id: str, options: Dict[str, str]) -> None:
+        pass
 
+    def find_ballot(self, player: Player) -> Iterable[Ballot]:
+        pass
+
+    def find_player(self, phone_number: str) -> Optional[Player]:
+        pass
+
+    def find_user(self, phone_number: str) -> Optional[object]:
+        pass
 
 
 class GameTest(unittest.TestCase):
@@ -601,7 +621,7 @@ class GameTest(unittest.TestCase):
 
     def test_play(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         # [Africa r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [Asia y1 y2 y3 k1 k2 k3 x1 x2 x3]
         gamedb._players = {
@@ -626,17 +646,17 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'r': Team(id='r', name='name/r', size=3, tribe_id='AFRICA'),
-            'g': Team(id='g', name='name/g', size=3, tribe_id='AFRICA'),
-            'b': Team(id='b', name='name/b', size=3, tribe_id='AFRICA'),
-            'y': Team(id='y', name='name/y', size=3, tribe_id='ASIA'),
-            'k': Team(id='k', name='name/k', size=3, tribe_id='ASIA'),
-            'x': Team(id='x', name='name/x', size=3, tribe_id='ASIA'),
+            'r': Team(id='r', name='name/r', count_players=3, tribe_id='AFRICA'),
+            'g': Team(id='g', name='name/g', count_players=3, tribe_id='AFRICA'),
+            'b': Team(id='b', name='name/b', count_players=3, tribe_id='AFRICA'),
+            'y': Team(id='y', name='name/y', count_players=3, tribe_id='ASIA'),
+            'k': Team(id='k', name='name/k', count_players=3, tribe_id='ASIA'),
+            'x': Team(id='x', name='name/x', count_players=3, tribe_id='ASIA'),
         }
 
         gamedb._tribes = {
-            'AFRICA': Tribe(id='AFRICA', name='name/AFRICA', size=9),
-            'ASIA': Tribe(id='ASIA', name='name/ASIA', size=9),
+            'AFRICA': Tribe(id='AFRICA', name='name/AFRICA', count_players=9),
+            'ASIA': Tribe(id='ASIA', name='name/ASIA', count_players=9),
         }
 
         gamedb._challenges = {
@@ -648,12 +668,13 @@ class GameTest(unittest.TestCase):
             'challenge/6': Challenge(id='challenge/6', name='name/challenge6'),
             'challenge/7': Challenge(id='challenge/7', name='name/challenge7'),
             'challenge/8': Challenge(id='challenge/8', name='name/challenge8'),
-            'challenge/10': Challenge(id='challenge/9', name='name/challenge9'),
-            'challenge/11': Challenge(id='challenge/10', name='name/challenge10'),
-            'challenge/12': Challenge(id='challenge/11', name='name/challenge11'),
-            'challenge/13': Challenge(id='challenge/12', name='name/challenge12'),
-            'challenge/14': Challenge(id='challenge/13', name='name/challenge13'),
-            'challenge/15': Challenge(id='challenge/14', name='name/challenge14'),
+            'challenge/9': Challenge(id='challenge/9', name='name/challenge9'),
+            'challenge/10': Challenge(id='challenge/10', name='name/challenge10'),
+            'challenge/11': Challenge(id='challenge/11', name='name/challenge11'),
+            'challenge/12': Challenge(id='challenge/12', name='name/challenge12'),
+            'challenge/13': Challenge(id='challenge/13', name='name/challenge13'),
+            'challenge/14': Challenge(id='challenge/14', name='name/challenge14'),
+            'challenge/15': Challenge(id='challenge/15', name='name/challenge15'),
         }
 
         gamedb._entries = {}
@@ -869,11 +890,11 @@ class GameTest(unittest.TestCase):
             tribe_id = [tribe for tribe in gamedb._tribes.values()
                         if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
-                'entry/1': Entry(id='entry/1', likes=5, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/2': Entry(id='entry/2', likes=4, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/4': Entry(id='entry/4', likes=2, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/5': Entry(id='entry/5', likes=1, views=1, player_id='k1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/1': Entry(id='entry/1', likes=5, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/2': Entry(id='entry/2', likes=4, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/4': Entry(id='entry/4', likes=2, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/10'),
+                'entry/5': Entry(id='entry/5', likes=1, views=1, player_id='k1', tribe_id=tribe_id, challenge_id='challenge/10'),
             }
 
         def council10_worker(gamedb):
@@ -892,10 +913,10 @@ class GameTest(unittest.TestCase):
             tribe_id = [tribe for tribe in gamedb._tribes.values()
                         if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
-                'entry/1': Entry(id='entry/1', likes=4, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/2': Entry(id='entry/2', likes=3, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/3': Entry(id='entry/3', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/4': Entry(id='entry/4', likes=1, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/1': Entry(id='entry/1', likes=4, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/11'),
+                'entry/2': Entry(id='entry/2', likes=3, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/11'),
+                'entry/3': Entry(id='entry/3', likes=2, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/11'),
+                'entry/4': Entry(id='entry/4', likes=1, views=1, player_id='y2', tribe_id=tribe_id, challenge_id='challenge/11'),
             }
 
         def council11_worker(gamedb):
@@ -913,9 +934,9 @@ class GameTest(unittest.TestCase):
             tribe_id = [tribe for tribe in gamedb._tribes.values()
                         if tribe.name == "a$apmob"][0].id
             gamedb._entries = {
-                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/9'),
-                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/9'),
+                'entry/1': Entry(id='entry/1', likes=1, views=1, player_id='r1', tribe_id=tribe_id, challenge_id='challenge/12'),
+                'entry/2': Entry(id='entry/2', likes=2, views=1, player_id='r2', tribe_id=tribe_id, challenge_id='challenge/12'),
+                'entry/3': Entry(id='entry/3', likes=3, views=1, player_id='y1', tribe_id=tribe_id, challenge_id='challenge/12'),
             }
 
         def council12_worker(gamedb):
@@ -978,7 +999,7 @@ class GameTest(unittest.TestCase):
 
     def test_play_multi_tribe(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         # [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 y3 k1 k2 k3 x1 x2 x3]
         gamedb._players = {
@@ -1003,17 +1024,17 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'r': Team(id='r', name='name/r', size=3, tribe_id='TOKYO'),
-            'g': Team(id='g', name='name/g', size=3, tribe_id='TOKYO'),
-            'b': Team(id='b', name='name/b', size=3, tribe_id='TOKYO'),
-            'y': Team(id='y', name='name/y', size=3, tribe_id='LONDON'),
-            'k': Team(id='k', name='name/k', size=3, tribe_id='LONDON'),
-            'x': Team(id='x', name='name/x', size=3, tribe_id='LONDON'),
+            'r': Team(id='r', name='name/r', count_players=3, tribe_id='TOKYO'),
+            'g': Team(id='g', name='name/g', count_players=3, tribe_id='TOKYO'),
+            'b': Team(id='b', name='name/b', count_players=3, tribe_id='TOKYO'),
+            'y': Team(id='y', name='name/y', count_players=3, tribe_id='LONDON'),
+            'k': Team(id='k', name='name/k', count_players=3, tribe_id='LONDON'),
+            'x': Team(id='x', name='name/x', count_players=3, tribe_id='LONDON'),
         }
 
         gamedb._tribes = {
-            'TOKYO': Tribe(id='TOKYO', name='name/TOKYO', size=9),
-            'LONDON': Tribe(id='LONDON', name='name/LONDON', size=9),
+            'TOKYO': Tribe(id='TOKYO', name='name/TOKYO', count_players=9),
+            'LONDON': Tribe(id='LONDON', name='name/LONDON', count_players=9),
         }
 
         gamedb._challenges = {
@@ -1028,12 +1049,12 @@ class GameTest(unittest.TestCase):
         def challenge1_worker(gamedb):
             # round 1: [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 y3 k1 k2 k3 x1 x2 x3]
             # tokyo wins
-            # asia teams vote
+            # london teams vote
             # y votes out y3
             # k votes out k3
             # x votes out x3
             # [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 k1 k2 x1 x2]
-            # asia teams of 2 would deadlock and must merge
+            # london teams of 2 would deadlock and must merge
             # [Tokyo r1 r2 r3 g1 g2 g3 b1 b2 b3] vs [London y1 y2 k1 k2 x1 x2 (all on k team)]
             gamedb._entries = {
                 'entry/1': Entry(id='entry/1', likes=2, views=1, player_id='r1', tribe_id='TOKYO', challenge_id='challenge/1'),
@@ -1133,7 +1154,7 @@ class GameTest(unittest.TestCase):
 
     def test_play_single_tribe(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         # start with 8 players in tribe
         gamedb._players = {
@@ -1148,12 +1169,12 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'red': Team(id='red', name='name/red', size=4, tribe_id='tribe/1'),
-            'blue': Team(id='blue', name='name/blue', size=4, tribe_id='tribe/1'),
+            'red': Team(id='red', name='name/red', count_players=4, tribe_id='tribe/1'),
+            'blue': Team(id='blue', name='name/blue', count_players=4, tribe_id='tribe/1'),
         }
 
         gamedb._tribes = {
-            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', size=8),
+            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', count_players=8),
         }
 
         gamedb._challenges = {
@@ -1296,7 +1317,7 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/7': Team(id='team/7', name='name/team7', size=4, tribe_id='tribe/2')
+            'team/7': Team(id='team/7', name='name/team7', count_players=4, tribe_id='tribe/2')
         }
 
         # in a tie situation, the algorithm leaves it to chance to
@@ -1315,7 +1336,7 @@ class GameTest(unittest.TestCase):
     def test_run_multi_tribe_council(self):
         gamedb = MockDatabase()
         gamedb.clear_votes = Mock()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/1': Player(id='player/1', tribe_id='tribe/1', team_id='team/1'),
@@ -1329,13 +1350,13 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=4, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=4, tribe_id='tribe/2'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=4, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=4, tribe_id='tribe/2'),
         }
 
         gamedb._tribes = {
-            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', size=4),
-            'tribe/2': Tribe(id='tribe/2', name='name/tribe2', size=4)
+            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', count_players=4),
+            'tribe/2': Tribe(id='tribe/2', name='name/tribe2', count_players=4)
         }
 
         # inject votes
@@ -1356,7 +1377,7 @@ class GameTest(unittest.TestCase):
     def test_run_single_tribe_council(self):
         gamedb = MockDatabase()
         gamedb.clear_votes = Mock()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         # inject votes
         gamedb._votes = {
@@ -1377,7 +1398,7 @@ class GameTest(unittest.TestCase):
     def test_run_finalist_tribe_council(self):
         gamedb = MockDatabase()
         gamedb.clear_votes = Mock()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         finalists = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1402,7 +1423,7 @@ class GameTest(unittest.TestCase):
     def test_run_single_team_council(self):
         gamedb = MockDatabase()
         gamedb.clear_votes = Mock()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/1': Player(id='player/1', tribe_id='tribe/1', team_id='team/1'),
@@ -1412,11 +1433,11 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=4, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=4, tribe_id='tribe/1'),
         }
 
         gamedb._tribes = {
-            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', size=4)
+            'tribe/1': Tribe(id='tribe/1', name='name/tribe1', count_players=4)
         }
 
         # inject votes
@@ -1438,7 +1459,7 @@ class GameTest(unittest.TestCase):
 
     def test_merge_teams_2player(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1446,8 +1467,8 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=1, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=1, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=1, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=1, tribe_id='tribe/1'),
         }
 
         tribe = gamedb.tribe_from_id('tribe/1')
@@ -1465,7 +1486,7 @@ class GameTest(unittest.TestCase):
 
     def test_merge_teams_3player(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1474,8 +1495,8 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=2, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=1, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=2, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=1, tribe_id='tribe/1'),
         }
 
         tribe = gamedb.tribe_from_id('tribe/1')
@@ -1494,7 +1515,7 @@ class GameTest(unittest.TestCase):
 
     def test_merge_teams_5player(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1505,8 +1526,8 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=2, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=3, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=2, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=3, tribe_id='tribe/1'),
         }
 
         tribe = gamedb.tribe_from_id('tribe/1')
@@ -1527,7 +1548,7 @@ class GameTest(unittest.TestCase):
 
     def test_merge_teams_6player(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1539,8 +1560,8 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=3, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=3, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=3, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=3, tribe_id='tribe/1'),
         }
 
         tribe = gamedb.tribe_from_id('tribe/1')
@@ -1562,7 +1583,7 @@ class GameTest(unittest.TestCase):
 
     def test_merge_teams_9player(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1577,10 +1598,10 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=2, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=2, tribe_id='tribe/1'),
-            'team/3': Team(id='team/3', name='name/team3', size=2, tribe_id='tribe/1'),
-            'team/4': Team(id='team/4', name='name/team4', size=3, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=2, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=2, tribe_id='tribe/1'),
+            'team/3': Team(id='team/3', name='name/team3', count_players=2, tribe_id='tribe/1'),
+            'team/4': Team(id='team/4', name='name/team4', count_players=3, tribe_id='tribe/1'),
         }
 
         tribe = gamedb.tribe_from_id('tribe/1')
@@ -1605,7 +1626,7 @@ class GameTest(unittest.TestCase):
 
     def test_merge_teams_10player(self):
         gamedb = MockDatabase()
-        engine = Mock()
+        engine = mock.MagicMock()
 
         gamedb._players = {
             'player/01': Player(id='player/01', tribe_id='tribe/1', team_id='team/1'),
@@ -1621,9 +1642,9 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=2, tribe_id='tribe/1'),
-            'team/2': Team(id='team/2', name='name/team2', size=4, tribe_id='tribe/1'),
-            'team/3': Team(id='team/3', name='name/team3', size=4, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=2, tribe_id='tribe/1'),
+            'team/2': Team(id='team/2', name='name/team2', count_players=4, tribe_id='tribe/1'),
+            'team/3': Team(id='team/3', name='name/team3', count_players=4, tribe_id='tribe/1'),
         }
 
         tribe = gamedb.tribe_from_id('tribe/1')
@@ -1664,26 +1685,24 @@ class GameTest(unittest.TestCase):
             ['name/challenge1', 'name/challenge2', 'name/challenge3', 'name/challenge4', 'name/challenge5']))
 
     def test_run_challenge(self):
-        engine = Mock()
+        engine = mock.MagicMock()
         gamedb = MockDatabase()
         challenge = gamedb.challenge_from_id('challenge/1')
-        challenge.start_timestamp = time.time() + _TEST_CHALLENGE_START_OFFSET_SEC
-        challenge.end_timestamp = challenge.start_timestamp + _TEST_CHALLENGE_END_OFFSET_SEC
         self._game._run_challenge(
             challenge=challenge, gamedb=gamedb, engine=engine)
         engine.add_event.assert_called_once()
 
     def test_score_entries_tribe_aggregate(self):
-        engine = Mock()
+        engine = mock.MagicMock()
         gamedb = MockDatabase()
         tribe = gamedb.tribe_from_id('tribe/1')
         challenge = gamedb.challenge_from_id('challenge/1')
         self.assertEqual(self._game._score_entries_tribe_aggregate(
-            tribe=tribe, challenge=challenge, gamedb=gamedb, engine=engine), 0.5)
+            tribe=tribe, challenge=challenge, gamedb=gamedb, engine=engine), 50)
         engine.add_event.assert_called()
 
     def test_score_entries_top_k_teams(self):
-        engine = Mock()
+        engine = mock.MagicMock()
         gamedb = MockDatabase()
         tribe = gamedb.tribe_from_id('tribe/2')
         challenge = gamedb.challenge_from_id('challenge/1')
@@ -1726,7 +1745,7 @@ class GameTest(unittest.TestCase):
         engine.add_event.assert_called()
 
     def test_score_entries_top_k_players(self):
-        engine = Mock()
+        engine = mock.MagicMock()
         gamedb = MockDatabase()
         tribe = gamedb.tribe_from_id('tribe/1')
         challenge = gamedb.challenge_from_id('challenge/1')
@@ -1738,7 +1757,7 @@ class GameTest(unittest.TestCase):
         }
 
         gamedb._teams = {
-            'team/1': Team(id='team/1', name='name/team1', size=3, tribe_id='tribe/1'),
+            'team/1': Team(id='team/1', name='name/team1', count_players=3, tribe_id='tribe/1'),
         }
 
         gamedb._entries = {
@@ -1764,9 +1783,15 @@ class GameTest(unittest.TestCase):
         tribe1_count = gamedb.count_players(from_tribe=tribe1)
         tribe2_count = gamedb.count_players(from_tribe=tribe2)
         tribe3 = self._game._merge_tribes(tribe1=tribe1, tribe2=tribe2,
-                                          new_tribe_name='test/tribe3', gamedb=gamedb)
+                                          new_tribe_name='test/tribe3', gamedb=gamedb, engine=mock.MagicMock())
         self.assertEqual(gamedb.count_players(
             from_tribe=tribe3), tribe1_count + tribe2_count)
+        self.assertEqual(gamedb.count_players(from_tribe=tribe1), 0)
+        self.assertEqual(gamedb.count_players(from_tribe=tribe2), 0)
+        self.assertEqual(gamedb.count_teams(from_tribe=tribe1), 0)
+        self.assertEqual(gamedb.count_teams(from_tribe=tribe2), 0)
+        self.assertFalse(gamedb.tribe_from_id(tribe1.id).active)
+        self.assertFalse(gamedb.tribe_from_id(tribe2.id).active)
 
 
 if __name__ == '__main__':

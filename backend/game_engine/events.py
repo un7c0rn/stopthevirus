@@ -11,22 +11,24 @@ import json
 import sys
 from concurrent.futures import ThreadPoolExecutor
 import copy
-from typing import Text, Union, Any, Dict
+from typing import Union, Any, Dict
 import uuid
-import pprint
+import time
+import botocore
 
 _NOP_SMS_ADDRESS = "555-123-4567"
+_AWS_SQS_INIT_TIME_SEC = 2
 
 
 @attr.s
 class SMSEventMessage(Serializable):
-    content: Text = attr.ib()
-    recipient_phone_numbers: List[Text] = attr.ib(factory=list)
+    content: str = attr.ib()
+    recipient_phone_numbers: List[str] = attr.ib(factory=list)
 
 
 @attr.s
 class SMSEvent(Serializable):
-    game_id: Text = attr.ib()
+    game_id: str = attr.ib()
     game_options: GameOptions = attr.ib()
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -38,7 +40,7 @@ class SMSEvent(Serializable):
         ]
 
     @classmethod
-    def from_json(cls, json_text: Text, game_options: GameOptions) -> Serializable:
+    def from_json(cls, json_text: str, game_options: GameOptions) -> Serializable:
         d = json.loads(json_text)
         d['game_options'] = game_options
         event_type = d['class']
@@ -83,24 +85,34 @@ class EventQueueError(Exception):
 
 
 class AmazonSQS(EventQueue):
-    def __init__(self, json_config_path: Text, game_id: Text, game_options: GameOptions = None) -> None:
+    def __init__(self, json_config_path: str, game_id: str, game_options: GameOptions = None) -> None:
         self.game_id = game_id
         with open(json_config_path, 'r') as f:
+            name = f'VIRUS-{game_id}-{str(uuid.uuid4())}.fifo'
             config = json.loads(f.read())
-            self._url = config['url']
             self._client = boto3.client(
                 'sqs',
                 aws_access_key_id=config['aws_access_key_id'],
                 aws_secret_access_key=config['aws_secret_access_key'],
                 region_name='us-east-2'
             )
+            self._client.create_queue(
+                QueueName=name,
+                Attributes={
+                    'FifoQueue': 'true'
+                }
+            )
+            # After you create a queue, you must wait at least one second after the queue
+            # is created to be able to use the queue.
+            time.sleep(_AWS_SQS_INIT_TIME_SEC)
+            self._url = self._client.get_queue_url(QueueName=name)['QueueUrl']
         # store a reference to game options for timezone specific
         # event deserialization from the AWS queue.
         self._game_options = game_options if game_options else GameOptions(
             game_schedule=STV_I18N_TABLE['US']
         )
 
-    def _delete_message(self, receipt_handle: Text) -> None:
+    def _delete_message(self, receipt_handle: str) -> None:
         self._client.delete_message(QueueUrl=self._url,
                                     ReceiptHandle=receipt_handle)
 
@@ -112,7 +124,6 @@ class AmazonSQS(EventQueue):
             ],
             MaxNumberOfMessages=1,
             WaitTimeSeconds=20)
-        log_message(message=str(response), game_id=self.game_id)
 
         if 'Messages' in response:
             message = response['Messages'][0]
@@ -125,16 +136,19 @@ class AmazonSQS(EventQueue):
             raise EventQueueError('Queue empty.')
 
     def put_fn(self, event: SMSEvent) -> None:
-        # TODO(brandon) add retry logic and error handling.
-        log_message(message="Putting {} on queue {}.".format(
-            event.to_json(), self._url), game_id=self.game_id)
-        response = self._client.send_message(
-            QueueUrl=self._url,
-            MessageBody=event.to_json(),
-            MessageGroupId=event.game_id,
-            MessageDeduplicationId=str(uuid.uuid4())
-        )
-        log_message(message=response, game_id=self.game_id)
+        try:
+            # TODO(brandon) add retry logic and error handling.
+            log_message(message="Putting {} on queue {}.".format(
+                event.to_json(), self._url), game_id=self.game_id)
+            response = self._client.send_message(
+                QueueUrl=self._url,
+                MessageBody=event.to_json(),
+                MessageGroupId=event.game_id,
+                MessageDeduplicationId=str(uuid.uuid4())
+            )
+        except Exception as e:
+            log_message(
+                messages=f'put_fn failed for event {event} with exception {str(e)}.')
 
     def put(self, event: SMSEvent, blocking: bool = False) -> None:
         if blocking:
@@ -142,6 +156,14 @@ class AmazonSQS(EventQueue):
         else:
             with ThreadPoolExecutor(max_workers=1) as executor:
                 executor.submit(self.put_fn, event)
+
+    def __del__(self):
+        try:
+            self._client.delete_queue(
+                QueueUrl=self._url
+            )
+        except:
+            pass
 
 
 @attr.s
@@ -166,7 +188,7 @@ class NotifyPlayerScoreEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_PLAYER_SCORE_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     points=self.points,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_end_time
@@ -198,7 +220,7 @@ class NotifyTeamReassignmentEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_TEAM_REASSIGNMENT_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     team=messages.players_as_formatted_list(
                         players=team_players),
                     date=self.game_options.game_schedule.tomorrow_localized_string,
@@ -231,34 +253,45 @@ class NotifySingleTeamCouncilEvent(SMSEvent):
         player_messages = []
         count_players = gamedb.count_players(
             from_tribe=gamedb.tribe_from_id(self.winning_player.tribe_id))
+        # TODO(brandon): unclear why this can't be done in a single bulk message.
         for player in self.losing_players:
+            options_map = messages.players_as_formatted_options_map(
+                players=self.losing_players, exclude_player=player)
+            # NOTE(brandon): we perform this synchronously to guarantee that ballots are
+            # created in the DB before SMS messages go out to users.
+            gamedb.ballot(
+                player_id=player.id, options=options_map.options, challenge_id=None
+            )
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_SINGLE_TEAM_COUNCIL_EVENT_LOSING_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         winner=messages.format_tiktok_username(
                             self.winning_player.tiktok),
                         players=count_players,
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_challenge_end_time),
-                        options=messages.players_as_formatted_options_list(
-                            players=self.losing_players, exclude_player=player)
+                        options=options_map.formatted_string
                     ),
-                    recipient_phone_numbers=player.phone_number
+                    recipient_phone_numbers=[player.phone_number]
                 )
             )
 
+        options_map = messages.players_as_formatted_options_map(
+            players=self.losing_players, exclude_player=self.winning_player)
+        gamedb.ballot(
+            player_id=self.winning_player.id, options=options_map.options, challenge_id=None
+        )
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_SINGLE_TEAM_COUNCIL_EVENT_WINNING_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     players=count_players,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_end_time),
-                    options=messages.players_as_formatted_options_list(
-                        players=self.losing_players)
+                    options=options_map.formatted_string
                 ),
-                recipient_phone_numbers=self.winning_player.phone_number
+                recipient_phone_numbers=[self.winning_player.phone_number]
             )
         )
 
@@ -292,21 +325,25 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
             # as an option to vote out. For MVP this helps with scale because the alternative
             # requires sending a different message to every player (as opposed to every team)
             # which is about a 5x cost increase for SMS.
-            r = [p.phone_number for p in losing_players]
+            recipient_phone_numbers = [p.phone_number for p in losing_players]
+            options_map = messages.players_as_formatted_options_map(
+                players=losing_players)
+            # TODO(brandon): this is slow and expensive. batch the ballot writes to gamedb.
+            for player in losing_players:
+                gamedb.ballot(
+                    player_id=player.id, options=options_map.options, challenge_id=None
+                )
+
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_SINGLE_TRIBE_COUNCIL_EVENT_LOSING_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_tribal_council_end_time
                         ),
-                        options=messages.players_as_formatted_options_list(
-                            # TODO(brandon): exclude the voter from the options list of players
-                            # to vote out.
-                            players=losing_players
-                        )
+                        options=options_map.formatted_string
                     ),
-                    recipient_phone_numbers=r
+                    recipient_phone_numbers=recipient_phone_numbers
                 )
             )
 
@@ -320,7 +357,7 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_SINGLE_TRIBE_COUNCIL_EVENT_WINNING_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_tribal_council_end_time
                     ),
@@ -338,7 +375,7 @@ class NotifySingleTribeCouncilEvent(SMSEvent):
 class NotifyTribalChallengeEvent(SMSEvent):
     challenge: Challenge = attr.ib()
 
-    def challenge_submission_link(self) -> Text:
+    def challenge_submission_link(self) -> str:
         pass
 
     @classmethod
@@ -360,10 +397,10 @@ class NotifyTribalChallengeEvent(SMSEvent):
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_TRIBAL_CHALLENGE_EVENT_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         challenge=self.challenge.name,
                         # TODO(brandon) refactor into common routes location
-                        link="https://{hostname}/challenge-submission/{player_id}/{game_id}/{challenge_id}".format(
+                        link="{hostname}/challenge-submission/{player_id}/{game_id}/{challenge_id}".format(
                             hostname=messages.VIR_US_HOSTNAME,
                             game_id=self.game_id,
                             player_id=player.id,
@@ -392,7 +429,7 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
             losing_tribe=Tribe.from_dict(json_dict['losing_tribe']),
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -407,6 +444,14 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
             for player in gamedb.list_players(from_team=team):
                 losing_players.append(player)
 
+            options_map = messages.players_as_formatted_options_map(
+                players=losing_players)
+
+            for player in losing_players:
+                gamedb.ballot(
+                    player_id=player.id, options=options_map.options, challenge_id=None
+                )
+
             # NOTE: UX isn't perfect here because we'll show the player's own name
             # as an option to vote out. For MVP this helps with scale because the alternative
             # requires sending a different message to every player (as opposed to every team)
@@ -414,16 +459,12 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
             player_messages.append(
                 SMSEventMessage(
                     content=messages.NOTIFY_MULTI_TRIBE_COUNCIL_EVENT_LOSING_MSG_FMT.format(
-                        header=messages.VIR_US_SMS_HEADER,
+                        header=messages.game_sms_header(gamedb=gamedb),
                         tribe=self.losing_tribe.name,
                         time=self.game_options.game_schedule.localized_time_string(
                             self.game_options.game_schedule.daily_tribal_council_end_time
                         ),
-                        options=messages.players_as_formatted_options_list(
-                            # TODO(brandon): exclude the voter from the options list of players
-                            # to vote out.
-                            players=losing_players
-                        )
+                        options=options_map.formatted_string
                     ),
                     recipient_phone_numbers=[
                         p.phone_number for p in losing_players]
@@ -440,7 +481,7 @@ class NotifyMultiTribeCouncilEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_MULTI_TRIBE_COUNCIL_EVENT_WINNING_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     winning_tribe=self.winning_tribe.name,
                     losing_tribe=self.losing_tribe.name,
                     time=self.game_options.game_schedule.localized_time_string(
@@ -469,24 +510,33 @@ class NotifyFinalTribalCouncilEvent(SMSEvent):
                        for v in json_dict['finalists']]
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
+        options_map = messages.players_as_formatted_options_map(
+            players=self.finalists)
+        # TODO(brandon): this is slow and expensive, but it should work.
+        for player in gamedb.stream_players():
+            gamedb.ballot(
+                player_id=player.id,
+                challenge_id=None,
+                options=options_map.options,
+                is_for_win=True
+            )
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_FINAL_TRIBAL_COUNCIL_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_HOSTNAME,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     players=len(self.finalists),
                     game=gamedb.game_from_id(id=self.game_id).hashtag,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_tribal_council_end_time
                     ),
-                    options=messages.players_as_formatted_options_list(
-                        players=self.finalists)
+                    options=options_map.formatted_string
                 ),
-                recipient_phone_numbers=[p.phone_number for p in gamedb.stream_players(
-                    active_player_predicate_value=True)]
+                recipient_phone_numbers=[
+                    p.phone_number for p in gamedb.stream_players()]
             )
         ]
 
@@ -503,7 +553,7 @@ class NotifyPlayerVotedOutEvent(SMSEvent):
             player=Player.from_dict(json_dict['player'])
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
@@ -514,7 +564,7 @@ class NotifyPlayerVotedOutEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_PLAYER_VOTED_OUT_TEAM_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     player=messages.format_tiktok_username(
                         self.player.tiktok),
                     time=self.game_options.game_schedule.localized_time_string(
@@ -526,7 +576,7 @@ class NotifyPlayerVotedOutEvent(SMSEvent):
         player_messages.append(
             SMSEventMessage(
                 content=messages.NOTIFY_PLAYER_VOTED_OUT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER
+                    header=messages.game_sms_header(gamedb=gamedb)
                 ),
                 recipient_phone_numbers=[self.player.phone_number]
             )
@@ -543,14 +593,14 @@ class NotifyTribalCouncilCompletionEvent(SMSEvent):
             game_id=json_dict['game_id'],
             game_options=json_dict['game_options'])
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         pass
 
     def messages(self, gamedb: Database) -> List[SMSEventMessage]:
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_TRIBAL_COUNCIL_COMPLETION_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     date=self.game_options.game_schedule.tomorrow_localized_string,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_start_time
@@ -579,14 +629,14 @@ class NotifyWinnerAnnouncementEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_WINNER_ANNOUNCEMENT_EVENT_WINNER_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     game=game_hashtag
                 ),
                 recipient_phone_numbers=[self.winner.phone_number]
             ),
             SMSEventMessage(
                 content=messages.NOTIFY_WINNER_ANNOUNCEMENT_EVENT_GENERAL_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     player=messages.format_tiktok_username(self.winner.tiktok),
                     game=game_hashtag
                 ),
@@ -608,9 +658,9 @@ class NotifyImmunityAwardedEvent(SMSEvent):
             team=Team.from_dict(json_dict['team'])
         )
 
-    def message_content(self, gamedb: Database) -> Text:
+    def message_content(self, gamedb: Database) -> str:
         return messages.NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT.format(
-            header=messages.VIR_US_SMS_HEADER,
+            header=messages.game_sms_header(gamedb=gamedb),
             date=self.game_options.game_schedule.tomorrow_localized_string,
             time=self.game_options.game_schedule.localized_time_string(
                 self.game_options.game_schedule.daily_challenge_start_time
@@ -621,7 +671,7 @@ class NotifyImmunityAwardedEvent(SMSEvent):
         return [
             SMSEventMessage(
                 content=messages.NOTIFY_IMMUNITY_AWARDED_EVENT_MSG_FMT.format(
-                    header=messages.VIR_US_SMS_HEADER,
+                    header=messages.game_sms_header(gamedb=gamedb),
                     date=self.game_options.game_schedule.tomorrow_localized_string,
                     time=self.game_options.game_schedule.localized_time_string(
                         self.game_options.game_schedule.daily_challenge_start_time
