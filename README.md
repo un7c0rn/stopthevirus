@@ -216,8 +216,3 @@ Use the <a href="https://help.github.com/en/github/collaborating-with-issues-and
 You may notice that the Firestore database credentials are included here in source control. This means that you can run your code against a real database instance without having to set one up. I think this is important especially for frontend development. The credentials are for a test-only public facing instance, a new prod instance will be deployed before the game goes live.
 
 7. This is a collaborative effort that cannot be completed alone. It's important to have a diverse group of perspectives, ideas and skills to bring this together and create impact. No pull request is too small. Seeking both code and simple graphic asset / design ideas for frontend.
-
-### Scalability
-
-<a href="https://github.com/un7c0rn/stopthevirus/blob/master/documentation/scale.md">Scalability Analysis</a>
-
