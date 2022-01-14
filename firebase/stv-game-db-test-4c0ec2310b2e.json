@@ -1,8 +1,8 @@
 {
   "type": "service_account",
   "project_id": "stv-game-db-test",
-  "private_key_id": "4c0ec2310b2ea33b9f0c32bbaf6b9595c939adf0",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCm8GL3+/nChIY4\nQg8ETpPlG9+mlwNqOdx1UP9HdgdXlFHo2wmKCnEmQVjTpvLiyRQ8azJi3ejRbObb\nF+etpJX6W05hStk/3FKuF4JxVNurE9v09Rhr38L+Kz7li5B7nOd2SUWED9EREf6W\nYyrFML+8UKewWCNXhxJX7zENCSXS4krR5UEyjUauP8b+D5y0LWB+vYGSItwrGjfb\nT4GhFSdlWNpTi3dWmgN+NWgj5I9EOMqAdSuNlp4Nqrld+j/LOgVpeC//TIvi9ebY\nJlYWt57PStkcW76MELJzvGO3mHktUC3Phoh7U46euDhnG8cMLVvOiJH4aIvqFy30\nDKfL5kgFAgMBAAECggEANWOYy0VvPaoDgPeDdPWqb/Hnp5ARXAYwPubOFa0mMPiy\n730pwlePk1P/1ATHFgeH7MC9xwfAX0XsWPJ+ujZybrSHzy7QZw+P87R6F8OzUzXR\nOTivfER+SKpM/b2SUi4+ikJptJAYZVSzbqY9df4eu9uxnYC6oNIGaFALiGc+DQCk\n/EWWUkur0fXTdP47e+Akr67V/AbNYmNIukEq4VWOt59PBh9UjlR/Iiup9/bpzBx6\n1uN6kWzcYaSe9H9XI2oyKNuolKJXXMrdHyAwaQjBckT3q0n0Ikqs+Kn2uc8cZdZb\n0jyJhi/u3F1Q5k5kSunLfcnRrylX7t5/HLHLuANlCwKBgQDSSslNbpN9DhKPDD67\nsew4PYBuBbxxHtYB2W/XvXTVNTUtJXZTah2R8kg2Cq8cQ2MeJFR+Ytk6j2uMubHx\nG5B3ZEF1pvzv531s1X6Evm5a6bbvntjMwauSI7Q2KN0KT2QEd2jYSaqE+thioooK\npochqJdGJfD318BXqkZ/4e2HswKBgQDLOVEvmO7+vi9KMc8dQmH7UMAIfYUWs5vd\nEgQMLnsPv2QtT+k/PQ4p2rKC/Y0yn2/EH7aRS7NCbHHeFfLf6fyBZYFczNu0TH7o\niQfQQU2v2zcZMGWO+FDlhbgyGpv3moW4cVCz/WQQfqNBncMBkUhrHo4t/VaIPWBP\nLJoZ2IEVZwKBgCo24RouLGVaQdd9ecpr+SOBFRsBA8chjYxpfc4tNhrmx3n8nzg3\ngSAfJufSVTyzOl5+pIeKiFj9GXXygQoJooKVGZ7omrX+HmuOoAs9vyF48URA+vx/\nlFWN3UtSAK1lKorK/b0NbLGtOWrzfgqNS2syUMvAKhNWuEHg6K4bSHeJAoGBAKqG\nXelimqiHTYckZHZYzX7kMz7slFCIRbEq/Np75idAof6jn0TBJrFYIZJoz6I6xr37\nHmas7q498Q45vKLG5Gpvki0ceP7BcXwN/9Bv+5AkkgdA5Pcixj7SBc2FJnqN3sb1\nzpI5fU2Z9cOJbahTEEFSUlukyIdpePb2phgp46bhAoGAJkpFUnd98oYithKokO8x\n0bfALkdgbJYqfTp/oIxQiB/A5g3gcafgzLomJ2YixKuNNfgX4nwLN/UxLca646dg\nb+8Lt3akRl9D2MOnY8l3ykAKPVo0XuQYz6yBKfu8hyT2sjJ3tSVaI49qSl6xe40M\nbiYhnk4nzXJf18t2lx06IUk=\n-----END PRIVATE KEY-----\n",
+  "private_key_id": "",
+  "private_key": "",
   "client_email": "stv-firebase-public-test@stv-game-db-test.iam.gserviceaccount.com",
   "client_id": "106834055588256677526",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
