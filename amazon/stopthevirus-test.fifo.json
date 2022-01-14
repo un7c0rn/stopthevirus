@@ -1,5 +1,5 @@
 {
     "url": "https://sqs.us-east-2.amazonaws.com/491054735894/stopthevirus-test.fifo",
-    "aws_access_key_id": "AKIAXEVJEUILJA3LKXM7",
-    "aws_secret_access_key": "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"
+    "aws_access_key_id": "",
+    "aws_secret_access_key": ""
 }
